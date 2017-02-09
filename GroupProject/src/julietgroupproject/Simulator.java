@@ -1,5 +1,7 @@
 package julietgroupproject;
 
+import com.jme3.system.JmeContext;
+import com.jme3.system.JmeContext.Type;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.BulletAppState;
@@ -33,7 +35,17 @@ import com.jme3.texture.Texture.WrapMode;
 import com.jme3.ui.Picture;
 
 public class Simulator extends SimpleApplication implements ActionListener {
-
+    
+    int age = 0;
+    int simTime;
+    int simsRunning = 0;
+    Simulator parent;
+    Alien alienToSim;
+    Brain brainOfAlienCurrentlyBeingSimulated;
+    
+    boolean mainApplication = false;
+    boolean runningPhysics = true;
+    
     float limbPower = 0.8f;
     float limbTargetVolcity = 2f;
     float time;
@@ -49,9 +61,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
     private Material alienMaterial3;
     private Material grassMaterial;
     private Material skyMaterial;
-    Alien simpleAlien;
-    Alien smallBlock;
-    Alien flipper;
+    
             
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
@@ -64,7 +74,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
     @Override
     public void simpleInitApp() {
         // Application start code
-
+        
         // Setup Physics
         setupTextures();
         bulletAppState = new BulletAppState();
@@ -73,51 +83,80 @@ public class Simulator extends SimpleApplication implements ActionListener {
         setupPhysicsWorld(rootNode, assetManager, bulletAppState.getPhysicsSpace());
         viewPort.setBackgroundColor(new ColorRGBA(98 / 255f, 167 / 255f, 224 / 255f, 1f));
         //setupBackground();
-        createRagDoll(20);
+        
+        if(mainApplication) {
+            Alien simpleAlien;
+            Alien smallBlock;
+            Alien flipper;
 
-        // Create an examples of aliens (what the editor will do) - we can add serialising them and saving later
-        Block chip = new Block(new Vector3f( 0.0f, 0.0f, 0.0f), new Vector3f( 0.0f, 0.0f, 0.0f), 0.1f, 0.1f, 0.1f, "Box", "ZAxis", 1.0f);
-        smallBlock = new Alien(chip);
+            // Create an examples of aliens (what the editor will do) - we can add serialising them and saving later
+            Block chip = new Block(new Vector3f( 0.0f, 0.0f, 0.0f), new Vector3f( 0.0f, 0.0f, 0.0f), 0.1f, 0.1f, 0.1f, "Box", "ZAxis", 1.0f);
+            smallBlock = new Alien(chip);
+
+            Block body = new Block(new Vector3f( 0.0f, 0.0f, 0.0f), new Vector3f( 0.0f, 0.0f, 0.0f), 1.0f, 0.1f, 1.0f, "Box", "ZAxis", 1.0f);
+            body.setRotation(new Matrix3f(1f,0f,0f,0f,0f,-1f,0f,1f,0f));
+            Block left = new Block(new Vector3f(-3.0f, 0.0f, 0.0f), new Vector3f(-1.5f, 0.0f, 0.0f), 1.0f, 0.1f, 1.0f, "Box", "ZAxis", 1.0f);
+            left.setRotation(new Matrix3f(1f,0f,0f,0f,0f,-1f,0f,1f,0f));
+            body.addLimb(left);
+            simpleAlien = new Alien(body);
+
+            float flipperTranslation = 0.8f;
+            Block rootBlock = new Block(new Vector3f( 0.0f, 0.0f, 0.0f), new Vector3f( 0.0f, 0.0f, 0.0f), 0.9f, 0.1f, 0.0f, "Torus", "ZAxis", 1.5f);
+            Block legLeft   = new Block(new Vector3f(-2.9f, 0.0f, 0.0f), new Vector3f(-1.3f, 0.0f, 0.0f), 0.7f, 0.1f, 0.6f, "Torus", "ZAxis", 2.2f);
+            legLeft.setRotation(new Matrix3f(1f,0f,0f,0f,0f,-1f,0f,1f,0f));
+            Block legRight  = new Block(new Vector3f( 2.6f, 0.0f, 0.0f), new Vector3f( 1.3f, 0.0f, 0.0f), 1.5f, 0.1f, 1.3f, "Box", "YAxis", 1.2f);
+            Block flipper1  = new Block(new Vector3f( flipperTranslation, 0.0f, 3.6f), new Vector3f( flipperTranslation, 0.0f, 1.3f), 0.6f, 0.1f, 2.1f, "Box", "XAxis", 1f);
+            Block flipper2  = new Block(new Vector3f( flipperTranslation, 0.0f,-3.6f), new Vector3f( flipperTranslation, 0.0f,-1.3f), 0.6f, 0.1f, 2.1f, "Box", "XAxis", 1f);
+            Block head      = new Block(new Vector3f(-2.0f, 0.0f, 0.0f), new Vector3f(-1.3f, 0.0f, 0.0f), 0.5f, 0.5f, 0.5f, "Cylinder", "ZAxis", 1f);
+            rootBlock.addLimb(legRight);
+            rootBlock.addLimb(legLeft);
+            legLeft.addLimb(flipper1);
+            legLeft.addLimb(flipper2);
+            flipper = new Alien(rootBlock);
+
+            // Create that alien in the simulation, with the Brain interface used to control it.
+            //brainOfAlienCurrentlyBeingSimulated = instantiateAlien(flipper, new Vector3f(0f, 0f, -10f));
+            Brain flipperb = instantiateAlien(flipper, new Vector3f(10f, 30f, -30f));
+            Brain flipperc = instantiateAlien(flipper, new Vector3f(-15f, 90f, -60f));
+
+            
+            Simulator app2 = new Simulator();
+            app2.simTime = 1000;
+            app2.alienToSim = flipper;
+            app2.parent = this;
+            app2.start(JmeContext.Type.Headless);
+            Simulator app3 = new Simulator();
+            app3.simTime = 1000;
+            app3.alienToSim = flipper;
+            app3.parent = this;
+            app3.start(JmeContext.Type.Headless);
+            simsRunning = 2;
+            
+            
+        }
+        if (!mainApplication) {
+            brainOfAlienCurrentlyBeingSimulated = instantiateAlien(alienToSim, Vector3f.ZERO);
+            // Control the instantiated alien (what the neural network will do)
+            setupKeys(brainOfAlienCurrentlyBeingSimulated);
+        }
         
-        Block body = new Block(new Vector3f( 0.0f, 0.0f, 0.0f), new Vector3f( 0.0f, 0.0f, 0.0f), 1.0f, 0.1f, 1.0f, "Box", "ZAxis", 1.0f);
-        body.setRotation(new Matrix3f(1f,0f,0f,0f,0f,-1f,0f,1f,0f));
-        Block left = new Block(new Vector3f(-3.0f, 0.0f, 0.0f), new Vector3f(-1.5f, 0.0f, 0.0f), 1.0f, 0.1f, 1.0f, "Box", "ZAxis", 1.0f);
-        left.setRotation(new Matrix3f(1f,0f,0f,0f,0f,-1f,0f,1f,0f));
-        body.addLimb(left);
-        simpleAlien = new Alien(body);
-        
-        float flipperTranslation = 0.8f;
-        Block rootBlock = new Block(new Vector3f( 0.0f, 0.0f, 0.0f), new Vector3f( 0.0f, 0.0f, 0.0f), 0.9f, 0.1f, 0.0f, "Torus", "ZAxis", 1.5f);
-        Block legLeft   = new Block(new Vector3f(-2.9f, 0.0f, 0.0f), new Vector3f(-1.3f, 0.0f, 0.0f), 0.7f, 0.1f, 0.6f, "Torus", "ZAxis", 2.2f);
-        Block legRight  = new Block(new Vector3f( 2.6f, 0.0f, 0.0f), new Vector3f( 1.3f, 0.0f, 0.0f), 1.5f, 0.1f, 1.3f, "Box", "YAxis", 1.2f);
-        Block flipper1  = new Block(new Vector3f( flipperTranslation, 0.0f, 3.6f), new Vector3f( flipperTranslation, 0.0f, 1.3f), 0.6f, 0.1f, 2.1f, "Box", "XAxis", 1f);
-        Block flipper2  = new Block(new Vector3f( flipperTranslation, 0.0f,-3.6f), new Vector3f( flipperTranslation, 0.0f,-1.3f), 0.6f, 0.1f, 2.1f, "Box", "XAxis", 1f);
-        Block head      = new Block(new Vector3f(-2.0f, 0.0f, 0.0f), new Vector3f(-1.3f, 0.0f, 0.0f), 0.5f, 0.5f, 0.5f, "Cylinder", "ZAxis", 1f);
-        rootBlock.addLimb(legRight);
-        rootBlock.addLimb(legLeft);
-        legLeft.addLimb(flipper1);
-        legLeft.addLimb(flipper2);
-        flipper = new Alien(rootBlock);
-        
-        // Create that alien in the simulation, with the Brain interface used to control it.
-        Brain flippera = instantiateAlien(flipper, new Vector3f(0f, 0f, -10f));
-        Brain flipperb = instantiateAlien(flipper, new Vector3f(10f, 30f, -40f));
-        Brain flipperc = instantiateAlien(flipper, new Vector3f(-15f, 90f, -60f));
         
         
-        // Control the instantiated alien (what the neural network will do)
-        setupKeys(flippera);
+        
         
     }
-    public void spawnAlien() {
+    public void endSimulator(Simulator s) {
+        // Only run in parent simulator, called by children when simTime is up.
+        System.out.println("Simulator has finished with a fitness of: "+ s.fitness());
+        s.stop();
+        simsRunning -= 1;
         
-        Brain chipTest = instantiateAlien(smallBlock, new Vector3f(0f, 0.4f, 0f));
-        
-        Brain brain2 = instantiateAlien(simpleAlien, new Vector3f(0f, 0f, 0f));
-        Brain brain3 = instantiateAlien(simpleAlien, new Vector3f(-5f, 5f, 0f));
-        
-
+        if (simsRunning == 0){
+            System.out.println("finished simulating!");
+            // Continue with the app
+        }
     }
+    
     public Brain instantiateAlien(Alien alien, Vector3f location) {
 
         Brain brain = new Brain();
@@ -132,7 +171,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         brain.geometries.add(rootBlockGeometry);
 
         recursivelyAddBlocks(rootBlock, rootBlock, rootBlockGeometry, nodeOfLimbGeometries, brain);
-
+        
         bulletAppState.getPhysicsSpace().addAll(nodeOfLimbGeometries);
         rootNode.attachChild(nodeOfLimbGeometries);
         brain.nodeOfLimbGeometries = nodeOfLimbGeometries;
@@ -247,74 +286,11 @@ public class Simulator extends SimpleApplication implements ActionListener {
                 }
             }
         }
-        if ("Pull ragdoll up".equals(string)) {
-            if (bln) {
-                shoulders.getControl(RigidBodyControl.class).activate();
-                applyForce = true;
-
-            } else {
-                applyForce = false;
-            }
-        }
         if ("Spawn Alien".equals(string)) {
             if (!bln){
-                spawnAlien();
+                //spawnAlien();
             }
         }
-    }
-
-    private Node ragDoll = new Node();
-    private Node shoulders;
-    private Vector3f upforce = new Vector3f(0, 200, 0);
-    private boolean applyForce = false;
-    private void createRagDoll(float z) {
-        shoulders  = createLimbNode("Capsule", 0.2f, 1.0f, 1, new Vector3f( 0.00f, 1.5f, z), true , 1f);
-        Node uArmL = createLimbNode("Capsule", 0.2f, 0.5f, 1, new Vector3f(-0.75f, 0.8f, z), false, 1f);
-        Node uArmR = createLimbNode("Capsule", 0.2f, 0.5f, 1, new Vector3f( 0.75f, 0.8f, z), false, 1f);
-        Node lArmL = createLimbNode("Capsule", 0.2f, 0.5f, 1, new Vector3f(-0.75f,-0.2f, z), false, 1f);
-        Node lArmR = createLimbNode("Capsule", 0.2f, 0.5f, 1, new Vector3f( 0.75f,-0.2f, z), false, 1f);
-        Node body  = createLimbNode("Capsule", 0.2f, 1.0f, 1, new Vector3f( 0.00f, 0.5f, z), false, 1f);
-        Node hips  = createLimbNode("Capsule", 0.2f, 0.5f, 1, new Vector3f( 0.00f,-0.5f, z), true , 1f);
-        Node uLegL = createLimbNode("Capsule", 0.2f, 0.5f, 1, new Vector3f(-0.25f,-1.2f, z), false, 1f);
-        Node uLegR = createLimbNode("Capsule", 0.2f, 0.5f, 1, new Vector3f( 0.25f,-1.2f, z), false, 1f);
-        Node lLegL = createLimbNode("Capsule", 0.2f, 0.5f, 1, new Vector3f(-0.25f,-2.2f, z), false, 1f);
-        Node lLegR = createLimbNode("Capsule", 0.2f, 0.5f, 1, new Vector3f( 0.25f,-2.2f, z), false, 1f);
-
-        join(body, shoulders, new Vector3f(0f, 1.4f, z));
-        join(body, hips, new Vector3f(0f, -0.5f, z));
-
-        join(uArmL, shoulders, new Vector3f(-0.75f, 1.4f, z));
-        join(uArmR, shoulders, new Vector3f(0.75f, 1.4f, z));
-        join(uArmL, lArmL, new Vector3f(-0.75f, .4f, z));
-        join(uArmR, lArmR, new Vector3f(0.75f, .4f, z));
-
-        join(uLegL, hips, new Vector3f(-.25f, -0.5f, z));
-        join(uLegR, hips, new Vector3f(.25f, -0.5f, z));
-        join(uLegL, lLegL, new Vector3f(-.25f, -1.7f, z));
-        join(uLegR, lLegR, new Vector3f(.25f, -1.7f, z));
-
-        ragDoll.attachChild(shoulders);
-        ragDoll.attachChild(body);
-        ragDoll.attachChild(hips);
-        ragDoll.attachChild(uArmL);
-        ragDoll.attachChild(uArmR);
-        ragDoll.attachChild(lArmL);
-        ragDoll.attachChild(lArmR);
-        ragDoll.attachChild(uLegL);
-        ragDoll.attachChild(uLegR);
-        ragDoll.attachChild(lLegL);
-        ragDoll.attachChild(lLegR);
-
-        rootNode.attachChild(ragDoll);
-        bulletAppState.getPhysicsSpace().addAll(ragDoll);
-    }
-    private PhysicsJoint join(Node A, Node B, Vector3f connectionPoint) {
-        Vector3f pivotA = A.worldToLocal(connectionPoint, new Vector3f());
-        Vector3f pivotB = B.worldToLocal(connectionPoint, new Vector3f());
-        ConeJoint joint = new ConeJoint(A.getControl(RigidBodyControl.class), B.getControl(RigidBodyControl.class), pivotA, pivotB);
-        joint.setLimit(1f, 1f, 0);
-
-        return joint;
     }
 
     public void setupKeys(Brain brain) {
@@ -362,7 +338,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         light.setColor(ColorRGBA.LightGray);
         rootNode.addLight(light);
 
-        Box floorBox = new Box(140, 0.25f, 140);
+        Box floorBox = new Box(140, 1f, 140);
         Geometry floorGeometry = new Geometry("Floor", floorBox);
         floorGeometry.setMaterial(grassMaterial);
         floorGeometry.setLocalTranslation(0, -5, 0);
@@ -400,15 +376,24 @@ public class Simulator extends SimpleApplication implements ActionListener {
 
     }
     
+    public float fitness() {
+        return brainOfAlienCurrentlyBeingSimulated.geometries.get(0).getControl(RigidBodyControl.class).getPhysicsLocation().x;
+    }
     @Override
     public void simpleUpdate(float tpf) {
-        if (applyForce) {
-            shoulders.getControl(RigidBodyControl.class).applyForce(upforce, Vector3f.ZERO);
+        if (runningPhysics) {
+            age += 1;
+            System.out.println(Thread.currentThread().getId() + " : "  + age + " : "+fitness());
+            if (!mainApplication && age >= simTime) {
+                parent.endSimulator(this);
+            }
         }
     }
 
     public static void main(String[] args) {
         Simulator app = new Simulator();
+        app.mainApplication = true;
+        app.runningPhysics = false;
         app.start();
     }
 }

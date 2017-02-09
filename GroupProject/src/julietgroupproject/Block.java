@@ -35,6 +35,7 @@ public class Block {
     public void applyProperties(Geometry g){
         // This function is used when the block is instantiated, used to make the properties of the geometry the same as the block.
         // As we add more properties for the blocks, this functions should be edited to apply them when the block is created
+        
         g.getControl(RigidBodyControl.class).setPhysicsRotation(rotation);
         
         // Set the friction of the limb
