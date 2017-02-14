@@ -38,8 +38,13 @@ import org.encog.ml.data.MLData;
 import org.encog.ml.data.basic.BasicMLData;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
+import com.jme3.niftygui.NiftyJmeDisplay;
+import de.lessvoid.nifty.Nifty;
+import java.util.Random;
+import julietgroupproject.GUI.MainMenuController;
 
 public class Simulator extends SimpleApplication implements ActionListener {
+
     
     int age = 0;
     int simTime;
@@ -51,9 +56,14 @@ public class Simulator extends SimpleApplication implements ActionListener {
     boolean mainApplication = false;
     boolean runningPhysics = true;
     
+
+
+    private MainMenuController myMainMenuController;
+
     float limbPower = 0.8f;
     float limbTargetVolcity = 2f;
     float time;
+    Random rng = new Random();
     private BulletAppState bulletAppState = new BulletAppState();
     private Brain brainToControl;
     private Texture alienTexture1;
@@ -66,8 +76,17 @@ public class Simulator extends SimpleApplication implements ActionListener {
     private Material alienMaterial3;
     private Material grassMaterial;
     private Material skyMaterial;
+
     
             
+
+    Alien simpleAlien;
+    Alien smallBlock;
+    Alien flipper;
+    Alien cuboid;
+    Brain prevAlien;
+    
+
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
@@ -75,7 +94,36 @@ public class Simulator extends SimpleApplication implements ActionListener {
         KeyInput.KEY_J, KeyInput.KEY_K,
         KeyInput.KEY_V, KeyInput.KEY_B,
         KeyInput.KEY_N, KeyInput.KEY_M};
-
+    
+    public void removeAlien(Brain brain) {
+        bulletAppState.getPhysicsSpace().removeAll(brain.nodeOfLimbGeometries);
+        brain.nodeOfLimbGeometries.removeFromParent();
+    }
+    
+    
+    public void toggleGravityOn() {
+        bulletAppState.getPhysicsSpace().setGravity(new Vector3f(0, -9.81f, 0));
+    }
+    
+    public void toggleGravityOff() {
+        bulletAppState.getPhysicsSpace().setGravity(Vector3f.ZERO);
+    }
+    
+    
+    public void addLimb() {
+        
+        if (prevAlien!=null){
+            removeAlien(prevAlien);
+        }
+        prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
+        setupKeys(prevAlien);
+        
+        Vector3f pos = new Vector3f(-10+20*rng.nextFloat(),-10+20*rng.nextFloat(),-10+20*rng.nextFloat());
+        Block legLeft   = new Block(pos, pos.mult(0.5f), 2*rng.nextFloat(), 2*rng.nextFloat(), 2*rng.nextFloat(), "Box", "ZAxis", 2.2f);
+        
+        cuboid.rootBlock.addLimb(legLeft);
+        
+    }
     
     @Override
     public void simpleInitApp() {
@@ -90,6 +138,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         viewPort.setBackgroundColor(new ColorRGBA(98 / 255f, 167 / 255f, 224 / 255f, 1f));
         //setupBackground();
         
+
         if(mainApplication) {
             Alien simpleAlien;
             Alien smallBlock;
@@ -149,11 +198,44 @@ public class Simulator extends SimpleApplication implements ActionListener {
             brainOfAlienCurrentlyBeingSimulated = instantiateAlien(alienToSim, Vector3f.ZERO);
             // Control the instantiated alien (what the neural network will do)
             setupKeys(brainOfAlienCurrentlyBeingSimulated);
+<<<<<<< HEAD
         }*/
+
+        
+
+        Vector3f pos = new Vector3f(-10+20*rng.nextFloat(),-10+20*rng.nextFloat(),-10+20*rng.nextFloat());
+        Block randomCuboid   = new Block(pos, pos.mult(0.5f), 4*rng.nextFloat(), 4*rng.nextFloat(), 4*rng.nextFloat(), "Box", "ZAxis", 2.2f);
+        cuboid = new Alien(randomCuboid);
+        
+        Block body = new Block(new Vector3f( 0.0f, 0.0f, 0.0f), new Vector3f( 0.0f, 0.0f, 0.0f), 1.0f, 0.1f, 1.0f, "Box", "ZAxis", 1.0f);
+        body.setRotation(new Matrix3f(1f,0f,0f,0f,0f,-1f,0f,1f,0f));
+        Block left = new Block(new Vector3f(-3.0f, 0.0f, 0.0f), new Vector3f(-1.5f, 0.0f, 0.0f), 1.0f, 0.1f, 1.0f, "Box", "ZAxis", 1.0f);
+        left.setRotation(new Matrix3f(1f,0f,0f,0f,0f,-1f,0f,1f,0f));
+        body.addLimb(left);
+        simpleAlien = new Alien(body);
+
         
         
         
+        //removeAlien(flippera);
+
+        // Control the instantiated alien (what the neural network will do)
+        //setupKeys(flippera);
+        toggleGravityOff();
+                
+        myMainMenuController = new MainMenuController(this);
+
+        stateManager.attach(myMainMenuController);
         
+        //Set up nifty
+        NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
+        Nifty nifty = niftyDisplay.getNifty();
+        guiViewPort.addProcessor(niftyDisplay);
+        nifty.fromXml("Interface/MainMenuLayout.xml", "start", myMainMenuController);
+        //nifty.setDebugOptionPanelColors(true); //un-comment this line to use DebugPanelColors and make sure Nifty is running correctly.
+        
+        flyCam.setDragToRotate(true); //detaches camera from mouse unless you click/drag.
+
         
     }
     
@@ -210,7 +292,9 @@ public class Simulator extends SimpleApplication implements ActionListener {
         nn.getStructure().finalizeStructure();
         nn.reset();
         brain.setNN(nn);
-        brain.nodeOfLimbGeometries.addControl(brain);
+        
+        // uncomment this line to allow control from ANN
+        //brain.nodeOfLimbGeometries.addControl(brain);
                 
         return brain;
     }

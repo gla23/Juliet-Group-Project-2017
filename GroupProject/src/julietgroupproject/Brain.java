@@ -28,6 +28,7 @@ public class Brain extends AbstractControl {
      * @author ss2324
      */
 
+
     public ArrayList<HingeJoint> joints = new ArrayList<HingeJoint>();
     public ArrayList<Geometry> geometries = new ArrayList<Geometry>();
     public Node nodeOfLimbGeometries;
