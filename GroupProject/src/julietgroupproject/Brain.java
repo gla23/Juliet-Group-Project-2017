@@ -12,6 +12,7 @@ public class Brain {
     //It has a list of the limbs (Geometries), joints (HingeJoints) and the graphical node all the geometries are attached to.
     // These can be used later e.g. by the neural network
     
+    
     public ArrayList<HingeJoint> joints = new ArrayList<HingeJoint>();
     public ArrayList<Geometry> geometries = new ArrayList<Geometry>();
     public Node nodeOfLimbGeometries;

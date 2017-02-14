@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<nifty xmlns="http://nifty-gui.sourceforge.net/nifty.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xsi:schemaLocation="http://nifty-gui.sourceforge.net/nifty.xsd http://nifty-gui.sourceforge.net/nifty.xsd">
+    <useStyles filename="nifty-default-styles.xml" />
+    <useControls filename="nifty-default-controls.xml" />
+    
+    <screen id="start" controller="julietgroupproject.GUI.MainMenuController">
+        <layer id="foreground" childLayout="center">
+            <panel id="panel_background" width = "100%" height="100%" childLayout="vertical">
+                <panel id="panel_top" backgroundColor="#ff0000ff" width="*" height="15%" childLayout="center">
+                    <control name="label" text="Select cube color" align="center" valign="top"/>
+
+                     <control id="colorSelectionBox" width="60%" height="90%" align="center" 
+
+                     valign="center" name="listBox" vertical="optional" horizontal="optional" 
+
+                     displayItems="3" selectionMode="Single" 
+
+                     forceSelection = "true" />
+
+                <control id="doneButton" name="button" label="Done" align = "center" valign="bottom" />
+                </panel>
+                <panel id="panel_middle" width="*" height="70%" childLayout="horizontal">
+                    <panel id = "panel_middle_left" backgroundColor="#ff5500ff" width= "10%" height = "*" childLayout = "vertical">
+                        <control name="button" label="GravityOff" id="GravButton" align="center" valign="center" 
+                                visibleToMouse="true" > 
+                                <interact onClick="toggleGravOff()"/>
+                        </control>
+                        <control name="button" label="GravityOn" id="GravButton" align="center" valign="center" 
+                                visibleToMouse="true" > 
+                                <interact onClick="toggleGravOn()"/>
+                        </control>
+                    </panel>
+                    <panel id = "panel_middle_center" width= "80%" height = "*" childLayout = "vertical">
+                    </panel>
+                    <panel id = "panel_middle_right" backgroundColor="#ff5500ff"  width= "10%" height = "*" childLayout = "vertical">
+                        <control name="button" label="Add Limb" id="add_limb_button" align="center" valign="center" 
+                                visibleToMouse="true" > 
+                                <interact onClick="addLimb()"/>
+                        </control>
+                    </panel>
+                </panel>
+                <panel id="panel_bottom" backgroundColor="#ffff00ff" width="*" height="15%" childLayout="center">
+                    <control name="button" label="HideGUI" id="hideGUI" align="center" valign="center" 
+                                visibleToMouse="true" > 
+                                <interact onClick="hideGUI()"/>
+                        </control>
+                </panel>
+            </panel>
+        </layer>
+    </screen>
+</nifty>
