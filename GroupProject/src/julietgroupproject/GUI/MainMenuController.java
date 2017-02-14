@@ -34,6 +34,10 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
       app.toggleGravityOff();
   }
   
+  public void newBody() {
+      app.createNewBody();
+      
+  }
    public void hideGUI() {
        nifty.exit();
        

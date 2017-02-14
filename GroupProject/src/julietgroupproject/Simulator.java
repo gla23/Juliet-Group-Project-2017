@@ -13,7 +13,9 @@ import com.jme3.bullet.joints.ConeJoint;
 import com.jme3.bullet.joints.HingeJoint;
 import com.jme3.bullet.joints.PhysicsJoint;
 import com.jme3.bullet.util.CollisionShapeFactory;
+import com.jme3.collision.CollisionResults;
 import com.jme3.input.KeyInput;
+import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
@@ -21,6 +23,7 @@ import com.jme3.light.AmbientLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Matrix3f;
+import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.ViewPort;
@@ -35,6 +38,7 @@ import com.jme3.texture.Texture.WrapMode;
 import com.jme3.ui.Picture;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.controls.TextField;
 import java.util.Random;
 import julietgroupproject.GUI.MainMenuController;
 
@@ -71,10 +75,11 @@ public class Simulator extends SimpleApplication implements ActionListener {
     private Material alienMaterial3;
     private Material grassMaterial;
     private Material skyMaterial;
+    private Nifty nifty;
 
     
-            
-
+           
+    
     Alien simpleAlien;
     Alien smallBlock;
     Alien flipper;
@@ -103,21 +108,161 @@ public class Simulator extends SimpleApplication implements ActionListener {
     public void toggleGravityOff() {
         bulletAppState.getPhysicsSpace().setGravity(Vector3f.ZERO);
     }
+   
+    
+    //Method for easily printing out vectors for debugging
+    public void printVector3f(Vector3f vec) {
+        System.out.println("("+vec.getX()+"," +vec.getY()+","+vec.getZ()+")");
+    }
+    
+    public void createNewBody() {
+        if (prevAlien==null){
+            
+            //Take the entries from text fields for limb size, do some error handling
+            TextField heightField = nifty.getCurrentScreen().findNiftyControl("bodyHeightTextField", TextField.class);
+            TextField widthField = nifty.getCurrentScreen().findNiftyControl("bodyWidthTextField", TextField.class);
+            TextField lengthField = nifty.getCurrentScreen().findNiftyControl("bodyLengthTextField", TextField.class);
+            float bodyWidth = 0f;
+            float bodyHeight = 0f;
+            float bodyLength = 0f;
+            
+            
+            try {
+                bodyWidth = Float.valueOf(heightField.getText());
+            } catch (NumberFormatException e) {
+                System.out.println("Whoops - Incorrect number format");
+            } finally {
+                if (bodyWidth <0) {
+                    bodyWidth = -bodyWidth;
+                } else if (bodyWidth ==0) {
+                    bodyWidth = 4*rng.nextFloat();
+                }
+            } 
+            
+            try {
+                bodyHeight = Float.valueOf(widthField.getText());
+            } catch (NumberFormatException e) {
+                System.out.println("Whoops - Incorrect number format");
+            } finally {
+                if (bodyHeight <0) {
+                    bodyHeight = -bodyHeight;
+                } else if (bodyHeight ==0) {
+                    bodyHeight = 4*rng.nextFloat();
+                }
+            } 
+           
+            try {
+                bodyLength = Float.valueOf(lengthField.getText());
+            } catch (NumberFormatException e) {
+                System.out.println("Whoops - Incorrect number format");
+            } finally {
+                if (bodyLength <0) {
+                    bodyLength = -bodyLength;
+                } else if (bodyLength ==0) {
+                    bodyLength = 4*rng.nextFloat();
+                }
+            } 
+            
+            //Instantiate the new alien
+            Vector3f pos = new Vector3f(-10+20*rng.nextFloat(),-10+20*rng.nextFloat(),-10+20*rng.nextFloat());
+            Block bodyBlock   = new Block(pos, pos.mult(0.5f), bodyHeight, bodyWidth, bodyLength, "Box", "ZAxis", 2.2f);
+            cuboid = new Alien(bodyBlock);
+            prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 2f, -10f));
+            setupKeys(prevAlien);
+        }
+        
+    }
     
     
+    //To be run when addLimb button pressed, adds random limb anywhere around body
     public void addLimb() {
         
+        //Get rid of old alien on screen
         if (prevAlien!=null){
             removeAlien(prevAlien);
+        
+            //Find safe distance for hinge point from body
+            float radius = (float) Math.sqrt((cuboid.rootBlock.height*cuboid.rootBlock.height)+(cuboid.rootBlock.width*cuboid.rootBlock.width)+(cuboid.rootBlock.length*cuboid.rootBlock.length));
+            
+            //Choose a random diretion to add limb and find hinge point
+            Vector3f newDir = new Vector3f(rng.nextFloat(),rng.nextFloat(),rng.nextFloat()).normalize();
+            Vector3f newHingePos = newDir.mult(radius);
+            
+            //Build random sizes for new limb
+            float boxWidth = rng.nextFloat();
+            float boxHeight = 0.3f*rng.nextFloat();
+            float boxLength = 4*rng.nextFloat();
+            
+            //Find safe distance from limb and get postion vector
+            float boxRad = (float) Math.sqrt((boxWidth*boxWidth)+(boxHeight*boxHeight)+(boxLength*boxLength));
+            Vector3f newPos = newDir.mult(radius+boxRad);
+
+            //Make limb and add it to body
+            Block flipper  = new Block(newPos,newHingePos, boxWidth, boxHeight, boxLength, "Box", "XAxis", 1f);
+            cuboid.rootBlock.addLimb(flipper);
+            
+             //Instantiate the new alien
+            prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 2f, -10f));
+            setupKeys(prevAlien);
         }
-        prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
+     
+       
+    }
+   
+    //To be run when right click on body, adds new limb with dimensions defined in text fields
+    public void addLimb(Vector3f contactPt, Vector3f normal) {
+        
+        //Get rid of old alien on screen
+         if (prevAlien!=null){
+            removeAlien(prevAlien);
+        } 
+   
+       
+        //Take the entries from text fields for limb size, do some error handling
+        TextField heightField = nifty.getCurrentScreen().findNiftyControl("heightTextField", TextField.class);
+        TextField widthField = nifty.getCurrentScreen().findNiftyControl("widthTextField", TextField.class);
+        TextField lengthField = nifty.getCurrentScreen().findNiftyControl("lengthTextField", TextField.class);
+        float boxWidth = -0.2f;
+        float boxHeight = -0.2f;
+        float boxLength = -0.2f;
+        try {
+            boxWidth = Float.valueOf(heightField.getText());
+            boxHeight = Float.valueOf(widthField.getText());
+            boxLength = Float.valueOf(lengthField.getText());
+        } catch (NumberFormatException e) {
+            System.out.println("Whoops - Incorrect number format");
+        } finally {
+            if (boxWidth <0) {
+                boxWidth = -boxWidth;
+            } else if (boxWidth ==0) {
+                boxWidth = 0.5f;
+            }
+            if (boxHeight <0) {
+                boxHeight = -boxHeight;
+            } else if (boxHeight ==0) {
+                boxHeight = 0.5f;
+            }
+            if (boxLength <0) {
+                boxLength = -boxLength;
+            } else if (boxLength ==0) {
+                boxLength = 0.5f;
+            }
+        } 
+        
+        //Find hinge and postion vectors given shape and click position
+        Vector3f newHingePos = contactPt.add(normal.mult(0.5f));
+        Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(boxLength,boxHeight),boxWidth)+1.0f));
+ 
+        //Build the new limb
+        Block limb  = new Block(newPos,newHingePos, boxHeight, boxWidth, boxLength, "Box", "XAxis", 1f);
+        
+        //Still working on getting this to rotate
+        limb.setNormal(normal);
+        
+        //Add new limb to alien and instantiate
+        cuboid.rootBlock.addLimb(limb);
+        prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 2f, -10f));
         setupKeys(prevAlien);
-        
-        Vector3f pos = new Vector3f(-10+20*rng.nextFloat(),-10+20*rng.nextFloat(),-10+20*rng.nextFloat());
-        Block legLeft   = new Block(pos, pos.mult(0.5f), 2*rng.nextFloat(), 2*rng.nextFloat(), 2*rng.nextFloat(), "Box", "ZAxis", 2.2f);
-        
-        cuboid.rootBlock.addLimb(legLeft);
-        
     }
     
     @Override
@@ -130,7 +275,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         stateManager.attach(bulletAppState);
         
         // setDebugEnabled - wireframe
-        bulletAppState.setDebugEnabled(false);
+        bulletAppState.setDebugEnabled(true);
         setupPhysicsWorld(rootNode, assetManager, bulletAppState.getPhysicsSpace());
         viewPort.setBackgroundColor(new ColorRGBA(98 / 255f, 167 / 255f, 224 / 255f, 1f));
         //setupBackground();
@@ -210,7 +355,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
 
         // Control the instantiated alien (what the neural network will do)
         //setupKeys(flippera);
-        //toggleGravityOff();
+        toggleGravityOff();
                 
         myMainMenuController = new MainMenuController(this);
 
@@ -218,12 +363,12 @@ public class Simulator extends SimpleApplication implements ActionListener {
         
         //Set up nifty
         NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
-        Nifty nifty = niftyDisplay.getNifty();
+        nifty = niftyDisplay.getNifty();
         guiViewPort.addProcessor(niftyDisplay);
         nifty.fromXml("Interface/MainMenuLayout.xml", "start", myMainMenuController);
         //nifty.setDebugOptionPanelColors(true); //un-comment this line to use DebugPanelColors and make sure Nifty is running correctly.
         
-        flyCam.setDragToRotate(true); //detaches camera from mouse unless you click/drag.
+        flyCam.setDragToRotate(true); //detaches camera from mouse unless you click/drag.a
 
         
     }
@@ -265,6 +410,8 @@ public class Simulator extends SimpleApplication implements ActionListener {
         for (Block b : parentBlock.getConnectedLimbs()) {
             Geometry g = createLimb(b.collisionShapeType, b.width, b.height, b.length, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getPosition()), b.mass);
             b.applyProperties(g);
+            System.out.println("Here");
+            printVector3f(b.getHingePosition());
             HingeJoint joint = joinHingeJoint(parentGeometry, g, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getHingePosition()), b.hingeType);
             geometries.attachChild(g);
             brain.joints.add(joint);
@@ -373,6 +520,29 @@ public class Simulator extends SimpleApplication implements ActionListener {
                 //spawnAlien();
             }
         }
+        
+        //When right mouse button clicked, fire ray to see if intersects with body
+        if ("AddLimb".equals(string) && !bln) {
+            //Generate the ray from position of click
+            CollisionResults results = new CollisionResults();
+            Vector2f click2d = inputManager.getCursorPosition();
+            Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
+            Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
+            
+            // Aim the ray from the clicked spot forwards.
+            Ray ray = new Ray(click3d, dir);
+            
+            //Check for collisions with body
+            cuboid.rootBlock.getGeometry().collideWith(ray, results);
+            
+            //If collided then generate new limb at collision point
+            if (results.size()>0) {
+                Vector3f colpt = results.getCollision(0).getContactPoint();
+                Vector3f pt = colpt.add(cuboid.rootBlock.getGeometry().getWorldTranslation().negate());
+                Vector3f norm = results.getCollision(0).getContactNormal();
+                addLimb(pt,norm);
+            }
+        }
     }
 
     public void setupKeys(Brain brain) {
@@ -389,6 +559,10 @@ public class Simulator extends SimpleApplication implements ActionListener {
         inputManager.addListener(this, "Pull ragdoll up");
         inputManager.addMapping("Spawn Alien", new KeyTrigger(KeyInput.KEY_SPACE));
         inputManager.addListener(this, "Spawn Alien");
+        
+        //Add the key binding for the right click to add limb funtionality
+        inputManager.addMapping("AddLimb",new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+        inputManager.addListener(this, "AddLimb");
     }
     public void setupTextures() {
         grassTexture = assetManager.loadTexture("Textures/grass1.jpg");
