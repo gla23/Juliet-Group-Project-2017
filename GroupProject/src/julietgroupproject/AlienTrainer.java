@@ -23,25 +23,14 @@
  */
 package julietgroupproject;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.encog.ml.CalculateScore;
-
 import org.encog.ml.ea.train.EvolutionaryAlgorithm;
-import org.encog.neural.hyperneat.substrate.Substrate;
-import org.encog.neural.hyperneat.substrate.SubstrateFactory;
 import org.encog.neural.neat.NEATPopulation;
 import org.encog.neural.neat.NEATUtil;
 import org.encog.neural.neat.training.species.OriginalNEATSpeciation;
@@ -71,14 +60,14 @@ public class AlienTrainer{
 
 	private NEATPopulation pop;
 	private EvolutionaryAlgorithm train;
-        private double targetError = 110.0;
+        private double targetError;
         private String filename;
         
         private int inputCount = 1;
         private int outputCount = 1;
         private int popCount = 500;
         
-        public void load()
+        private void load()
         {
             pop = null;
             try
@@ -99,8 +88,9 @@ public class AlienTrainer{
             }
         }
         
-        public void save()
+        private void save()
         {
+            //TODO: can cause stack overflow as NEATPopulation's Serialize is not implemented properly
             try
             {
                 ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename));
@@ -111,7 +101,6 @@ public class AlienTrainer{
             }
             catch(IOException e)
             {
-                e.printStackTrace();
                 System.out.println("Error saving to file.");
             }
         }
@@ -134,11 +123,11 @@ public class AlienTrainer{
             train = NEATUtil.constructNEATTrainer(pop, score);
             OriginalNEATSpeciation speciation = new OriginalNEATSpeciation();
             speciation.setCompatibilityThreshold(1);
-            train.setSpeciation(speciation = new OriginalNEATSpeciation());
+            train.setSpeciation(new OriginalNEATSpeciation());
             // train.setThreadCount(1);
         }
         
-	public void resetTraining() {
+	private void resetTraining() {
 		pop = new NEATPopulation(inputCount, outputCount, popCount);
 		pop.setActivationCycles(4);
 		pop.reset();
@@ -170,7 +159,7 @@ public class AlienTrainer{
                     if (IO.available() > 0){break;}
                 } catch(IOException e) {break;}
                 this.train.iteration();
-                System.out.println("Error: " + Format.formatDouble(this.train.getError(), 2));
+                System.out.println("Error: " + Format.formatDouble(this.train.getError(), 2)); //TODO: Error always returns 1
                 System.out.println("Iterations: " + Format.formatInteger(this.train.getIteration()));
             } while (this.train.getError() > targetError);
 
