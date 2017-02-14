@@ -128,7 +128,9 @@ public class Simulator extends SimpleApplication implements ActionListener {
         setupTextures();
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
-        bulletAppState.setDebugEnabled(true);
+        
+        // setDebugEnabled - wireframe
+        bulletAppState.setDebugEnabled(false);
         setupPhysicsWorld(rootNode, assetManager, bulletAppState.getPhysicsSpace());
         viewPort.setBackgroundColor(new ColorRGBA(98 / 255f, 167 / 255f, 224 / 255f, 1f));
         //setupBackground();
@@ -166,8 +168,8 @@ public class Simulator extends SimpleApplication implements ActionListener {
 
             // Create that alien in the simulation, with the Brain interface used to control it.
             //brainOfAlienCurrentlyBeingSimulated = instantiateAlien(flipper, new Vector3f(0f, 0f, -10f));
-            Brain flipperb = instantiateAlien(flipper, new Vector3f(10f, 30f, -30f));
-            Brain flipperc = instantiateAlien(flipper, new Vector3f(-15f, 90f, -60f));
+           // Brain flipperb = instantiateAlien(flipper, new Vector3f(10f, 30f, -30f));
+            //Brain flipperc = instantiateAlien(flipper, new Vector3f(-15f, 90f, -60f));
 
             
             Simulator app2 = new Simulator();
@@ -208,7 +210,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
 
         // Control the instantiated alien (what the neural network will do)
         //setupKeys(flippera);
-        toggleGravityOff();
+        //toggleGravityOff();
                 
         myMainMenuController = new MainMenuController(this);
 
