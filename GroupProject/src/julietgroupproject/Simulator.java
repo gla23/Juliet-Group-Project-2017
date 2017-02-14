@@ -157,16 +157,6 @@ public class Simulator extends SimpleApplication implements ActionListener {
         
     }
     
-    public void startSimulation(MLRegression nn, int ticks, boolean background, SimulationCallback cb) {
-        if (background) {
-            Simulator sim = new Simulator();
-            sim.simTime = ticks;
-            sim.alienToSim = this.alienToSim;
-            sim.start(JmeContext.Type.Headless);
-            
-        }
-    }
-    
     
     public void endSimulator(Simulator s) {
         // Only run in parent simulator, called by children when simTime is up.
