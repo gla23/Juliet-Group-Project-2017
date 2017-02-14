@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Queue;
 
 import org.encog.ml.ea.train.EvolutionaryAlgorithm;
 import org.encog.neural.neat.NEATPopulation;
@@ -105,7 +106,7 @@ public class AlienTrainer{
             }
         }
         
-        public AlienTrainer(double _targetError, String _filename)
+        public AlienTrainer(double _targetError, String _filename, Queue<SimulationData> _simTasks)
         {
             targetError = _targetError;
             filename = _filename;
@@ -118,7 +119,7 @@ public class AlienTrainer{
                 resetTraining();
             }
             
-            AlienEvaluator score = new AlienEvaluator();
+            AlienEvaluator score = new AlienEvaluator(_simTasks);
             
             train = NEATUtil.constructNEATTrainer(pop, score);
             OriginalNEATSpeciation speciation = new OriginalNEATSpeciation();
@@ -134,7 +135,7 @@ public class AlienTrainer{
                 System.out.println("Population reset");
 	}
 
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
             if (args.length != 2)
             {
                 System.out.println("Usage: AlienTrainer <filename> <error>");
@@ -146,7 +147,7 @@ public class AlienTrainer{
             AlienTrainer trainer = new AlienTrainer(error, args[0]);
             trainer.run();
                 
-	}
+	}*/
 
 	public void run() {
 

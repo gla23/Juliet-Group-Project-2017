@@ -4,6 +4,7 @@
  */
 package julietgroupproject;
 
+import java.util.Queue;
 import org.encog.ml.CalculateScore;
 import org.encog.ml.MLMethod;
 import org.encog.ml.MLRegression;
@@ -13,7 +14,7 @@ import org.encog.ml.MLRegression;
  * @author Peter
  */
 public class AlienEvaluator implements CalculateScore{
-    private SimulationHandler simHandler;
+    private Queue<SimulationData> simTasks;
     double simTime;
     
     @Override
@@ -31,13 +32,17 @@ public class AlienEvaluator implements CalculateScore{
     @Override
     public double calculateScore(MLMethod nn)
     {
-        return simHandler.startSimulation((MLRegression)nn, simTime);
+        SimulationData request = new SimulationData((MLRegression)nn, simTime); 
+        
+        simTasks.add(request);
+        
+        return request.getFitness();
     }
     
     
-    public AlienEvaluator()
+    public AlienEvaluator(Queue<SimulationData> _simTasks)
     {
-        simHandler = new SimulationHandler();
+        simTasks = _simTasks;
         simTime = 5.0;
     }
 }
