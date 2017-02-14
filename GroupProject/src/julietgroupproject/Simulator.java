@@ -1,7 +1,6 @@
 package julietgroupproject;
 
 import com.jme3.system.JmeContext;
-import com.jme3.system.JmeContext.Type;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.BulletAppState;
@@ -33,6 +32,12 @@ import com.jme3.scene.shape.Torus;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.WrapMode;
 import com.jme3.ui.Picture;
+import java.util.Random;
+import org.encog.ml.MLRegression;
+import org.encog.ml.data.MLData;
+import org.encog.ml.data.basic.BasicMLData;
+import org.encog.neural.networks.BasicNetwork;
+import org.encog.neural.networks.layers.BasicLayer;
 
 public class Simulator extends SimpleApplication implements ActionListener {
     
@@ -71,6 +76,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         KeyInput.KEY_V, KeyInput.KEY_B,
         KeyInput.KEY_N, KeyInput.KEY_M};
 
+    
     @Override
     public void simpleInitApp() {
         // Application start code
@@ -113,13 +119,18 @@ public class Simulator extends SimpleApplication implements ActionListener {
             legLeft.addLimb(flipper1);
             legLeft.addLimb(flipper2);
             flipper = new Alien(rootBlock);
+            
+            brainOfAlienCurrentlyBeingSimulated = instantiateAlien(flipper, Vector3f.ZERO);
+            // Control the instantiated alien (what the neural network will do)
+            setupKeys(brainOfAlienCurrentlyBeingSimulated);
+        
 
             // Create that alien in the simulation, with the Brain interface used to control it.
             //brainOfAlienCurrentlyBeingSimulated = instantiateAlien(flipper, new Vector3f(0f, 0f, -10f));
-            Brain flipperb = instantiateAlien(flipper, new Vector3f(10f, 30f, -30f));
-            Brain flipperc = instantiateAlien(flipper, new Vector3f(-15f, 90f, -60f));
+            //Brain flipperb = instantiateAlien(flipper, new Vector3f(10f, 30f, -30f));
+            //Brain flipperc = instantiateAlien(flipper, new Vector3f(-15f, 90f, -60f));
 
-            
+            /*
             Simulator app2 = new Simulator();
             app2.simTime = 1000;
             app2.alienToSim = flipper;
@@ -131,20 +142,22 @@ public class Simulator extends SimpleApplication implements ActionListener {
             app3.parent = this;
             app3.start(JmeContext.Type.Headless);
             simsRunning = 2;
-            
+            */
             
         }
-        if (!mainApplication) {
+        /*if (!mainApplication) {
             brainOfAlienCurrentlyBeingSimulated = instantiateAlien(alienToSim, Vector3f.ZERO);
             // Control the instantiated alien (what the neural network will do)
             setupKeys(brainOfAlienCurrentlyBeingSimulated);
-        }
+        }*/
         
         
         
         
         
     }
+    
+    
     public void endSimulator(Simulator s) {
         // Only run in parent simulator, called by children when simTime is up.
         System.out.println("Simulator has finished with a fitness of: "+ s.fitness());
@@ -175,6 +188,29 @@ public class Simulator extends SimpleApplication implements ActionListener {
         bulletAppState.getPhysicsSpace().addAll(nodeOfLimbGeometries);
         rootNode.attachChild(nodeOfLimbGeometries);
         brain.nodeOfLimbGeometries = nodeOfLimbGeometries;
+        
+        final int jointCount = brain.joints.size();
+        
+        BasicNetwork nn = new BasicNetwork(){
+            
+            Random rng = new Random();
+            final int size = jointCount;
+            double[] out = new double[size];
+            
+            @Override
+            public MLData compute(MLData in) {
+                for (int i=0;i<size;i++) {
+                    out[i] = rng.nextDouble();
+                }
+                return new BasicMLData(out);
+            }
+        };
+        nn.addLayer(new BasicLayer(jointCount));
+        nn.addLayer(new BasicLayer(jointCount));
+        nn.getStructure().finalizeStructure();
+        nn.reset();
+        brain.setNN(nn);
+        brain.nodeOfLimbGeometries.addControl(brain);
                 
         return brain;
     }
