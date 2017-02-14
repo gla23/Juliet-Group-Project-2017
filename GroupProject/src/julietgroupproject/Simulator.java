@@ -133,7 +133,10 @@ public class Simulator extends SimpleApplication implements ActionListener {
         setupTextures();
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
-        bulletAppState.setDebugEnabled(true);
+        
+        // turn the wireframe off
+        bulletAppState.setDebugEnabled(false);
+        
         setupPhysicsWorld(rootNode, assetManager, bulletAppState.getPhysicsSpace());
         viewPort.setBackgroundColor(new ColorRGBA(98 / 255f, 167 / 255f, 224 / 255f, 1f));
         //setupBackground();
@@ -198,7 +201,6 @@ public class Simulator extends SimpleApplication implements ActionListener {
             brainOfAlienCurrentlyBeingSimulated = instantiateAlien(alienToSim, Vector3f.ZERO);
             // Control the instantiated alien (what the neural network will do)
             setupKeys(brainOfAlienCurrentlyBeingSimulated);
-<<<<<<< HEAD
         }*/
 
         
@@ -221,7 +223,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
 
         // Control the instantiated alien (what the neural network will do)
         //setupKeys(flippera);
-        toggleGravityOff();
+        //toggleGravityOff();
                 
         myMainMenuController = new MainMenuController(this);
 
