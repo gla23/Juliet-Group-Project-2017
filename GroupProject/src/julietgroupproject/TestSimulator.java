@@ -19,10 +19,13 @@ public class TestSimulator extends SimpleApplication {
 
     private BulletAppState bulletAppState;
     private Queue<SimulationData> queue;
-
+    private boolean waiting;
+    
+    
     public TestSimulator(Queue queue) {
         super();
         this.queue = queue;
+        waiting = true;
     }
 
     @Override
@@ -59,10 +62,15 @@ public class TestSimulator extends SimpleApplication {
         if (!stateManager.getState(SimulatorAppState.class).isRunningSimulation()) {
             SimulationData s = this.queue.poll();
             if (s != null) {
-                System.out.println("running simulation! " + s.toString());
+                System.out.println(Thread.currentThread().getId()+ ": running simulation!");
+                waiting = false;
                 stateManager.getState(SimulatorAppState.class).startSimulation(s);
             } else {
-                System.out.println("Waiting for simulation data!");
+                if (!waiting)
+                {
+                    System.out.println(Thread.currentThread().getId()+ ": waiting for simulation data!");
+                    waiting = true;
+                }
             }
         }
 

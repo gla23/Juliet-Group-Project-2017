@@ -37,6 +37,8 @@ public class AlienTrainer{
                 pop = (NEATPopulation)in.readObject();
                 
                 in.close();
+                
+                System.out.println("Loaded successfully");
             }
             catch(IOException e)
             {
@@ -60,6 +62,8 @@ public class AlienTrainer{
                 out.writeObject(pop);
                 
                 out.close();
+                
+                System.out.println("Saved successfully");
             }
             catch(IOException e)
             {

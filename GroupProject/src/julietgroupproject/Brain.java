@@ -117,11 +117,11 @@ public class Brain extends AbstractControl {
                     // try to stop moving
                     j.enableMotor(true, 0f, 0f);
                     // debug
-                    System.out.println("Suspending limb #" + i);
+                    //System.out.println("Suspending limb #" + i);
                 } else {
                     j.enableMotor(true, v, p);
                     // debug
-                    System.out.println("Moving limb #" + i + " with velocity " + v + ", power " + p);
+                    //System.out.println("Moving limb #" + i + " with velocity " + v + ", power " + p);
                 }
 
             }

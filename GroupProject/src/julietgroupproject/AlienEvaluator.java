@@ -12,6 +12,8 @@ import org.encog.ml.MLRegression;
 public class AlienEvaluator implements CalculateScore{
     private Queue<SimulationData> simTasks;
     double simTime;
+    long returnedRequests = 0;
+    
     
     @Override
     public boolean requireSingleThreaded()
@@ -32,7 +34,9 @@ public class AlienEvaluator implements CalculateScore{
         
         simTasks.add(request);
         
-        return request.getFitness();
+        double val = request.getFitness();
+        System.out.println(++returnedRequests + " returned: " + val);
+        return val;
     }
     
     

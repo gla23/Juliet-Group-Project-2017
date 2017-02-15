@@ -18,9 +18,23 @@ public class TestAlienTrainer {
     public static void main(String[] args) {
         Queue<SimulationData> q = new ConcurrentLinkedQueue<>();
         AlienTrainer trainer = new AlienTrainer(0.5,"test.pop",q,4,4);
-        TestSimulator sim = new TestSimulator(q);
+        TestSimulator sim0 = new TestSimulator(q);
+        TestSimulator sim1 = new TestSimulator(q);
+        TestSimulator sim2 = new TestSimulator(q);
+        TestSimulator sim3 = new TestSimulator(q);
+        TestSimulator sim4 = new TestSimulator(q);
+        TestSimulator sim5 = new TestSimulator(q);
+        TestSimulator sim6 = new TestSimulator(q);
+        TestSimulator sim7 = new TestSimulator(q);
         //sim.start(JmeContext.Type.Headless);
-        sim.start();
+        sim0.start();
+        sim1.start(JmeContext.Type.Headless);
+        sim2.start(JmeContext.Type.Headless);
+        sim3.start(JmeContext.Type.Headless);
+        sim4.start(JmeContext.Type.Headless);
+        sim5.start(JmeContext.Type.Headless);
+        sim6.start(JmeContext.Type.Headless);
+        sim7.start(JmeContext.Type.Headless);
         trainer.run();
     }
 }
