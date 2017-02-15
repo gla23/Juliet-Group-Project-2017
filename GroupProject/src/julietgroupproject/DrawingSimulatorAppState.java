@@ -12,6 +12,7 @@ import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.light.AmbientLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -44,8 +45,9 @@ public class DrawingSimulatorAppState extends SimulatorAppState
         AmbientLight light = new AmbientLight();
         light.setColor(ColorRGBA.LightGray);
         simRoot.addLight(light);
-
+        viewPort.setBackgroundColor(new ColorRGBA(98 / 255f, 167 / 255f, 224 / 255f, 1f));
         super.floorGeometry.setMaterial(grassMaterial);
+        floorGeometry.getMesh().scaleTextureCoordinates(new Vector2f(40,40));
     }
     
     private Texture alienTexture1;
