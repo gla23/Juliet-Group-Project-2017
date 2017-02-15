@@ -37,11 +37,15 @@ public class Brain extends AbstractControl {
     private static final float MAX_VELOCITY = 2f;
     private static final float MIN_VELOCITY = 0.1f;
     private static final float MAX_POWER = 1f;
-    private static final int TICK_CYCLE = 50;
+    private static final int TICK_CYCLE = 10;
     private int tick = 0;
 
     public Vector3f getPosition(Node node) {
         return node.getControl(RigidBodyControl.class).getPhysicsLocation();
+    }
+    
+    public MLRegression getNN() {
+        return this.nn;
     }
 
     public void setNN(MLRegression nn) {
