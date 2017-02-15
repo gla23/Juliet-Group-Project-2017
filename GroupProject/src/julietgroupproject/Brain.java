@@ -38,7 +38,6 @@ public class Brain extends AbstractControl {
     private static final float MIN_VELOCITY = 0.1f;
     private static final float MAX_POWER = 1f;
 
-    private static final int TICK_CYCLE = 50;
 
     private static final int TICK_CYCLE = 10;
 
@@ -87,16 +86,6 @@ public class Brain extends AbstractControl {
         }
     }
 
-    @Override
-
-    public void setSpatial(Spatial spatial) {
-        super.setSpatial(spatial);
-
-        // initialise nn input/output arrays
-        if (spatial != null) {
-            nnInput = new double[nn.getInputCount()];
-        }
-    }
 
     @Override
 

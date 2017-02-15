@@ -271,24 +271,8 @@ public class Simulator extends SimpleApplication implements ActionListener {
         cuboid.rootBlock.addLimb(limb);
         prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 2f, -10f));
         setupKeys(prevAlien);
-=======
-    
-    
-    public void addLimb() {
-        
-        if (prevAlien!=null){
-            removeAlien(prevAlien);
-        }
-        prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
-        setupKeys(prevAlien);
-        
-        Vector3f pos = new Vector3f(-10+20*rng.nextFloat(),-10+20*rng.nextFloat(),-10+20*rng.nextFloat());
-        Block legLeft   = new Block(pos, pos.mult(0.5f), 2*rng.nextFloat(), 2*rng.nextFloat(), 2*rng.nextFloat(), "Box", "ZAxis", 2.2f);
-        
-        cuboid.rootBlock.addLimb(legLeft);
-
-        
     }
+   
     
     @Override
     public void simpleInitApp() {
@@ -423,10 +407,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         
     }
 
-        flyCam.setDragToRotate(true); //detaches camera from mouse unless you click/drag.
-
-        
-    }
+   
     
     
 
