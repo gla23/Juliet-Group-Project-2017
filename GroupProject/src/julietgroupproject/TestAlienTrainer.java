@@ -4,9 +4,11 @@
  */
 package julietgroupproject;
 
+import com.jme3.bullet.PhysicsSpace;
 import com.jme3.system.JmeContext;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Logger;
 
 /**
  *
@@ -16,6 +18,10 @@ public class TestAlienTrainer {
     
     
     public static void main(String[] args) {
+        // Mute the PhysicsSpace logger
+        Logger physicslogger = Logger.getLogger(PhysicsSpace.class.getName());
+        physicslogger.setUseParentHandlers(false);
+        
         Queue<SimulationData> q = new ConcurrentLinkedQueue<>();
         AlienTrainer trainer = new AlienTrainer(0.5,"test.pop",q,4,4);
         TestSimulator sim0 = new TestSimulator(q);
