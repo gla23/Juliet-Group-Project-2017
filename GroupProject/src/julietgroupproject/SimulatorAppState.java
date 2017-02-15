@@ -34,13 +34,13 @@ import org.encog.ml.MLRegression;
 public class SimulatorAppState extends AbstractAppState {
 
     // resources from app
-    private SimpleApplication app;
-    private Node rootNode;
-    private AssetManager assetManager;
-    private AppStateManager stateManager;
-    private InputManager inputManager;
-    private ViewPort viewPort;
-    private BulletAppState physics;
+    protected SimpleApplication app;
+    protected Node rootNode;
+    protected AssetManager assetManager;
+    protected AppStateManager stateManager;
+    protected InputManager inputManager;
+    protected ViewPort viewPort;
+    protected BulletAppState physics;
     
     
     protected Alien alien;
@@ -53,6 +53,8 @@ public class SimulatorAppState extends AbstractAppState {
     private long simStartTime;
     private long simTimeLimit;
     private Vector3f startLocation = Vector3f.ZERO;
+    
+    protected Geometry floorGeometry;
 
     public SimulatorAppState(Alien alien) {
         /*
@@ -65,6 +67,8 @@ public class SimulatorAppState extends AbstractAppState {
     }
 
     public void startSimulation(SimulationData data) {
+        this.reset();
+        
         this.currentSim = data;
         this.simTimeLimit = (long) (1000000000 * data.getSimTime());
         this.currentAlienBrain = instantiateAlien(this.alien, this.startLocation, data.getToEvaluate());
@@ -79,7 +83,6 @@ public class SimulatorAppState extends AbstractAppState {
             synchronized (this.currentSim) {
                 this.currentSim.setFitness(this.calcFitness());
                 System.out.println("Stopping simulation! " + this.currentSim.toString());
-                this.currentSim.notifyAll();
             }
         }
     }
@@ -101,12 +104,8 @@ public class SimulatorAppState extends AbstractAppState {
         this.inputManager = this.app.getInputManager();
         this.viewPort = this.app.getViewPort();
         this.physics = this.stateManager.getState(BulletAppState.class);
-
-        // TEMPORARY CODE!!!!
-        setupTextures();
         
-        
-        reset();
+        //reset();
     }
 
     public void reset() {
@@ -127,23 +126,19 @@ public class SimulatorAppState extends AbstractAppState {
     }
 
     protected void initialiseWorld() {
-        AmbientLight light = new AmbientLight();
-        light.setColor(ColorRGBA.LightGray);
-        simRoot.addLight(light);
 
         Box floorBox = new Box(140, 1f, 140);
-        Geometry floorGeometry = new Geometry("Floor", floorBox);
+        floorGeometry = new Geometry("Floor", floorBox);
         //floorGeometry.setMaterial(grassMaterial);
         floorGeometry.setLocalTranslation(0, -5, 0);
         floorGeometry.addControl(new RigidBodyControl(0));
         ////////
-        floorGeometry.setMaterial(grassMaterial);
         //floorGeometry.getMesh().scaleTextureCoordinates(new Vector2f(40,40));
         simRoot.attachChild(floorGeometry);
         physics.getPhysicsSpace().add(floorGeometry);
     }
 
-    private Brain instantiateAlien(Alien a, Vector3f location, MLRegression nn) {
+    protected Brain instantiateAlien(Alien a, Vector3f location, MLRegression nn) {
         /*
          * Spawn a new alien at a specified location.
          */
@@ -158,8 +153,7 @@ public class SimulatorAppState extends AbstractAppState {
         b.geometries.add(rootBlockGeometry);
 
         AlienHelper.recursivelyAddBlocks(rootBlock, rootBlock, rootBlockGeometry, alienNode, b);
-        // TEMP
-        alienNode.setMaterial(alienMaterial1);
+        
         
         
         
@@ -176,48 +170,7 @@ public class SimulatorAppState extends AbstractAppState {
         return simInProgress;
     }
     
-    //TEMPORARY CODE!!!!!
-    private Texture alienTexture1;
-    private Texture alienTexture2;
-    private Texture alienTexture3;
-    private Texture grassTexture;
-    private Texture skyTexture;
-    private Material alienMaterial1;
-    private Material alienMaterial2;
-    private Material alienMaterial3;
-    private Material grassMaterial;
-    private Material skyMaterial;
-
-    public void setupTextures() {
-        grassTexture = assetManager.loadTexture("Textures/grass1.jpg");
-        grassTexture.setAnisotropicFilter(4);
-        grassTexture.setWrap(Texture.WrapMode.Repeat);
-        grassMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        grassMaterial.setTexture("ColorMap", grassTexture);
-        skyTexture = assetManager.loadTexture("Textures/sky1.jpg");
-        skyTexture.setWrap(Texture.WrapMode.Repeat);
-        skyMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        skyMaterial.setTexture("ColorMap", skyTexture);
-
-        alienTexture1 = assetManager.loadTexture("Textures/alien1.jpg");
-        alienTexture1.setWrap(Texture.WrapMode.Repeat);
-        alienMaterial1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        alienMaterial1.setTexture("ColorMap", alienTexture1);
-
-        alienTexture2 = assetManager.loadTexture("Textures/alien2.jpg");
-        alienTexture2.setWrap(Texture.WrapMode.Repeat);
-        alienMaterial2 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        alienMaterial2.setTexture("ColorMap", alienTexture2);
-        alienTexture3 = assetManager.loadTexture("Textures/alien3.jpg");
-        alienTexture3.setWrap(Texture.WrapMode.Repeat);
-        alienMaterial3 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        alienMaterial3.setTexture("ColorMap", alienTexture3);
-    }
     
-
-    
-    // END OF TEMPORARY CODE!
-    ///////////
     
     @Override
     public void cleanup() {
@@ -244,7 +197,6 @@ public class SimulatorAppState extends AbstractAppState {
         if (simInProgress && ((System.nanoTime() - simStartTime) > simTimeLimit)) {
             // stop simulation and report result
             stopSimulation();
-            reset();
         }
     }
 }

@@ -20,12 +20,13 @@ public class TestSimulator extends SimpleApplication {
     private BulletAppState bulletAppState;
     private Queue<SimulationData> queue;
     private boolean waiting;
+    private boolean toDisplay;
     
-    
-    public TestSimulator(Queue queue) {
+    public TestSimulator(Queue queue, boolean _toDisplay) {
         super();
         this.queue = queue;
         waiting = true;
+        toDisplay = _toDisplay;
     }
 
     @Override
@@ -54,7 +55,14 @@ public class TestSimulator extends SimpleApplication {
         legLeft.addLimb(flipper2);
         flipper = new Alien(rootBlock);
 
-        stateManager.attach(new SimulatorAppState(flipper));
+        if (!toDisplay)
+        {
+            stateManager.attach(new SimulatorAppState(flipper));
+        }
+        else
+        {
+            stateManager.attach(new DrawingSimulatorAppState(flipper));
+        }
     }
 
     @Override
