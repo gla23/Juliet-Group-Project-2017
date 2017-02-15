@@ -16,8 +16,8 @@ public class TestAlienTrainer {
     
     
     public static void main(String[] args) {
-        Queue<SimulationData> q = new ConcurrentLinkedQueue<SimulationData>();
-        AlienTrainer trainer = new AlienTrainer(0.5,"test.pop",q);
+        Queue<SimulationData> q = new ConcurrentLinkedQueue<>();
+        AlienTrainer trainer = new AlienTrainer(0.5,"test.pop",q,4,4);
         TestSimulator sim = new TestSimulator(q);
         //sim.start(JmeContext.Type.Headless);
         sim.start();
