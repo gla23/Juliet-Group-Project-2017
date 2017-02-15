@@ -1,6 +1,3 @@
-/GroupProject/build/
-
-
 # Created by https://www.gitignore.io/api/java,windows,macos,netbeans
 
 ### Java ###
@@ -78,3 +75,4 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/java,windows,macos,netbeans
+

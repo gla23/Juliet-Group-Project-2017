@@ -1,7 +1,6 @@
 package julietgroupproject;
 
 import com.jme3.system.JmeContext;
-import com.jme3.system.JmeContext.Type;
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.BulletAppState;
@@ -16,6 +15,7 @@ import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
+import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
@@ -39,6 +39,14 @@ import com.jme3.ui.Picture;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.TextField;
+import java.util.Random;
+import org.encog.ml.MLRegression;
+import org.encog.ml.data.MLData;
+import org.encog.ml.data.basic.BasicMLData;
+import org.encog.neural.networks.BasicNetwork;
+import org.encog.neural.networks.layers.BasicLayer;
+import com.jme3.niftygui.NiftyJmeDisplay;
+import de.lessvoid.nifty.Nifty;
 import java.util.Random;
 import julietgroupproject.GUI.MainMenuController;
 
@@ -108,7 +116,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
     public void toggleGravityOff() {
         bulletAppState.getPhysicsSpace().setGravity(Vector3f.ZERO);
     }
-   
+    
     
     //Method for easily printing out vectors for debugging
     public void printVector3f(Vector3f vec) {
@@ -263,6 +271,23 @@ public class Simulator extends SimpleApplication implements ActionListener {
         cuboid.rootBlock.addLimb(limb);
         prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 2f, -10f));
         setupKeys(prevAlien);
+=======
+    
+    
+    public void addLimb() {
+        
+        if (prevAlien!=null){
+            removeAlien(prevAlien);
+        }
+        prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
+        setupKeys(prevAlien);
+        
+        Vector3f pos = new Vector3f(-10+20*rng.nextFloat(),-10+20*rng.nextFloat(),-10+20*rng.nextFloat());
+        Block legLeft   = new Block(pos, pos.mult(0.5f), 2*rng.nextFloat(), 2*rng.nextFloat(), 2*rng.nextFloat(), "Box", "ZAxis", 2.2f);
+        
+        cuboid.rootBlock.addLimb(legLeft);
+
+        
     }
     
     @Override
@@ -274,8 +299,12 @@ public class Simulator extends SimpleApplication implements ActionListener {
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
         
+
         // setDebugEnabled - wireframe
         bulletAppState.setDebugEnabled(true);
+
+        // turn the wireframe off
+        bulletAppState.setDebugEnabled(false);
         setupPhysicsWorld(rootNode, assetManager, bulletAppState.getPhysicsSpace());
         viewPort.setBackgroundColor(new ColorRGBA(98 / 255f, 167 / 255f, 224 / 255f, 1f));
         //setupBackground();
@@ -313,10 +342,10 @@ public class Simulator extends SimpleApplication implements ActionListener {
 
             // Create that alien in the simulation, with the Brain interface used to control it.
             //brainOfAlienCurrentlyBeingSimulated = instantiateAlien(flipper, new Vector3f(0f, 0f, -10f));
-           // Brain flipperb = instantiateAlien(flipper, new Vector3f(10f, 30f, -30f));
+            //Brain flipperb = instantiateAlien(flipper, new Vector3f(10f, 30f, -30f));
             //Brain flipperc = instantiateAlien(flipper, new Vector3f(-15f, 90f, -60f));
 
-            
+            /*
             Simulator app2 = new Simulator();
             app2.simTime = 1000;
             app2.alienToSim = flipper;
@@ -337,6 +366,18 @@ public class Simulator extends SimpleApplication implements ActionListener {
             setupKeys(brainOfAlienCurrentlyBeingSimulated);
         }
 
+            */
+            
+        }
+        /*if (!mainApplication) {
+            brainOfAlienCurrentlyBeingSimulated = instantiateAlien(alienToSim, Vector3f.ZERO);
+            // Control the instantiated alien (what the neural network will do)
+            setupKeys(brainOfAlienCurrentlyBeingSimulated);
+        }*/
+
+
+        
+
         Vector3f pos = new Vector3f(-10+20*rng.nextFloat(),-10+20*rng.nextFloat(),-10+20*rng.nextFloat());
         Block randomCuboid   = new Block(pos, pos.mult(0.5f), 4*rng.nextFloat(), 4*rng.nextFloat(), 4*rng.nextFloat(), "Box", "ZAxis", 2.2f);
         cuboid = new Alien(randomCuboid);
@@ -355,7 +396,11 @@ public class Simulator extends SimpleApplication implements ActionListener {
 
         // Control the instantiated alien (what the neural network will do)
         //setupKeys(flippera);
+
         toggleGravityOff();
+
+        //toggleGravityOff();
+
                 
         myMainMenuController = new MainMenuController(this);
 
@@ -363,15 +408,28 @@ public class Simulator extends SimpleApplication implements ActionListener {
         
         //Set up nifty
         NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
+
         nifty = niftyDisplay.getNifty();
+
+        Nifty nifty = niftyDisplay.getNifty();
+
         guiViewPort.addProcessor(niftyDisplay);
         nifty.fromXml("Interface/MainMenuLayout.xml", "start", myMainMenuController);
         //nifty.setDebugOptionPanelColors(true); //un-comment this line to use DebugPanelColors and make sure Nifty is running correctly.
         
+
         flyCam.setDragToRotate(true); //detaches camera from mouse unless you click/drag.a
 
         
     }
+
+        flyCam.setDragToRotate(true); //detaches camera from mouse unless you click/drag.
+
+        
+    }
+    
+    
+
     public void endSimulator(Simulator s) {
         // Only run in parent simulator, called by children when simTime is up.
         System.out.println("Simulator has finished with a fitness of: "+ s.fitness());
@@ -402,6 +460,33 @@ public class Simulator extends SimpleApplication implements ActionListener {
         bulletAppState.getPhysicsSpace().addAll(nodeOfLimbGeometries);
         rootNode.attachChild(nodeOfLimbGeometries);
         brain.nodeOfLimbGeometries = nodeOfLimbGeometries;
+
+        
+        final int jointCount = brain.joints.size();
+        
+        BasicNetwork nn = new BasicNetwork(){
+            
+            Random rng = new Random();
+            final int size = jointCount;
+            double[] out = new double[size];
+            
+            @Override
+            public MLData compute(MLData in) {
+                for (int i=0;i<size;i++) {
+                    out[i] = rng.nextDouble();
+                }
+                return new BasicMLData(out);
+            }
+        };
+        nn.addLayer(new BasicLayer(jointCount));
+        nn.addLayer(new BasicLayer(jointCount));
+        nn.getStructure().finalizeStructure();
+        nn.reset();
+        brain.setNN(nn);
+        
+        // uncomment this line to allow control from ANN
+        //brain.nodeOfLimbGeometries.addControl(brain);
+
                 
         return brain;
     }
@@ -410,8 +495,10 @@ public class Simulator extends SimpleApplication implements ActionListener {
         for (Block b : parentBlock.getConnectedLimbs()) {
             Geometry g = createLimb(b.collisionShapeType, b.width, b.height, b.length, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getPosition()), b.mass);
             b.applyProperties(g);
+
             System.out.println("Here");
             printVector3f(b.getHingePosition());
+
             HingeJoint joint = joinHingeJoint(parentGeometry, g, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getHingePosition()), b.hingeType);
             geometries.attachChild(g);
             brain.joints.add(joint);
@@ -520,6 +607,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
                 //spawnAlien();
             }
         }
+
         
         //When right mouse button clicked, fire ray to see if intersects with body
         if ("AddLimb".equals(string) && !bln) {
@@ -543,6 +631,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
                 addLimb(pt,norm);
             }
         }
+
     }
 
     public void setupKeys(Brain brain) {
@@ -559,10 +648,12 @@ public class Simulator extends SimpleApplication implements ActionListener {
         inputManager.addListener(this, "Pull ragdoll up");
         inputManager.addMapping("Spawn Alien", new KeyTrigger(KeyInput.KEY_SPACE));
         inputManager.addListener(this, "Spawn Alien");
+
         
         //Add the key binding for the right click to add limb funtionality
         inputManager.addMapping("AddLimb",new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         inputManager.addListener(this, "AddLimb");
+
     }
     public void setupTextures() {
         grassTexture = assetManager.loadTexture("Textures/grass1.jpg");

@@ -64,8 +64,8 @@ public class AlienTrainer{
         private double targetError;
         private String filename;
         
-        private int inputCount = 1;
-        private int outputCount = 1;
+        private int inputCount = 4;
+        private int outputCount = 4;
         private int popCount = 500;
         
         private void load()
