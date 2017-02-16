@@ -62,7 +62,7 @@ public class DrawingSimulatorAppState extends SimulatorAppState
     private Material skyMaterial;
 
     public void setupTextures() {
-        grassTexture = assetManager.loadTexture("Textures/grass1.jpg");
+        grassTexture = assetManager.loadTexture("Textures/grass4.png");
         grassTexture.setAnisotropicFilter(4);
         grassTexture.setWrap(Texture.WrapMode.Repeat);
         grassMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
@@ -96,7 +96,7 @@ public class DrawingSimulatorAppState extends SimulatorAppState
         Brain b = super.instantiateAlien(a, location, nn);
         
         // TEMP
-        b.nodeOfLimbGeometries.setMaterial(alienMaterial1);
+        b.nodeOfLimbGeometries.setMaterial(alienMaterial2);
 
         return b;
     }
