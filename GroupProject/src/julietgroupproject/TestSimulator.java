@@ -21,14 +21,21 @@ public class TestSimulator extends SimpleApplication {
     private Queue<SimulationData> queue;
     private boolean waiting;
     private boolean toDisplay;
+    private volatile boolean toKill;
 
     public TestSimulator(Queue queue, boolean _toDisplay) {
         super();
         this.queue = queue;
         waiting = true;
         toDisplay = _toDisplay;
+        toKill = false;
     }
 
+    public void kill()
+    {
+        toKill = true;
+    }
+    
     @Override
     public void simpleInitApp() {
 
@@ -72,6 +79,10 @@ public class TestSimulator extends SimpleApplication {
         //TODO: might move this block of code into
         //SimulatorAppState as well
         if (!stateManager.getState(SimulatorAppState.class).isRunningSimulation()) {
+            if (toKill)
+            {
+                this.stop();
+            }
             SimulationData s;
             if (toDisplay) {
                 //we peek instead of poll for simulator

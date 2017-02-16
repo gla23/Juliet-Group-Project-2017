@@ -46,5 +46,15 @@ public class TestAlienTrainer {
         //sim7.start(JmeContext.Type.Headless);
         
         trainer.run();
+        
+        //Cleanup after runs complete:
+        sim0.kill();
+        sim1.kill();
+        sim2.kill();
+        //sim3.kill();
+        //sim4.kill();
+        //sim5.kill();
+        //sim6.kill();
+        //sim7.kill();
     }
 }
