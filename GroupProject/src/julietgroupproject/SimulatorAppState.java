@@ -41,22 +41,19 @@ public class SimulatorAppState extends AbstractAppState {
     protected InputManager inputManager;
     protected ViewPort viewPort;
     protected BulletAppState physics;
-    
-    
     protected Alien alien;
     protected Node simRoot;
     protected Node scene;
     protected Node alienRoot;
-    private SimulationData currentSim;
-    private Brain currentAlienBrain;
-    private boolean simInProgress;
-    private long simStartTime;
-    private long simTimeLimit;
-    private Vector3f startLocation = Vector3f.ZERO;
-    
+    protected int nnUpdateCycle;
+    protected SimulationData currentSim;
+    protected Brain currentAlienBrain;
+    protected boolean simInProgress;
+    protected float simTimeLimit;
+    protected Vector3f startLocation = Vector3f.ZERO;
     protected Geometry floorGeometry;
 
-    public SimulatorAppState(Alien alien) {
+    public SimulatorAppState(Alien alien, int _nnUpdateCycle) {
         /*
          * Constructor, taking an Alien object as the Alien
          * to be tested in this simulator.
@@ -64,32 +61,46 @@ public class SimulatorAppState extends AbstractAppState {
          * @param alien The alien to be tested.
          */
         this.alien = alien;
+        this.nnUpdateCycle = _nnUpdateCycle;
     }
 
     public void startSimulation(SimulationData data) {
-        this.reset();
         
+        // turn physics back on
+        this.physics.setEnabled(true);
+        this.reset();
         this.currentSim = data;
-        this.simTimeLimit = (long) (1000000000 * data.getSimTime());
+        this.simTimeLimit = (float) data.getSimTime();
         this.currentAlienBrain = instantiateAlien(this.alien, this.startLocation, data.getToEvaluate());
-        this.simStartTime = System.nanoTime();
         this.simInProgress = true;
     }
 
-    private void stopSimulation() {
-
+    protected void stopSimulation() {
+        /*
+         * Stop simulation.
+         */
         this.simInProgress = false;
         if (this.currentSim != null) {
             synchronized (this.currentSim) {
-                this.currentSim.setFitness(this.calcFitness());
-                System.out.println("Stopping simulation! " + this.currentSim.toString());
+                double fitness = this.calcFitness();
+                this.currentSim.setFitness(fitness);
             }
+            System.out.println("Stopping simulation! " + this.currentSim.toString());
         }
+        // turn physics off to save CPU time
+        this.physics.setEnabled(false);
     }
 
-    private double calcFitness() {
+    protected double calcFitness() {
+        /*
+         * Calculate fitness for the current simulated
+         * alien.
+         */
         if (this.currentAlienBrain != null) {
-            return (double) AlienHelper.getGeometryLocation(this.currentAlienBrain.geometries.get(0)).x;
+            Vector3f pos = AlienHelper.getGeometryLocation(this.currentAlienBrain.geometries.get(0));
+            double fitness = pos.x;
+            if(Double.isNaN(fitness)){ System.err.println(pos); throw new RuntimeException("bad fitness"); };
+            return fitness;
         } else {
             throw new RuntimeException("No simulation running! Cannot compute fitness.");
         }
@@ -104,7 +115,8 @@ public class SimulatorAppState extends AbstractAppState {
         this.inputManager = this.app.getInputManager();
         this.viewPort = this.app.getViewPort();
         this.physics = this.stateManager.getState(BulletAppState.class);
-        
+        // turn physics off to save CPU time
+        this.physics.setEnabled(false);
         //reset();
     }
 
@@ -113,8 +125,7 @@ public class SimulatorAppState extends AbstractAppState {
         this.currentAlienBrain = null;
         this.currentSim = null;
         this.simInProgress = false;
-        this.simStartTime = 0L;
-        this.simTimeLimit = 0L;
+        this.simTimeLimit = 0.0f;
 
         if (this.simRoot != null) {
             this.physics.getPhysicsSpace().removeAll(simRoot);
@@ -129,11 +140,8 @@ public class SimulatorAppState extends AbstractAppState {
 
         Box floorBox = new Box(140, 1f, 140);
         floorGeometry = new Geometry("Floor", floorBox);
-        //floorGeometry.setMaterial(grassMaterial);
         floorGeometry.setLocalTranslation(0, -5, 0);
         floorGeometry.addControl(new RigidBodyControl(0));
-        ////////
-        //floorGeometry.getMesh().scaleTextureCoordinates(new Vector2f(40,40));
         simRoot.attachChild(floorGeometry);
         physics.getPhysicsSpace().add(floorGeometry);
     }
@@ -153,25 +161,21 @@ public class SimulatorAppState extends AbstractAppState {
         b.geometries.add(rootBlockGeometry);
 
         AlienHelper.recursivelyAddBlocks(rootBlock, rootBlock, rootBlockGeometry, alienNode, b);
-        
-        
-        
-        
+
         physics.getPhysicsSpace().addAll(alienNode);
         simRoot.attachChild(alienNode);
         b.nodeOfLimbGeometries = alienNode;
         b.setNN(nn);
+        b.setTickCycle(nnUpdateCycle);
         alienNode.addControl(b);
 
         return b;
     }
-    
+
     public boolean isRunningSimulation() {
         return simInProgress;
     }
-    
-    
-    
+
     @Override
     public void cleanup() {
         super.cleanup();
@@ -179,8 +183,8 @@ public class SimulatorAppState extends AbstractAppState {
         this.simRoot.removeFromParent();
         this.currentAlienBrain = null;
         if (this.currentSim != null) {
-            synchronized(this.currentSim){
-            this.currentSim.notifyAll();
+            synchronized (this.currentSim) {
+                this.currentSim.notifyAll();
             }
         }
         this.currentSim = null;
@@ -194,9 +198,12 @@ public class SimulatorAppState extends AbstractAppState {
     @Override
     public void update(float tpf) {
 
-        if (simInProgress && ((System.nanoTime() - simStartTime) > simTimeLimit)) {
-            // stop simulation and report result
-            stopSimulation();
+        if (simInProgress) {
+            simTimeLimit -= tpf * physics.getSpeed();
+            if (simTimeLimit < 0f) {
+                // stop simulation and report result
+                stopSimulation();
+            }
         }
     }
 }

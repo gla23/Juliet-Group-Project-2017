@@ -37,12 +37,14 @@ public class Brain extends AbstractControl {
     private static final float MAX_VELOCITY = 2f;
     private static final float MIN_VELOCITY = 0.1f;
     private static final float MAX_POWER = 1f;
-    private static final int TICK_CYCLE = 10;
+    /*
+     * 
+     */
+    private int tickCycle = 100;
     private int tick = 0;
 
-    public Vector3f getPosition(Node node) {
-        return node.getControl(RigidBodyControl.class).getPhysicsLocation();
-    }
+    public int getTickCycle() { return tickCycle; }
+    public void setTickCycle(int _tickCycle) { this.tickCycle = _tickCycle; }
     
     public MLRegression getNN() {
         return this.nn;
@@ -69,6 +71,9 @@ public class Brain extends AbstractControl {
             if (in > 1.0) in = 1.0;
             nnInput[i] = in;
         }
+        
+        //Vector3f heading = this.geometries.get(0).getControl(RigidBodyControl.class).getPhysicsRotation().mult(Vector3f.UNIT_Z).project(Vector3f.UNIT_X).normalize();
+        
     }
 
     @Override
@@ -99,7 +104,7 @@ public class Brain extends AbstractControl {
 
         tick++;
 
-        if (tick == TICK_CYCLE) {
+        if (tick >= this.tickCycle) {
             tick = 0;
             
             updateInput();

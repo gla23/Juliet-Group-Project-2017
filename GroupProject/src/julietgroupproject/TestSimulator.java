@@ -21,7 +21,7 @@ public class TestSimulator extends SimpleApplication {
     private Queue<SimulationData> queue;
     private boolean waiting;
     private boolean toDisplay;
-    
+
     public TestSimulator(Queue queue, boolean _toDisplay) {
         super();
         this.queue = queue;
@@ -33,9 +33,7 @@ public class TestSimulator extends SimpleApplication {
     public void simpleInitApp() {
 
         bulletAppState = new BulletAppState();
-        
-        // try changing BulletAppState.speed and Brain.TICK_CYCLE
-        bulletAppState.setSpeed(100.0f);
+
         stateManager.attach(bulletAppState);
 
 
@@ -55,28 +53,40 @@ public class TestSimulator extends SimpleApplication {
         legLeft.addLimb(flipper2);
         flipper = new Alien(rootBlock);
 
-        if (!toDisplay)
-        {
-            stateManager.attach(new SimulatorAppState(flipper));
-        }
-        else
-        {
-            stateManager.attach(new DrawingSimulatorAppState(flipper));
+        if (!toDisplay) {
+            // Warning: if you change speed, you MUST change
+            // Brain.tickCycle accordingly!
+            // try using 100/(speed up rate)
+            // DO NOT EXCEED 50.0f speed up!
+            bulletAppState.setSpeed(50.0f);
+            bulletAppState.getPhysicsSpace().setMaxSubSteps(200);
+            stateManager.attach(new SimulatorAppState(flipper,2));
+        } else {
+         
+            stateManager.attach(new DrawingSimulatorAppState(flipper,100));
         }
     }
 
     @Override
     public void simpleUpdate(float tpf) {
+        //TODO: might move this block of code into
+        //SimulatorAppState as well
         if (!stateManager.getState(SimulatorAppState.class).isRunningSimulation()) {
-            SimulationData s = this.queue.poll();
+            SimulationData s;
+            if (toDisplay) {
+                //we peek instead of poll for simulator
+                //with graphics.
+                s = this.queue.peek();
+            } else {
+                s = this.queue.poll();
+            }
             if (s != null) {
-                System.out.println(Thread.currentThread().getId()+ ": running simulation!");
+                System.out.println(Thread.currentThread().getId() + ": starting simulation!");
                 waiting = false;
                 stateManager.getState(SimulatorAppState.class).startSimulation(s);
             } else {
-                if (!waiting)
-                {
-                    System.out.println(Thread.currentThread().getId()+ ": waiting for simulation data!");
+                if (!waiting) {
+                    System.out.println(Thread.currentThread().getId() + ": waiting for simulation data!");
                     waiting = true;
                 }
             }

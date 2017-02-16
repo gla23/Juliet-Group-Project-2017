@@ -26,9 +26,9 @@ import org.encog.ml.MLRegression;
  */
 public class DrawingSimulatorAppState extends SimulatorAppState
 {
-    public DrawingSimulatorAppState(Alien alien)
+    public DrawingSimulatorAppState(Alien _alien, int _nnUpdateCycle)
     {
-        super(alien);
+        super(_alien,_nnUpdateCycle);
     }
     
     @Override
@@ -87,6 +87,7 @@ public class DrawingSimulatorAppState extends SimulatorAppState
         alienMaterial3.setTexture("ColorMap", alienTexture3);
     }
     
+    @Override
     protected Brain instantiateAlien(Alien a, Vector3f location, MLRegression nn) {
         /*
          * Spawn a new alien at a specified location.
@@ -100,4 +101,14 @@ public class DrawingSimulatorAppState extends SimulatorAppState
         return b;
     }
     
+    @Override
+    protected void stopSimulation() {
+        /*
+         * Stop the current simulation,
+         * but do not set the fitness.
+         */
+        this.simInProgress = false;
+        //turn physics off?
+        //this.physics.setEnabled(false);
+    }
 }
