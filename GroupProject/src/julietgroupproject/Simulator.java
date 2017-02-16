@@ -72,6 +72,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
     float limbPower = 0.8f;
     float limbTargetVolcity = 2f;
     float time;
+    float minBoxDimention = 0.4f;
     Random rng = new Random();
     private BulletAppState bulletAppState = new BulletAppState();
     private Brain brainToControl;
@@ -520,6 +521,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
 
     private Geometry createLimb(String meshShape, float width, float height, float length, Vector3f location, float mass) {
         
+        
         Mesh mesh;
         if (meshShape.equals("Cylinder")) {
             mesh = new Cylinder(40,40,width,length,true);
@@ -528,7 +530,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         } else if (meshShape.equals("Sphere")) {
             mesh = new Sphere(40,40,width);
         } else {
-            mesh = new Box(width,height,length);
+            mesh = new Box(Math.max(minBoxDimention,width),Math.max(minBoxDimention,height),Math.max(minBoxDimention,length));
         }
         Geometry limb = new Geometry("Limb",mesh);
         RigidBodyControl r;
