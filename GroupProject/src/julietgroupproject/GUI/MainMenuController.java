@@ -58,6 +58,15 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
        app.toggleWireMesh();
    }
     
+   public void setToCuboid() {
+       app.setShapeToCuboid();
+       
+   }
+   
+   public void setToSphere() {
+       app.setShapeToSphere();
+   }
+   
   @Override
   public void initialize(AppStateManager stateManager, Application app) {
    // this.app = app;

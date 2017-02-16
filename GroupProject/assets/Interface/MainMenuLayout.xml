@@ -39,9 +39,17 @@
                                 <control name="textfield" id="widthTextField" maxLength="20"  />
                                 <control name="label" text="Enter Length (Z-axis):" />
                                 <control name="textfield" id="lengthTextField" maxLength="20" />
+                                <control name ="button" label="Set shape to cuboid" width = "*" id = "cuboidButton" visibleToMouse="true">
+                                    <interact onClick="setToCuboid()"/>
+                                </control>
+                                <control name ="button" label="Set shape to sphere" width = "*" id = "sphereButton" visibleToMouse="true">
+                                    <interact onClick="setToSphere()"/>
+                                </control>
                             </panel>
                             <control name = "button" label = "Set Focus to Simulator" align = "center" width = "*"/>
                             <control name="label" text="*** Right click on body to add ***" height = "10%"/>
+              
+                            
                         </panel>
                         
                     </panel>

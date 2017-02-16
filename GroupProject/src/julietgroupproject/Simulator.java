@@ -47,6 +47,7 @@ import org.encog.ml.data.basic.BasicMLData;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
 import com.jme3.niftygui.NiftyJmeDisplay;
+import com.jme3.scene.shape.Sphere;
 import de.lessvoid.nifty.Nifty;
 import java.util.Random;
 import julietgroupproject.GUI.MainMenuController;
@@ -88,6 +89,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
     private boolean wireMesh = true;
     
     private ChaseCamera chaseCam;
+    private String currentShape = "Box";
            
     
     Alien simpleAlien;
@@ -138,6 +140,16 @@ public class Simulator extends SimpleApplication implements ActionListener {
         chaseCam.setTrailingRotationInertia(0.1f);
     }
     
+    public void setShapeToCuboid() {
+        currentShape = "Box";
+        System.out.println(currentShape);
+        
+    }
+    
+    public void setShapeToSphere() {
+        currentShape = "Sphere";
+        System.out.println(currentShape);
+    }
     public void createNewBody() {
         if (prevAlien==null){
             
@@ -188,7 +200,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
             
             //Instantiate the new alien
             Vector3f pos = new Vector3f(-10+20*rng.nextFloat(),-10+20*rng.nextFloat(),-10+20*rng.nextFloat());
-            Block bodyBlock   = new Block(pos, pos.mult(0.5f), bodyHeight, bodyWidth, bodyLength, "Box", "ZAxis", 2.2f);
+            Block bodyBlock   = new Block(pos, pos.mult(0.5f), bodyHeight, bodyWidth, bodyLength, currentShape, "ZAxis", 2.2f);
             cuboid = new Alien(bodyBlock);
             prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 2f, -10f));
             setChaseCam(cuboid);
@@ -222,7 +234,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
             Vector3f newPos = newDir.mult(radius+boxRad);
 
             //Make limb and add it to body
-            Block flipper  = new Block(newPos,newHingePos, boxWidth, boxHeight, boxLength, "Box", "XAxis", 1f);
+            Block flipper  = new Block(newPos,newHingePos, boxWidth, boxHeight, boxLength, currentShape, "XAxis", 1f);
             cuboid.rootBlock.addLimb(flipper);
             
              //Instantiate the new alien
@@ -279,7 +291,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(boxLength,boxHeight),boxWidth)+1.0f));
  
         //Build the new limb
-        Block limb  = new Block(newPos,newHingePos, boxHeight, boxWidth, boxLength, "Box", "XAxis", 1f);
+        Block limb  = new Block(newPos,newHingePos, boxHeight, boxWidth, boxLength, currentShape, "XAxis", 1f);
         
         //Still working on getting this to rotate
         limb.setNormal(normal);
@@ -496,7 +508,6 @@ public class Simulator extends SimpleApplication implements ActionListener {
             Geometry g = createLimb(b.collisionShapeType, b.width, b.height, b.length, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getPosition()), b.mass);
             b.applyProperties(g);
 
-            System.out.println("Here");
             printVector3f(b.getHingePosition());
 
             HingeJoint joint = joinHingeJoint(parentGeometry, g, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getHingePosition()), b.hingeType);
@@ -514,6 +525,8 @@ public class Simulator extends SimpleApplication implements ActionListener {
             mesh = new Cylinder(40,40,width,length,true);
         } else if (meshShape.equals("Torus")) {
             mesh = new Torus(40,40,width,length);
+        } else if (meshShape.equals("Sphere")) {
+            mesh = new Sphere(40,40,width);
         } else {
             mesh = new Box(width,height,length);
         }
