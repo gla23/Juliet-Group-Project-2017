@@ -54,6 +54,10 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     public void onEndScreen() {
   }
     
+   public void toggleWireMesh() {
+       app.toggleWireMesh();
+   }
+    
   @Override
   public void initialize(AppStateManager stateManager, Application app) {
    // this.app = app;

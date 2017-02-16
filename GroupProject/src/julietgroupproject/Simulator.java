@@ -84,7 +84,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
     private Material grassMaterial;
     private Material skyMaterial;
     private Nifty nifty;
-
+    private boolean wireMesh = true;
     
            
     
@@ -117,6 +117,10 @@ public class Simulator extends SimpleApplication implements ActionListener {
         bulletAppState.getPhysicsSpace().setGravity(Vector3f.ZERO);
     }
     
+    public void toggleWireMesh() {
+        bulletAppState.setDebugEnabled(wireMesh);
+        wireMesh = !wireMesh;
+    }
     
     //Method for easily printing out vectors for debugging
     public void printVector3f(Vector3f vec) {

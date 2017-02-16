@@ -74,11 +74,16 @@
                         </control>
                     </panel>
                 </panel>
-                <panel id="panel_bottom" backgroundColor="#ffff00ff" width="*" height="15%" childLayout="center">
+                <panel id="panel_bottom" backgroundColor="#ffff00ff" width="*" height="15%" childLayout="vertical">
                     <control name="button" label="HideGUI" id="hideGUI" align="center" valign="center" 
                                 visibleToMouse="true" > 
                                 <interact onClick="hideGUI()"/>
                         </control>
+                    <control name="button" label="Toggle Wire Mesh" width = "10%" id="wireMesh" align="center" valign="center" 
+                                visibleToMouse="true" > 
+                                <interact onClick="toggleWireMesh()"/>
+                        </control>
+                        
                 </panel>
             </panel>
         </layer>
