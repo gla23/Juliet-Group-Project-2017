@@ -12,6 +12,7 @@ import com.jme3.bullet.joints.ConeJoint;
 import com.jme3.bullet.joints.HingeJoint;
 import com.jme3.bullet.joints.PhysicsJoint;
 import com.jme3.bullet.util.CollisionShapeFactory;
+import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.ChaseCamera;
 import com.jme3.input.KeyInput;
@@ -41,6 +42,7 @@ import com.jme3.niftygui.NiftyJmeDisplay;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.TextField;
 import java.util.Random;
+import java.util.LinkedList;
 import org.encog.ml.MLRegression;
 import org.encog.ml.data.MLData;
 import org.encog.ml.data.basic.BasicMLData;
@@ -49,7 +51,6 @@ import org.encog.neural.networks.layers.BasicLayer;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.scene.shape.Sphere;
 import de.lessvoid.nifty.Nifty;
-import java.util.Random;
 import julietgroupproject.GUI.MainMenuController;
 
 public class Simulator extends SimpleApplication implements ActionListener {
@@ -248,7 +249,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
     }
    
     //To be run when right click on body, adds new limb with dimensions defined in text fields
-    public void addLimb(Vector3f contactPt, Vector3f normal) {
+    public void addLimb(Block block, Vector3f contactPt, Vector3f normal) {
         
         //Get rid of old alien on screen
          if (prevAlien!=null){
@@ -298,7 +299,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         limb.setNormal(normal);
         
         //Add new limb to alien and instantiate
-        cuboid.rootBlock.addLimb(limb);
+        block.addLimb(limb);
         prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 2f, -10f));
         setChaseCam(cuboid);
         setupKeys(prevAlien);
@@ -635,15 +636,39 @@ public class Simulator extends SimpleApplication implements ActionListener {
             // Aim the ray from the clicked spot forwards.
             Ray ray = new Ray(click3d, dir);
             
-            //Check for collisions with body
-            cuboid.rootBlock.getGeometry().collideWith(ray, results);
+            //Check for collisions with body recursively
+            rootNode.collideWith(ray, results);
+            CollisionResult collision = results.getClosestCollision();
+            
             
             //If collided then generate new limb at collision point
             if (results.size()>0) {
-                Vector3f colpt = results.getCollision(0).getContactPoint();
-                Vector3f pt = colpt.add(cuboid.rootBlock.getGeometry().getWorldTranslation().negate());
-                Vector3f norm = results.getCollision(0).getContactNormal();
-                addLimb(pt,norm);
+                Geometry geo = collision.getGeometry();
+                Vector3f colpt = collision.getContactPoint();
+                Vector3f pt = colpt.add(geo.getWorldTranslation().negate());
+                Vector3f norm = collision.getContactNormal();
+                
+                //Find block assoicated with collision geometry
+                Block block = null;
+                
+                LinkedList<Block> q = new LinkedList<Block>();
+                q.push(cuboid.rootBlock);
+                
+                while (!q.isEmpty()) {
+                    Block head = q.pop();
+                    if (geo == head.getGeometry()) {
+                        block = head;
+                        break;
+                    } else {
+                        for (Block child : head.getConnectedLimbs()) {
+                            q.push(child);
+                        }
+                    }
+                }
+                
+                if (block != null) {
+                    addLimb(block,pt,norm);
+                }
             }
         }
 
