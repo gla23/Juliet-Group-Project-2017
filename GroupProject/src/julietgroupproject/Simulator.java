@@ -13,6 +13,7 @@ import com.jme3.bullet.joints.HingeJoint;
 import com.jme3.bullet.joints.PhysicsJoint;
 import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.collision.CollisionResults;
+import com.jme3.input.ChaseCamera;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.KeyInput;
@@ -86,6 +87,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
     private Nifty nifty;
     private boolean wireMesh = true;
     
+    private ChaseCamera chaseCam;
            
     
     Alien simpleAlien;
@@ -125,6 +127,15 @@ public class Simulator extends SimpleApplication implements ActionListener {
     //Method for easily printing out vectors for debugging
     public void printVector3f(Vector3f vec) {
         System.out.println("("+vec.getX()+"," +vec.getY()+","+vec.getZ()+")");
+    }
+    
+    public void setChaseCam(Alien shape) {
+        chaseCam = new ChaseCamera(cam, shape.rootBlock.getGeometry(), inputManager);
+        chaseCam.setTrailingEnabled(true);
+        chaseCam.setChasingSensitivity(1f);
+        chaseCam.setSmoothMotion(true); //automatic following
+        chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_LEFT),new KeyTrigger(KeyInput.KEY_P));
+        chaseCam.setTrailingRotationInertia(0.1f);
     }
     
     public void createNewBody() {
@@ -180,6 +191,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
             Block bodyBlock   = new Block(pos, pos.mult(0.5f), bodyHeight, bodyWidth, bodyLength, "Box", "ZAxis", 2.2f);
             cuboid = new Alien(bodyBlock);
             prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 2f, -10f));
+            setChaseCam(cuboid);
             setupKeys(prevAlien);
         }
         
@@ -215,6 +227,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
             
              //Instantiate the new alien
             prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 2f, -10f));
+            setChaseCam(cuboid);
             setupKeys(prevAlien);
         }
      
@@ -274,6 +287,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         //Add new limb to alien and instantiate
         cuboid.rootBlock.addLimb(limb);
         prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 2f, -10f));
+        setChaseCam(cuboid);
         setupKeys(prevAlien);
     }
    
@@ -406,8 +420,9 @@ public class Simulator extends SimpleApplication implements ActionListener {
         //nifty.setDebugOptionPanelColors(true); //un-comment this line to use DebugPanelColors and make sure Nifty is running correctly.
         
 
-        flyCam.setDragToRotate(true); //detaches camera from mouse unless you click/drag.a
-
+        //flyCam.setDragToRotate(true); //detaches camera from mouse unless you click/drag.a
+        
+        flyCam.setEnabled(false);
         
     }
 
@@ -638,7 +653,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         //Add the key binding for the right click to add limb funtionality
         inputManager.addMapping("AddLimb",new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         inputManager.addListener(this, "AddLimb");
-
+        
     }
     public void setupTextures() {
         grassTexture = assetManager.loadTexture("Textures/grass1.jpg");
