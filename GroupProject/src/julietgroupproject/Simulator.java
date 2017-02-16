@@ -74,6 +74,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
     float limbTargetVolcity = 2f;
     float time;
     float minBoxDimention = 0.4f;
+    float minSphereDimention = 0.4f;
     Random rng = new Random();
     private BulletAppState bulletAppState = new BulletAppState();
     private Brain brainToControl;
@@ -91,6 +92,11 @@ public class Simulator extends SimpleApplication implements ActionListener {
     private boolean wireMesh = true;
     
     private ChaseCamera chaseCam;
+    private float horizontalAngle = 0;
+    private float verticalAngle = 0;
+    private float cameraZoom = 10;
+    private boolean smoothCam = false;
+    
     private String currentShape = "Box";
            
     
@@ -123,6 +129,20 @@ public class Simulator extends SimpleApplication implements ActionListener {
         bulletAppState.getPhysicsSpace().setGravity(Vector3f.ZERO);
     }
     
+    public void resetAlien() {
+        if (prevAlien != null) {
+            removeAlien(prevAlien);
+            prevAlien = null;
+        }
+        
+    }
+    
+    public void toggleSmoothness() {
+        smoothCam = !smoothCam;
+        chaseCam.setSmoothMotion(smoothCam);
+        
+        
+    }
     public void toggleWireMesh() {
         bulletAppState.setDebugEnabled(wireMesh);
         wireMesh = !wireMesh;
@@ -134,12 +154,35 @@ public class Simulator extends SimpleApplication implements ActionListener {
     }
     
     public void setChaseCam(Alien shape) {
+        if (chaseCam !=null) { 
+            horizontalAngle = chaseCam.getHorizontalRotation();
+            verticalAngle = chaseCam.getVerticalRotation();
+            cameraZoom = chaseCam.getDistanceToTarget();
+            chaseCam.setSmoothMotion(false);
+            
+        }
+        //toggleSmoothness();
         chaseCam = new ChaseCamera(cam, shape.rootBlock.getGeometry(), inputManager);
+        //toggleSmoothness();
+        chaseCam.setSmoothMotion(false);
+        chaseCam.setDefaultDistance(20.6f);
+        //chaseCam.setSmoothMotion(true);
+        chaseCam.setDefaultHorizontalRotation(horizontalAngle);
+        chaseCam.setDefaultVerticalRotation(verticalAngle);
+        
+        chaseCam.setMinVerticalRotation((float) (Math.PI)*-0.25f);
         chaseCam.setTrailingEnabled(true);
         chaseCam.setChasingSensitivity(1f);
-        chaseCam.setSmoothMotion(true); //automatic following
+        
         chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_LEFT),new KeyTrigger(KeyInput.KEY_P));
         chaseCam.setTrailingRotationInertia(0.1f);
+        chaseCam.setUpVector(new Vector3f(0,1,0));
+        chaseCam.setZoomInTrigger(new KeyTrigger(KeyInput.KEY_LBRACKET), new MouseButtonTrigger(MouseInput.AXIS_WHEEL));
+        chaseCam.setZoomOutTrigger(new KeyTrigger(KeyInput.KEY_RBRACKET),new MouseButtonTrigger(MouseInput.AXIS_WHEEL));
+        chaseCam.setZoomSensitivity(10);
+        //toggleSmoothness();
+        chaseCam.setSmoothMotion(true);
+        
     }
     
     public void setShapeToCuboid() {
@@ -204,7 +247,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
             Vector3f pos = new Vector3f(-10+20*rng.nextFloat(),-10+20*rng.nextFloat(),-10+20*rng.nextFloat());
             Block bodyBlock   = new Block(pos, pos.mult(0.5f), bodyHeight, bodyWidth, bodyLength, currentShape, "ZAxis", 2.2f);
             cuboid = new Alien(bodyBlock);
-            prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 2f, -10f));
+            prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
             setChaseCam(cuboid);
             setupKeys(prevAlien);
         }
@@ -240,7 +283,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
             cuboid.rootBlock.addLimb(flipper);
             
              //Instantiate the new alien
-            prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 2f, -10f));
+            prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
             setChaseCam(cuboid);
             setupKeys(prevAlien);
         }
@@ -300,7 +343,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         
         //Add new limb to alien and instantiate
         block.addLimb(limb);
-        prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 2f, -10f));
+        prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
         setChaseCam(cuboid);
         setupKeys(prevAlien);
     }
@@ -529,7 +572,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         } else if (meshShape.equals("Torus")) {
             mesh = new Torus(40,40,width,length);
         } else if (meshShape.equals("Sphere")) {
-            mesh = new Sphere(40,40,width);
+            mesh = new Sphere(40,40,Math.max(width,minSphereDimention));
         } else {
             mesh = new Box(Math.max(minBoxDimention,width),Math.max(minBoxDimention,height),Math.max(minBoxDimention,length));
         }
