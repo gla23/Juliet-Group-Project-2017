@@ -59,7 +59,7 @@ public class Brain extends AbstractControl {
          * fetch physical information into nnInput.
          */
 
-        for (int i = 0; i < nnInput.length; i++) {
+        for (int i = 0; i < nnInput.length - 1; i++) { //TODO class to describe input categories
             
             // normalise input to range from 0 to 1
             // Angles are in radians. 0 indicates no
@@ -72,8 +72,15 @@ public class Brain extends AbstractControl {
             nnInput[i] = in;
         }
         
-        //Vector3f heading = this.geometries.get(0).getControl(RigidBodyControl.class).getPhysicsRotation().mult(Vector3f.UNIT_Z).project(Vector3f.UNIT_X).normalize();
         
+        double bearing = this.geometries.get(0).getControl(RigidBodyControl.class).getPhysicsRotation().toAngles(null)[2];
+        
+        nnInput[nnInput.length - 1] = (bearing + Math.PI) / (2.0 * Math.PI);
+        
+        if ((bearing + Math.PI) / (2.0 * Math.PI) < 0.0 || (bearing + Math.PI) / (2.0 * Math.PI) > 1.0)
+        {
+            throw new RuntimeException("Angle normalisation incorrect");
+        }
     }
 
     @Override

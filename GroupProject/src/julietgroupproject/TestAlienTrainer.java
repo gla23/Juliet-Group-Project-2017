@@ -23,7 +23,7 @@ public class TestAlienTrainer {
         physicslogger.setUseParentHandlers(false);
         
         Queue<SimulationData> q = new ConcurrentLinkedQueue<>();
-        AlienTrainer trainer = new AlienTrainer(0.5,"test.pop",q,4,4);
+        AlienTrainer trainer = new AlienTrainer(0.5,"test32.pop",q,5,4);
         TestSimulator sim0 = new TestSimulator(q, true);
         TestSimulator sim1 = new TestSimulator(q, false);
         TestSimulator sim2 = new TestSimulator(q, false);
