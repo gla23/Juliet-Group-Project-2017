@@ -96,7 +96,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
     private float horizontalAngle = 0;
     private float verticalAngle = 0;
     private float cameraZoom = 10;
-    private boolean smoothCam = false;
+    private boolean smoothCam = true;
     
     private String currentShape = "Box";
            
@@ -172,7 +172,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         chaseCam.setDefaultVerticalRotation(verticalAngle);
         
         chaseCam.setMinVerticalRotation((float) (Math.PI)*-0.25f);
-        chaseCam.setTrailingEnabled(true);
+        //chaseCam.setTrailingEnabled(true);
         chaseCam.setChasingSensitivity(1f);
         
         chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_LEFT),new KeyTrigger(KeyInput.KEY_P));
