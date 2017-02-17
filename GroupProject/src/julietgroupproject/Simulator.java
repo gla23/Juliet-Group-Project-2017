@@ -200,8 +200,8 @@ public class Simulator extends SimpleApplication implements ActionListener {
         if (prevAlien==null){
             
             //Take the entries from text fields for limb size, do some error handling
-            TextField heightField = nifty.getCurrentScreen().findNiftyControl("bodyHeightTextField", TextField.class);
             TextField widthField = nifty.getCurrentScreen().findNiftyControl("bodyWidthTextField", TextField.class);
+            TextField heightField = nifty.getCurrentScreen().findNiftyControl("bodyHeightTextField", TextField.class);
             TextField lengthField = nifty.getCurrentScreen().findNiftyControl("bodyLengthTextField", TextField.class);
             float bodyWidth = 0f;
             float bodyHeight = 0f;
@@ -209,7 +209,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
             
             
             try {
-                bodyWidth = Float.valueOf(heightField.getText());
+                bodyWidth = Float.valueOf(widthField.getText());
             } catch (NumberFormatException e) {
                 System.out.println("Whoops - Incorrect number format");
             } finally {
@@ -221,7 +221,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
             } 
             
             try {
-                bodyHeight = Float.valueOf(widthField.getText());
+                bodyHeight = Float.valueOf(heightField.getText());
             } catch (NumberFormatException e) {
                 System.out.println("Whoops - Incorrect number format");
             } finally {
@@ -302,15 +302,15 @@ public class Simulator extends SimpleApplication implements ActionListener {
    
        
         //Take the entries from text fields for limb size, do some error handling
-        TextField heightField = nifty.getCurrentScreen().findNiftyControl("heightTextField", TextField.class);
         TextField widthField = nifty.getCurrentScreen().findNiftyControl("widthTextField", TextField.class);
+        TextField heightField = nifty.getCurrentScreen().findNiftyControl("heightTextField", TextField.class);
         TextField lengthField = nifty.getCurrentScreen().findNiftyControl("lengthTextField", TextField.class);
         float boxWidth  = -1.8f;
         float boxHeight = -0.4f;
         float boxLength = -0.4f;
         try {
-            boxWidth = Float.valueOf(heightField.getText());
-            boxHeight = Float.valueOf(widthField.getText());
+            boxWidth = Float.valueOf(widthField.getText());
+            boxHeight = Float.valueOf(heightField.getText());
             boxLength = Float.valueOf(lengthField.getText());
         } catch (NumberFormatException e) {
             System.out.println("Whoops - Incorrect number format");
