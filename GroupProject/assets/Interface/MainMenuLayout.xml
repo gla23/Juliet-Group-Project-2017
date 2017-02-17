@@ -17,7 +17,7 @@
                 </panel>
                 <panel id="panel_middle" width="*" height="70%" childLayout="horizontal">
                     <panel id = "panel_middle_left" backgroundColor="#ff5500ff" width= "10%" height = "*" childLayout = "vertical">
-                        <panel id = "panel_gravity_options" backgroundColor="#ff5533ff" width= "*" height = "40%" childLayout = "vertical" valign = "center">
+                        <panel id = "panel_gravity_options" backgroundColor="#ff5533ff" width= "*" height = "25%" childLayout = "vertical" valign = "center">
                             <control name="label" text="Gravity options:" align = "center" />
                             <control name="button" label="GravityOff" id="GravButton" align="center" valign="center" 
                                 visibleToMouse="true" > 
@@ -32,7 +32,7 @@
                         <panel id ="panel_new_limb_size_entry" backgroundColour="#bb345123" width = "*" height = "70%" childLayout = "vertical">
                             <control name="label"text="New Limb Generator" height = "10%" valign = "top"/>
                             
-                            <panel id = "panel_new_limb_entry_fields" backgroundColour="#bb345123" width = "*" height = "60%" childLayout = "vertical" valign ="center">
+                            <panel id = "panel_new_limb_entry_fields" backgroundColour="#bb345123" width = "*" height = "40%" childLayout = "vertical" valign ="center">
                                 <control name="label" text="Enter Height (Y-axis):" />
                                 <control name="textfield" id="heightTextField" maxLength="20" />
                                 <control name="label" text="Enter Width (X-axis):" />
@@ -91,7 +91,10 @@
                                 visibleToMouse="true" > 
                                 <interact onClick="toggleWireMesh()"/>
                         </control>
-                        
+                        <control name="button" label="Reset Alien" width = "10%" id="alienReset" align="center" valign="center" 
+                                visibleToMouse="true" > 
+                                <interact onClick="resetAlien()"/>
+                        </control>
                 </panel>
             </panel>
         </layer>

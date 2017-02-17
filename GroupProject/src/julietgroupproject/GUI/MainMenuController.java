@@ -60,7 +60,12 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     
    public void setToCuboid() {
        app.setShapeToCuboid();
-       
+       Label currentShape = nifty.getCurrentScreen().findNiftyControl("currentShape", Label.class);
+       currentShape.setText("Cuboid");
+   }
+   
+   public void toggleSmoothness() {
+       app.toggleSmoothness();
    }
    
    public void setToSphere() {
