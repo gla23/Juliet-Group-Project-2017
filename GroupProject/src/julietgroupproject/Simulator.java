@@ -178,9 +178,10 @@ public class Simulator extends SimpleApplication implements ActionListener {
         chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_LEFT),new KeyTrigger(KeyInput.KEY_P));
         chaseCam.setTrailingRotationInertia(0.1f);
         chaseCam.setUpVector(new Vector3f(0,1,0));
-        chaseCam.setZoomInTrigger(new KeyTrigger(KeyInput.KEY_LBRACKET), new MouseButtonTrigger(MouseInput.AXIS_WHEEL));
-        chaseCam.setZoomOutTrigger(new KeyTrigger(KeyInput.KEY_RBRACKET),new MouseButtonTrigger(MouseInput.AXIS_WHEEL));
+        chaseCam.setZoomInTrigger(new KeyTrigger(KeyInput.KEY_LBRACKET));
+        chaseCam.setZoomOutTrigger(new KeyTrigger(KeyInput.KEY_RBRACKET));
         chaseCam.setZoomSensitivity(10);
+        chaseCam.setInvertVerticalAxis(true);
         //toggleSmoothness();
         chaseCam.setSmoothMotion(true);
         
@@ -310,8 +311,6 @@ public class Simulator extends SimpleApplication implements ActionListener {
         float boxLength = -0.4f;
         try {
             boxWidth = Float.valueOf(widthField.getText());
-            boxHeight = Float.valueOf(heightField.getText());
-            boxLength = Float.valueOf(lengthField.getText());
         } catch (NumberFormatException e) {
             System.out.println("Whoops - Incorrect number format");
         } finally {
@@ -320,11 +319,23 @@ public class Simulator extends SimpleApplication implements ActionListener {
             } else if (boxWidth ==0) {
                 boxWidth = 0.4f;
             }
+        }
+        try {
+            boxHeight = Float.valueOf(heightField.getText());
+        } catch (NumberFormatException e) {
+            System.out.println("Whoops - Incorrect number format");
+        } finally {
             if (boxHeight <0) {
                 boxHeight = -boxHeight;
             } else if (boxHeight ==0) {
                 boxHeight = 0.4f;
             }
+        }
+        try {
+            boxLength = Float.valueOf(lengthField.getText());
+        } catch (NumberFormatException e) {
+            System.out.println("Whoops - Incorrect number format");
+        } finally {
             if (boxLength <0) {
                 boxLength = -boxLength;
             } else if (boxLength ==0) {
@@ -332,6 +343,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
             }
         } 
         
+            
         Vector3f whlVec = new Vector3f(boxWidth,boxHeight,boxLength);
         Matrix3f rotator = new Matrix3f();
         rotator.fromStartEndVectors(normal, new Vector3f(1,0,0));
@@ -377,7 +389,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         setupTextures();
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
-        
+        setDisplayStatView(false);
 
         // setDebugEnabled - wireframe
         bulletAppState.setDebugEnabled(true);
@@ -421,8 +433,8 @@ public class Simulator extends SimpleApplication implements ActionListener {
             flipper = new Alien(rootBlock);
 
             // Create that alien in the simulation, with the Brain interface used to control it.
-            brainOfAlienCurrentlyBeingSimulated = instantiateAlien(flipper, new Vector3f(-12f, 0f, -10f));
-            setupKeys(brainOfAlienCurrentlyBeingSimulated);
+            //brainOfAlienCurrentlyBeingSimulated = instantiateAlien(flipper, new Vector3f(-12f, 0f, -10f));
+            //setupKeys(brainOfAlienCurrentlyBeingSimulated);
             //Brain flipperb = instantiateAlien(flipper, new Vector3f(10f, 30f, -30f));
             //Brain flipperc = instantiateAlien(flipper, new Vector3f(-15f, 90f, -60f));
 
@@ -492,7 +504,6 @@ public class Simulator extends SimpleApplication implements ActionListener {
 
         nifty = niftyDisplay.getNifty();
 
-        Nifty nifty = niftyDisplay.getNifty();
 
         guiViewPort.addProcessor(niftyDisplay);
         nifty.fromXml("Interface/MainMenuLayout.xml", "start", myMainMenuController);
@@ -760,7 +771,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         
     }
     public void setupTextures() {
-        grassTexture = assetManager.loadTexture("Textures/grass1.jpg");
+        grassTexture = assetManager.loadTexture("Textures/grass4.png");
         grassTexture.setAnisotropicFilter(4);
         grassTexture.setWrap(WrapMode.Repeat);
         grassMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");

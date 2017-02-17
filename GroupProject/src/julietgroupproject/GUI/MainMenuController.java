@@ -39,9 +39,13 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
       app.createNewBody();
       
   }
-   public void hideGUI() {
-       nifty.exit();
+   public void hideEditor() {
+       nifty.gotoScreen("hidden");
        
+   }
+   
+   public void showEditor(){
+       nifty.gotoScreen("start");
    }
    
    public void addLimb() {
@@ -62,7 +66,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
    public void setToCuboid() {
        app.setShapeToCuboid();
        Label currentShape = nifty.getCurrentScreen().findNiftyControl("currentShape", Label.class);
-       currentShape.setText("Cuboid");
+       currentShape.setText("Currently Selected: Cuboid");
    }
    
    public void toggleSmoothness() {
@@ -72,7 +76,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
    public void setToSphere() {
        app.setShapeToSphere();
        Label currentShape = nifty.getCurrentScreen().findNiftyControl("currentShape", Label.class);
-       currentShape.setText("Sphere");
+       currentShape.setText("Currently Selected: Sphere");
    }
    
    public void resetAlien() {
