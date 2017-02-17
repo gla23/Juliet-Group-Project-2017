@@ -165,9 +165,12 @@ public class Simulator extends SimpleApplication implements ActionListener {
         //toggleSmoothness();
         chaseCam = new ChaseCamera(cam, shape.rootBlock.getGeometry(), inputManager);
         //toggleSmoothness();
-        chaseCam.setSmoothMotion(false);
-        chaseCam.setDefaultDistance(20.6f);
-        //chaseCam.setSmoothMotion(true);
+        chaseCam.setSmoothMotion(smoothCam);
+        if (smoothCam) {
+            chaseCam.setDefaultDistance(20.6f);
+        } else {
+            chaseCam.setDefaultDistance(cameraZoom);
+        }
         chaseCam.setDefaultHorizontalRotation(horizontalAngle);
         chaseCam.setDefaultVerticalRotation(verticalAngle);
         
@@ -182,9 +185,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         chaseCam.setZoomOutTrigger(new KeyTrigger(KeyInput.KEY_RBRACKET));
         chaseCam.setZoomSensitivity(10);
         chaseCam.setInvertVerticalAxis(true);
-        //toggleSmoothness();
-        chaseCam.setSmoothMotion(true);
-        
+        chaseCam.setMaxDistance(150);
     }
     
     public void setShapeToCuboid() {
