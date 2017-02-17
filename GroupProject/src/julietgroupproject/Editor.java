@@ -54,13 +54,13 @@ import com.jme3.scene.shape.Sphere;
 import de.lessvoid.nifty.Nifty;
 import julietgroupproject.GUI.MainMenuController;
 
-public class Simulator extends SimpleApplication implements ActionListener {
+public class Editor extends SimpleApplication implements ActionListener {
 
     
     int age = 0;
     int simTime;
     int simsRunning = 0;
-    Simulator parent;
+    Editor parent;
     Alien alienToSim;
     Brain brainOfAlienCurrentlyBeingSimulated;
     
@@ -517,7 +517,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
         
     }
 
-    public void endSimulator(Simulator s) {
+    public void endSimulator(Editor s) {
         // Only run in parent simulator, called by children when simTime is up.
         System.out.println("Simulator has finished with a fitness of: "+ s.fitness());
         s.stop();
@@ -854,7 +854,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
     }
 
     public static void main(String[] args) {
-        Simulator app = new Simulator();
+        Editor app = new Editor();
         app.mainApplication = true;
         app.runningPhysics = false;
         app.start();

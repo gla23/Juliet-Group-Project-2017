@@ -9,16 +9,16 @@ import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
-import julietgroupproject.Simulator;
+import julietgroupproject.Editor;
 
 public class MainMenuController extends AbstractAppState implements ScreenController {
 
-  private Simulator app;
+  private Editor app;
   private AppStateManager stateManager;
   private Nifty nifty;
   private Screen screen;
     
-  public MainMenuController(Simulator App) {
+  public MainMenuController(Editor App) {
       this.app = App;
   }
   
