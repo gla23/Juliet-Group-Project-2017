@@ -25,6 +25,7 @@ import com.jme3.light.AmbientLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Matrix3f;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -215,7 +216,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
                 if (bodyWidth <0) {
                     bodyWidth = -bodyWidth;
                 } else if (bodyWidth ==0) {
-                    bodyWidth = 4*rng.nextFloat();
+                    bodyWidth = 2.1f;//4*rng.nextFloat();
                 }
             } 
             
@@ -227,7 +228,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
                 if (bodyHeight <0) {
                     bodyHeight = -bodyHeight;
                 } else if (bodyHeight ==0) {
-                    bodyHeight = 4*rng.nextFloat();
+                    bodyHeight = 0.7f;//4*rng.nextFloat();
                 }
             } 
            
@@ -239,13 +240,13 @@ public class Simulator extends SimpleApplication implements ActionListener {
                 if (bodyLength <0) {
                     bodyLength = -bodyLength;
                 } else if (bodyLength ==0) {
-                    bodyLength = 4*rng.nextFloat();
+                    bodyLength = 1.6f;//4*rng.nextFloat();
                 }
             } 
             
             //Instantiate the new alien
             Vector3f pos = new Vector3f(-10+20*rng.nextFloat(),-10+20*rng.nextFloat(),-10+20*rng.nextFloat());
-            Block bodyBlock   = new Block(pos, pos.mult(0.5f), bodyHeight, bodyWidth, bodyLength, currentShape, "ZAxis", 2.2f);
+            Block bodyBlock   = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", 2.2f);
             cuboid = new Alien(bodyBlock);
             prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
             setChaseCam(cuboid);
@@ -304,9 +305,9 @@ public class Simulator extends SimpleApplication implements ActionListener {
         TextField heightField = nifty.getCurrentScreen().findNiftyControl("heightTextField", TextField.class);
         TextField widthField = nifty.getCurrentScreen().findNiftyControl("widthTextField", TextField.class);
         TextField lengthField = nifty.getCurrentScreen().findNiftyControl("lengthTextField", TextField.class);
-        float boxWidth = -0.2f;
-        float boxHeight = -0.2f;
-        float boxLength = -0.2f;
+        float boxWidth  = -1.8f;
+        float boxHeight = -0.4f;
+        float boxLength = -0.4f;
         try {
             boxWidth = Float.valueOf(heightField.getText());
             boxHeight = Float.valueOf(widthField.getText());
@@ -317,26 +318,45 @@ public class Simulator extends SimpleApplication implements ActionListener {
             if (boxWidth <0) {
                 boxWidth = -boxWidth;
             } else if (boxWidth ==0) {
-                boxWidth = 0.5f;
+                boxWidth = 0.4f;
             }
             if (boxHeight <0) {
                 boxHeight = -boxHeight;
             } else if (boxHeight ==0) {
-                boxHeight = 0.5f;
+                boxHeight = 0.4f;
             }
             if (boxLength <0) {
                 boxLength = -boxLength;
             } else if (boxLength ==0) {
-                boxLength = 0.5f;
+                boxLength = 1.3f;
             }
         } 
+        
+        Vector3f whlVec = new Vector3f(boxWidth,boxHeight,boxLength);
+        Matrix3f rotator = new Matrix3f();
+        rotator.fromStartEndVectors(normal, new Vector3f(1,0,0));
+        whlVec = rotator.mult(whlVec);
+        whlVec.x = Math.abs(whlVec.x);
+        whlVec.y = Math.abs(whlVec.y);
+        whlVec.z = Math.abs(whlVec.z);
+        
+        
+        
         
         //Find hinge and postion vectors given shape and click position
         Vector3f newHingePos = contactPt.add(normal.mult(0.5f));
         Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(boxLength,boxHeight),boxWidth)+1.0f));
- 
+        String axisToUse = "ZAxis";
+        if (whlVec.x<whlVec.z){
+            axisToUse = "XAxis";
+        }
+        
         //Build the new limb
-        Block limb  = new Block(newPos,newHingePos, boxHeight, boxWidth, boxLength, currentShape, "XAxis", 1f);
+        Block limb  = new Block(newPos,newHingePos,whlVec.x , whlVec.y, whlVec.z, currentShape, axisToUse, 1f);
+        Matrix3f rotation = new Matrix3f();
+        rotation.fromStartEndVectors(new Vector3f(0,1,0), normal);
+        
+        limb.rotation = rotation;
         
         //Still working on getting this to rotate
         limb.setNormal(normal);
@@ -391,6 +411,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
             legLeft.setRotation(new Matrix3f(1f,0f,0f,0f,0f,-1f,0f,1f,0f));
             Block legRight  = new Block(new Vector3f( 2.6f, 0.0f, 0.0f), new Vector3f( 1.3f, 0.0f, 0.0f), 1.5f, 0.1f, 1.3f, "Box", "YAxis", 1.2f);
             Block flipper1  = new Block(new Vector3f( flipperTranslation, 0.0f, 3.6f), new Vector3f( flipperTranslation, 0.0f, 1.3f), 0.6f, 0.1f, 2.1f, "Box", "XAxis", 1f);
+            flipper1.setRotation(new Matrix3f(0.0f,  1.0f,  0.0f, -1.0f,  0.0f,  -0.0f,  -0.0f,  0.0f,  1.0f));
             Block flipper2  = new Block(new Vector3f( flipperTranslation, 0.0f,-3.6f), new Vector3f( flipperTranslation, 0.0f,-1.3f), 0.6f, 0.1f, 2.1f, "Box", "XAxis", 1f);
             Block head      = new Block(new Vector3f(-2.0f, 0.0f, 0.0f), new Vector3f(-1.3f, 0.0f, 0.0f), 0.5f, 0.5f, 0.5f, "Cylinder", "ZAxis", 1f);
             rootBlock.addLimb(legRight);
@@ -400,7 +421,8 @@ public class Simulator extends SimpleApplication implements ActionListener {
             flipper = new Alien(rootBlock);
 
             // Create that alien in the simulation, with the Brain interface used to control it.
-            //brainOfAlienCurrentlyBeingSimulated = instantiateAlien(flipper, new Vector3f(0f, 0f, -10f));
+            brainOfAlienCurrentlyBeingSimulated = instantiateAlien(flipper, new Vector3f(-12f, 0f, -10f));
+            setupKeys(brainOfAlienCurrentlyBeingSimulated);
             //Brain flipperb = instantiateAlien(flipper, new Vector3f(10f, 30f, -30f));
             //Brain flipperc = instantiateAlien(flipper, new Vector3f(-15f, 90f, -60f));
 
@@ -483,10 +505,6 @@ public class Simulator extends SimpleApplication implements ActionListener {
         
     }
 
-   
-    
-    
-
     public void endSimulator(Simulator s) {
         // Only run in parent simulator, called by children when simTime is up.
         System.out.println("Simulator has finished with a fitness of: "+ s.fitness());
@@ -553,7 +571,7 @@ public class Simulator extends SimpleApplication implements ActionListener {
             Geometry g = createLimb(b.collisionShapeType, b.width, b.height, b.length, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getPosition()), b.mass);
             b.applyProperties(g);
 
-            printVector3f(b.getHingePosition());
+            //printVector3f(b.getHingePosition());
 
             HingeJoint joint = joinHingeJoint(parentGeometry, g, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getHingePosition()), b.hingeType);
             geometries.attachChild(g);
@@ -579,12 +597,17 @@ public class Simulator extends SimpleApplication implements ActionListener {
         Geometry limb = new Geometry("Limb",mesh);
         RigidBodyControl r;
         r = new RigidBodyControl(CollisionShapeFactory.createDynamicMeshShape(limb),mass);
+        
+        //Quaternion q = new Quaternion().fromAngles(0f, 1f, 0.5f); //fromRotationMatrix(new Matrix3f(1f,0f,0f,0f,0f,-1f,0f,1f,0f));
+        //r.setPhysicsRotation(q); //setLocalRotation(q);
+        
         limb.addControl(r); //limb.setMesh(CollisionShapeFactory.createMeshShape(limb));
-        r.setPhysicsLocation(location);
-        //limb.setLocalTranslation(location);
         limb.setMaterial(alienMaterial2);
-        limb.getMesh().scaleTextureCoordinates(new Vector2f(1f,1f));
+        //limb.getMesh().scaleTextureCoordinates(new Vector2f(1f,1f));
         limb.getControl(RigidBodyControl.class).setPhysicsLocation(location);
+        
+        
+        
         return limb;
     }
     private Node createLimbNode(String collisionType, float width, float height, float length, Vector3f location, boolean rotate, float mass) {
@@ -644,10 +667,8 @@ public class Simulator extends SimpleApplication implements ActionListener {
                         brainToControl.joints.get(i).getBodyA().activate();
                         brainToControl.joints.get(i).getBodyB().activate();
                         brainToControl.joints.get(i).enableMotor(true, 1 * limbTargetVolcity, limbPower);
-                        System.out.println("G1");
                     } else {
                         brainToControl.joints.get(i).enableMotor(false, 0, 0);
-                        System.out.println("G2");
                     }
                 }
                 if (("Alien joint " + ((Integer) i).toString() + " anticlockwise").equals(string)) {
