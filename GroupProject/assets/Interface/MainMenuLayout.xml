@@ -27,6 +27,10 @@
                                 visibleToMouse="true" > 
                                 <interact onClick="toggleGravOn()"/>
                         </control>
+                        <control name="button" label="smoothCamera?" id="smoothCamera" align="center" valign="center" 
+                                visibleToMouse="true" > 
+                                <interact onClick="toggleSmoothness()"/>
+                        </control>
                         </panel>
                         
                         <panel id ="panel_new_limb_size_entry" backgroundColour="#bb345123" width = "*" height = "70%" childLayout = "vertical">
@@ -39,16 +43,22 @@
                                 <control name="textfield" id="widthTextField" maxLength="20"  />
                                 <control name="label" text="Enter Length (Z-axis):" />
                                 <control name="textfield" id="lengthTextField" maxLength="20" />
+                            </panel>
+                            <panel id = "panel_new_limb_entry_fields_second" backgroundColour="#bb345123" width = "*" height = "25%" childLayout = "vertical" valign ="center">
+                                <control name = "button" label = "Set Focus to Simulator" align = "center" width = "*"/>
+                                <control name="label" text="*** Right click on body to add ***" height = "10%"/>
+                            </panel>
+                            <panel id = "panel_shape_selector" backgroundColour="#bb345123" width = "*" height = "25%" childLayout = "vertical" valign ="center">
+                               <control name="label" text="Shape Selector" />
                                 <control name ="button" label="Set shape to cuboid" width = "*" id = "cuboidButton" visibleToMouse="true">
                                     <interact onClick="setToCuboid()"/>
                                 </control>
                                 <control name ="button" label="Set shape to sphere" width = "*" id = "sphereButton" visibleToMouse="true">
                                     <interact onClick="setToSphere()"/>
                                 </control>
+                                <control name="label" text="Currently Selected:" />
+                                <control name="label" width = "*" id = "currentShape" text="Cuboid" />
                             </panel>
-                            <control name = "button" label = "Set Focus to Simulator" align = "center" width = "*"/>
-                            <control name="label" text="*** Right click on body to add ***" height = "10%"/>
-              
                             
                         </panel>
                         

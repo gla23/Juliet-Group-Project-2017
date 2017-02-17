@@ -6,6 +6,7 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Vector3f;
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 import julietgroupproject.Simulator;
@@ -70,6 +71,12 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
    
    public void setToSphere() {
        app.setShapeToSphere();
+       Label currentShape = nifty.getCurrentScreen().findNiftyControl("currentShape", Label.class);
+       currentShape.setText("Sphere");
+   }
+   
+   public void resetAlien() {
+       app.resetAlien();
    }
    
   @Override
