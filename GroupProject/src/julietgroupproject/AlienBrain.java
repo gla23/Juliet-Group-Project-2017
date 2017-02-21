@@ -20,6 +20,8 @@ import org.encog.ml.data.basic.BasicMLData;
 /**
  *
  * @author GeorgeLenovo
+ * 
+ * Controls an alien contained in an AlienNode using neural network.
  */
 public class AlienBrain extends AbstractControl {
     private AlienNode alien;

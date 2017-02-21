@@ -24,19 +24,19 @@ public class TestAlienTrainer {
         
         Queue<SimulationData> q = new ConcurrentLinkedQueue<>();
         AlienTrainer trainer = new AlienTrainer(0.5,"test32.pop",q,5,4);
-        TestSimulator sim0 = new TestSimulator(q, true);
-        TestSimulator sim1 = new TestSimulator(q, false);
-        TestSimulator sim2 = new TestSimulator(q, false);
+        //SlaveSimulator sim0 = new SlaveSimulator(q, true);
+        SlaveSimulator sim1 = new SlaveSimulator(q, false);
+        SlaveSimulator sim2 = new SlaveSimulator(q, false);
         
         /*
-        TestSimulator sim3 = new TestSimulator(q, false);
-        TestSimulator sim4 = new TestSimulator(q, false);
-        TestSimulator sim5 = new TestSimulator(q, false);
-        TestSimulator sim6 = new TestSimulator(q, false);
-        TestSimulator sim7 = new TestSimulator(q, false);
+        SlaveSimulator sim3 = new SlaveSimulator(q, false);
+        SlaveSimulator sim4 = new SlaveSimulator(q, false);
+        SlaveSimulator sim5 = new SlaveSimulator(q, false);
+        SlaveSimulator sim6 = new SlaveSimulator(q, false);
+        SlaveSimulator sim7 = new SlaveSimulator(q, false);
         */
         //sim.start(JmeContext.Type.Headless);
-        sim0.start();
+        //sim0.start();
         sim1.start(JmeContext.Type.Headless);
         sim2.start(JmeContext.Type.Headless);
         //sim3.start(JmeContext.Type.Headless);
@@ -48,7 +48,7 @@ public class TestAlienTrainer {
         trainer.run();
         
         //Cleanup after runs complete:
-        sim0.kill();
+        //sim0.kill();
         sim1.kill();
         sim2.kill();
         //sim3.kill();

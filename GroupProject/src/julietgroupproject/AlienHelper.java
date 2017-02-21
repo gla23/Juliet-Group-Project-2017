@@ -91,4 +91,18 @@ public class AlienHelper {
     public static Vector3f getGeometryLocation(Geometry g) {
         return g.getControl(RigidBodyControl.class).getPhysicsLocation();
     }
+    
+    public static AlienNode assembleAlien(Alien a, Vector3f location) {
+        AlienNode alienNode = new AlienNode();
+        Block rootBlock = a.rootBlock;
+        Geometry rootBlockGeometry = AlienHelper.assembleBlock(rootBlock, location);
+        rootBlock.applyProperties(rootBlockGeometry);
+        alienNode.attachChild(rootBlockGeometry);
+        alienNode.geometries.add(rootBlockGeometry);
+        recursivelyAddBlocks(rootBlock, rootBlock, rootBlockGeometry, alienNode);
+        return alienNode;
+    }
+    
+    
+    
 }

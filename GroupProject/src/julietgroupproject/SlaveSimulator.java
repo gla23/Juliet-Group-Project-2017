@@ -15,19 +15,16 @@ import java.util.Queue;
  *
  * @author Sunny <ss2324@cam.ac.uk>
  */
-public class TestSimulator extends SimpleApplication {
+public class SlaveSimulator extends SimpleApplication {
 
     private BulletAppState bulletAppState;
     private Queue<SimulationData> queue;
-    private boolean waiting;
     private boolean toDisplay;
     private volatile boolean toKill;
 
-    public TestSimulator(Queue queue, boolean _toDisplay) {
+    public SlaveSimulator(Queue queue, boolean _toDisplay) {
         super();
         this.queue = queue;
-        waiting = true;
-        toDisplay = _toDisplay;
         toKill = false;
     }
 
@@ -61,9 +58,7 @@ public class TestSimulator extends SimpleApplication {
         flipper = new Alien(rootBlock);
 
         if (!toDisplay) {
-            stateManager.attach(new SimulatorAppState(flipper,queue,1.0));
-        } else {
-            stateManager.attach(new DrawingSimulatorAppState(flipper,queue,1.0));
+            stateManager.attach(new TrainingAppState(flipper,queue,1.0));
         }
     }
 

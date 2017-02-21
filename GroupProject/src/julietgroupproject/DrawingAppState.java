@@ -25,11 +25,11 @@ import org.encog.ml.MLRegression;
  *
  * @author Peter
  */
-public class DrawingSimulatorAppState extends SimulatorAppState
+public class DrawingAppState extends SimulatorAppState
 {
-    public DrawingSimulatorAppState(Alien _alien, Queue<SimulationData> q, double _simSpeed)
+    public DrawingAppState(Alien _alien, double _simSpeed)
     {
-        super(_alien,q,_simSpeed);
+        super(_alien,_simSpeed);
     }
     
     @Override
@@ -89,27 +89,16 @@ public class DrawingSimulatorAppState extends SimulatorAppState
     }
     
     @Override
-    protected AlienNode instantiateAlien(Alien a, Vector3f location, MLRegression nn) {
+    protected AlienNode instantiateAlien(Alien a, Vector3f location) {
         /*
          * Spawn a new alien at a specified location.
          */
         
-        AlienNode b = super.instantiateAlien(a, location, nn);
+        AlienNode node = super.instantiateAlien(a, location);
         
         // TEMP
-        b.setMaterial(alienMaterial2);
+        node.setMaterial(alienMaterial2);
 
-        return b;
-    }
-    
-    @Override
-    protected void stopSimulation() {
-        /*
-         * Stop the current simulation,
-         * but do not set the fitness.
-         */
-        this.simInProgress = false;
-        //turn physics off?
-        //this.physics.setEnabled(false);
+        return node;
     }
 }
