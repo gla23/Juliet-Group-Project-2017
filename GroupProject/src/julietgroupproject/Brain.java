@@ -37,7 +37,10 @@ public class Brain extends AbstractControl {
     private static final float MAX_VELOCITY = 2f;
     private static final float MIN_VELOCITY = 0.1f;
     private static final float MAX_POWER = 1f;
+
+
     private static final int TICK_CYCLE = 10;
+
     private int tick = 0;
 
     public Vector3f getPosition(Node node) {
@@ -68,6 +71,7 @@ public class Brain extends AbstractControl {
             if (in < 0.0) in = 0.0;
             if (in > 1.0) in = 1.0;
             nnInput[i] = in;
+
         }
     }
 
@@ -78,10 +82,13 @@ public class Brain extends AbstractControl {
         // initialise nn input/output arrays
         if (spatial != null) {
             nnInput = new double[nn.getInputCount()];
+
         }
     }
 
+
     @Override
+
     protected void controlUpdate(float tpf) {
         /*
          * Updates state of alien.

@@ -19,6 +19,8 @@ public class Block {
     public String collisionShapeType;
     public String hingeType;
     private LinkedList<Block> connectedLimbs = new LinkedList<Block>(); // List of Blocks that this is the parent of
+    private Geometry geo;
+    private Vector3f normal = new Vector3f(1,0,0);
     
 
     public Block(Vector3f pos, Vector3f hingePos, float width, float height, float length, String collisionShapeType, String hingeType,float mass) {
@@ -35,11 +37,22 @@ public class Block {
     public void applyProperties(Geometry g){
         // This function is used when the block is instantiated, used to make the properties of the geometry the same as the block.
         // As we add more properties for the blocks, this functions should be edited to apply them when the block is created
+        this.geo = g;
         
-        g.getControl(RigidBodyControl.class).setPhysicsRotation(rotation);
+        //Still trying to figure out the rotation here
+        /*geo.getControl(RigidBodyControl.class).setPhysicsRotation(new Matrix3f(0.1f,0.2f,0.3f,0.4f,0.5f,0.6f,0.7f,0.8f,0.9f));
+        geo.rotate(0.1f,0.4f,0.7f);*/
+        
         
         // Set the friction of the limb
         //g.getControl(RigidBodyControl.class).setFriction(friction);
+    }
+    
+    public void setNormal(Vector3f norm) {
+        normal = norm;
+    }
+    public Geometry getGeometry() {
+        return geo;
     }
     
     public Vector3f getPosition() {
