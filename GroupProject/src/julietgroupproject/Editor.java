@@ -499,7 +499,7 @@ public class Editor extends SimpleApplication implements ActionListener {
         myMainMenuController = new MainMenuController(this);
 
         stateManager.attach(myMainMenuController);
-        
+     
         //Set up nifty
         NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
 
@@ -507,7 +507,7 @@ public class Editor extends SimpleApplication implements ActionListener {
 
 
         guiViewPort.addProcessor(niftyDisplay);
-        nifty.fromXml("Interface/MainMenuLayout.xml", "start", myMainMenuController);
+        nifty.fromXml("Interface/MainMenuLayout.xml", "begin", myMainMenuController);
         //nifty.setDebugOptionPanelColors(true); //un-comment this line to use DebugPanelColors and make sure Nifty is running correctly.
         
 

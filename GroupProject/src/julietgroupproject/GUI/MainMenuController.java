@@ -7,6 +7,9 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Vector3f;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.Label;
+import de.lessvoid.nifty.controls.Window;
+import de.lessvoid.nifty.effects.EffectEventId;
+import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 import julietgroupproject.Editor;
@@ -46,6 +49,39 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
    
    public void showEditor(){
        nifty.gotoScreen("start");
+   }
+   
+   public void newAlienButtonClick() {
+       nifty.gotoScreen("start");
+   }
+   
+   public void loadAlienButtonClick() {
+       nifty.gotoScreen("loadAlien");
+   }
+   
+   public void runPreviousSimulation() {
+       //TODO
+   }
+   
+   public void runNewSimulation() {
+       //TODO
+   }
+   
+   public void loadAlien() {
+       //TODO
+       nifty.getCurrentScreen().findElementByName("panel_background").startEffect(EffectEventId.onCustom);
+       
+   }
+   
+   public void saveAlien() {
+       //TODO
+   }
+   
+   public void editorOptions() {
+       //TODO
+       nifty.gotoScreen("editor_options");
+       //Window window = nifty.getCurrentScreen().findNiftyControl("editor_options_window", Window.class);
+       
    }
    
    public void addLimb() {
