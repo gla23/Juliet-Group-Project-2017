@@ -23,6 +23,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
+import java.util.Queue;
 import org.encog.ml.MLRegression;
 
 /**
@@ -41,27 +42,51 @@ public class SimulatorAppState extends AbstractAppState {
     protected InputManager inputManager;
     protected ViewPort viewPort;
     protected BulletAppState physics;
+    // simulation related fields
+    protected Queue<SimulationData> queue;
     protected Alien alien;
     protected Node simRoot;
     protected Node scene;
     protected Node alienRoot;
+    public static final int DEFAULT_UPDATE_CYCLE = 100;
     protected int nnUpdateCycle;
+    protected float simSpeed;
+    private float originalSpeed;
     protected SimulationData currentSim;
     protected Brain currentAlienBrain;
+    // flags
+    private volatile boolean toKill;
     protected boolean simInProgress;
     protected float simTimeLimit;
+    // World related
     protected Vector3f startLocation = Vector3f.ZERO;
     protected Geometry floorGeometry;
 
-    public SimulatorAppState(Alien alien, int _nnUpdateCycle) {
+    public SimulatorAppState(Alien alien, Queue<SimulationData> q, double _simSpeed) {
         /*
          * Constructor, taking an Alien object as the Alien
-         * to be tested in this simulator.
+         * to be tested in this simulator, the task queue with
+         * simulation data (neural network objects) and the
+         * simulation speed.
          * 
          * @param alien The alien to be tested.
+         * @param q The SimulationData queue. Must be thread-safe.
+         * @param simSpeed Simulation speed. Default is 1.0.
          */
         this.alien = alien;
-        this.nnUpdateCycle = _nnUpdateCycle;
+        this.queue = q;
+        this.simSpeed = (float)_simSpeed;
+        
+        this.nnUpdateCycle = (int)(DEFAULT_UPDATE_CYCLE / this.simSpeed);
+    }
+    
+    public void setToKill(boolean _toKill) {
+        //might need to watch for concurrent
+        this.toKill = _toKill;
+    }
+    
+    public boolean getToKill() {
+        return this.toKill;
     }
 
     public void startSimulation(SimulationData data) {
@@ -117,6 +142,8 @@ public class SimulatorAppState extends AbstractAppState {
         this.physics = this.stateManager.getState(BulletAppState.class);
         // turn physics off to save CPU time
         this.physics.setEnabled(false);
+        this.originalSpeed = this.physics.getSpeed();
+        this.physics.setSpeed(simSpeed);
         //reset();
     }
 
@@ -183,11 +210,11 @@ public class SimulatorAppState extends AbstractAppState {
         this.simRoot.removeFromParent();
         this.currentAlienBrain = null;
         if (this.currentSim != null) {
-            synchronized (this.currentSim) {
-                this.currentSim.notifyAll();
-            }
+            // push unfinished simulation back to queue
+            queue.add(this.currentSim);
         }
         this.currentSim = null;
+        this.physics.setSpeed(originalSpeed);
     }
 
     @Override
@@ -203,6 +230,19 @@ public class SimulatorAppState extends AbstractAppState {
             if (simTimeLimit < 0f) {
                 // stop simulation and report result
                 stopSimulation();
+            }
+        } else {
+            // try to poll task from the queue
+            if (toKill)
+            {
+                this.stateManager.detach(this);
+            } else {
+                SimulationData s;
+            s = this.queue.peek();
+            if (s != null) {
+                System.out.println(Thread.currentThread().getId() + ": starting simulation!");
+                stateManager.getState(SimulatorAppState.class).startSimulation(s);
+            }
             }
         }
     }

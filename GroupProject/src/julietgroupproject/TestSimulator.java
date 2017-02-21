@@ -61,47 +61,16 @@ public class TestSimulator extends SimpleApplication {
         flipper = new Alien(rootBlock);
 
         if (!toDisplay) {
-            // Warning: if you change speed, you MUST change
-            // Brain.tickCycle accordingly!
-            // try using 100/(speed up rate)
-            // DO NOT EXCEED 50.0f speed up!
-            bulletAppState.setSpeed(50.0f);
-            bulletAppState.getPhysicsSpace().setMaxSubSteps(200);
-            stateManager.attach(new SimulatorAppState(flipper,2));
+            stateManager.attach(new SimulatorAppState(flipper,queue,1.0));
         } else {
-         
-            stateManager.attach(new DrawingSimulatorAppState(flipper,100));
+            stateManager.attach(new DrawingSimulatorAppState(flipper,queue,1.0));
         }
     }
 
     @Override
     public void simpleUpdate(float tpf) {
-        //TODO: might move this block of code into
-        //SimulatorAppState as well
-        if (!stateManager.getState(SimulatorAppState.class).isRunningSimulation()) {
-            if (toKill)
-            {
-                this.stop();
-            }
-            SimulationData s;
-            if (toDisplay) {
-                //we peek instead of poll for simulator
-                //with graphics.
-                s = this.queue.peek();
-            } else {
-                s = this.queue.poll();
-            }
-            if (s != null) {
-                System.out.println(Thread.currentThread().getId() + ": starting simulation!");
-                waiting = false;
-                stateManager.getState(SimulatorAppState.class).startSimulation(s);
-            } else {
-                if (!waiting) {
-                    System.out.println(Thread.currentThread().getId() + ": waiting for simulation data!");
-                    waiting = true;
-                }
-            }
-        }
-
+       if (toKill) {
+           this.stop();
+       }
     }
 }

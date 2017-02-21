@@ -18,6 +18,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
+import java.util.Queue;
 import org.encog.ml.MLRegression;
 
 /**
@@ -26,9 +27,9 @@ import org.encog.ml.MLRegression;
  */
 public class DrawingSimulatorAppState extends SimulatorAppState
 {
-    public DrawingSimulatorAppState(Alien _alien, int _nnUpdateCycle)
+    public DrawingSimulatorAppState(Alien _alien, Queue<SimulationData> q, double _simSpeed)
     {
-        super(_alien,_nnUpdateCycle);
+        super(_alien,q,_simSpeed);
     }
     
     @Override
