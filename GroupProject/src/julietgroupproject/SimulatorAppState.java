@@ -23,6 +23,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
+import java.util.Queue;
 import org.encog.ml.MLRegression;
 
 /**
@@ -34,59 +35,97 @@ import org.encog.ml.MLRegression;
 public class SimulatorAppState extends AbstractAppState {
 
     // resources from app
-    private SimpleApplication app;
-    private Node rootNode;
-    private AssetManager assetManager;
-    private AppStateManager stateManager;
-    private InputManager inputManager;
-    private ViewPort viewPort;
-    private BulletAppState physics;
-    
-    
+    protected SimpleApplication app;
+    protected Node rootNode;
+    protected AssetManager assetManager;
+    protected AppStateManager stateManager;
+    protected InputManager inputManager;
+    protected ViewPort viewPort;
+    protected BulletAppState physics;
+    // simulation related fields
+    protected Queue<SimulationData> queue;
     protected Alien alien;
     protected Node simRoot;
     protected Node scene;
     protected Node alienRoot;
-    private SimulationData currentSim;
-    private Brain currentAlienBrain;
-    private boolean simInProgress;
-    private long simStartTime;
-    private long simTimeLimit;
-    private Vector3f startLocation = Vector3f.ZERO;
+    public static final int DEFAULT_UPDATE_CYCLE = 100;
+    protected int nnUpdateCycle;
+    protected float simSpeed;
+    private float originalSpeed;
+    protected SimulationData currentSim;
+    protected Brain currentAlienBrain;
+    // flags
+    private volatile boolean toKill;
+    protected boolean simInProgress;
+    protected float simTimeLimit;
+    // World related
+    protected Vector3f startLocation = Vector3f.ZERO;
+    protected Geometry floorGeometry;
 
-    public SimulatorAppState(Alien alien) {
+    public SimulatorAppState(Alien alien, Queue<SimulationData> q, double _simSpeed) {
         /*
          * Constructor, taking an Alien object as the Alien
-         * to be tested in this simulator.
+         * to be tested in this simulator, the task queue with
+         * simulation data (neural network objects) and the
+         * simulation speed.
          * 
          * @param alien The alien to be tested.
+         * @param q The SimulationData queue. Must be thread-safe.
+         * @param simSpeed Simulation speed. Default is 1.0.
          */
         this.alien = alien;
+        this.queue = q;
+        this.simSpeed = (float)_simSpeed;
+        
+        this.nnUpdateCycle = (int)(DEFAULT_UPDATE_CYCLE / this.simSpeed);
+    }
+    
+    public void setToKill(boolean _toKill) {
+        //might need to watch for concurrent
+        this.toKill = _toKill;
+    }
+    
+    public boolean getToKill() {
+        return this.toKill;
     }
 
     public void startSimulation(SimulationData data) {
+        
+        // turn physics back on
+        this.physics.setEnabled(true);
+        this.reset();
         this.currentSim = data;
-        this.simTimeLimit = (long) (1000000000 * data.getSimTime());
+        this.simTimeLimit = (float) data.getSimTime();
         this.currentAlienBrain = instantiateAlien(this.alien, this.startLocation, data.getToEvaluate());
-        this.simStartTime = System.nanoTime();
         this.simInProgress = true;
     }
 
-    private void stopSimulation() {
-
+    protected void stopSimulation() {
+        /*
+         * Stop simulation.
+         */
         this.simInProgress = false;
         if (this.currentSim != null) {
             synchronized (this.currentSim) {
-                this.currentSim.setFitness(this.calcFitness());
-                System.out.println("Stopping simulation! " + this.currentSim.toString());
-                this.currentSim.notifyAll();
+                double fitness = this.calcFitness();
+                this.currentSim.setFitness(fitness);
             }
+            System.out.println("Stopping simulation! " + this.currentSim.toString());
         }
+        // turn physics off to save CPU time
+        this.physics.setEnabled(false);
     }
 
-    private double calcFitness() {
+    protected double calcFitness() {
+        /*
+         * Calculate fitness for the current simulated
+         * alien.
+         */
         if (this.currentAlienBrain != null) {
-            return (double) AlienHelper.getGeometryLocation(this.currentAlienBrain.geometries.get(0)).x;
+            Vector3f pos = AlienHelper.getGeometryLocation(this.currentAlienBrain.geometries.get(0));
+            double fitness = pos.x;
+            if(Double.isNaN(fitness)){ System.err.println(pos); throw new RuntimeException("bad fitness"); };
+            return fitness;
         } else {
             throw new RuntimeException("No simulation running! Cannot compute fitness.");
         }
@@ -101,12 +140,11 @@ public class SimulatorAppState extends AbstractAppState {
         this.inputManager = this.app.getInputManager();
         this.viewPort = this.app.getViewPort();
         this.physics = this.stateManager.getState(BulletAppState.class);
-
-        // TEMPORARY CODE!!!!
-        setupTextures();
-        
-        
-        reset();
+        // turn physics off to save CPU time
+        this.physics.setEnabled(false);
+        this.originalSpeed = this.physics.getSpeed();
+        this.physics.setSpeed(simSpeed);
+        //reset();
     }
 
     public void reset() {
@@ -114,8 +152,7 @@ public class SimulatorAppState extends AbstractAppState {
         this.currentAlienBrain = null;
         this.currentSim = null;
         this.simInProgress = false;
-        this.simStartTime = 0L;
-        this.simTimeLimit = 0L;
+        this.simTimeLimit = 0.0f;
 
         if (this.simRoot != null) {
             this.physics.getPhysicsSpace().removeAll(simRoot);
@@ -127,23 +164,16 @@ public class SimulatorAppState extends AbstractAppState {
     }
 
     protected void initialiseWorld() {
-        AmbientLight light = new AmbientLight();
-        light.setColor(ColorRGBA.LightGray);
-        simRoot.addLight(light);
 
         Box floorBox = new Box(140, 1f, 140);
-        Geometry floorGeometry = new Geometry("Floor", floorBox);
-        //floorGeometry.setMaterial(grassMaterial);
+        floorGeometry = new Geometry("Floor", floorBox);
         floorGeometry.setLocalTranslation(0, -5, 0);
         floorGeometry.addControl(new RigidBodyControl(0));
-        ////////
-        floorGeometry.setMaterial(grassMaterial);
-        //floorGeometry.getMesh().scaleTextureCoordinates(new Vector2f(40,40));
         simRoot.attachChild(floorGeometry);
         physics.getPhysicsSpace().add(floorGeometry);
     }
 
-    private Brain instantiateAlien(Alien a, Vector3f location, MLRegression nn) {
+    protected Brain instantiateAlien(Alien a, Vector3f location, MLRegression nn) {
         /*
          * Spawn a new alien at a specified location.
          */
@@ -158,67 +188,21 @@ public class SimulatorAppState extends AbstractAppState {
         b.geometries.add(rootBlockGeometry);
 
         AlienHelper.recursivelyAddBlocks(rootBlock, rootBlock, rootBlockGeometry, alienNode, b);
-        // TEMP
-        alienNode.setMaterial(alienMaterial1);
-        
-        
-        
+
         physics.getPhysicsSpace().addAll(alienNode);
         simRoot.attachChild(alienNode);
         b.nodeOfLimbGeometries = alienNode;
         b.setNN(nn);
+        b.setTickCycle(nnUpdateCycle);
         alienNode.addControl(b);
 
         return b;
     }
-    
+
     public boolean isRunningSimulation() {
         return simInProgress;
     }
-    
-    //TEMPORARY CODE!!!!!
-    private Texture alienTexture1;
-    private Texture alienTexture2;
-    private Texture alienTexture3;
-    private Texture grassTexture;
-    private Texture skyTexture;
-    private Material alienMaterial1;
-    private Material alienMaterial2;
-    private Material alienMaterial3;
-    private Material grassMaterial;
-    private Material skyMaterial;
 
-    public void setupTextures() {
-        grassTexture = assetManager.loadTexture("Textures/grass1.jpg");
-        grassTexture.setAnisotropicFilter(4);
-        grassTexture.setWrap(Texture.WrapMode.Repeat);
-        grassMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        grassMaterial.setTexture("ColorMap", grassTexture);
-        skyTexture = assetManager.loadTexture("Textures/sky1.jpg");
-        skyTexture.setWrap(Texture.WrapMode.Repeat);
-        skyMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        skyMaterial.setTexture("ColorMap", skyTexture);
-
-        alienTexture1 = assetManager.loadTexture("Textures/alien1.jpg");
-        alienTexture1.setWrap(Texture.WrapMode.Repeat);
-        alienMaterial1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        alienMaterial1.setTexture("ColorMap", alienTexture1);
-
-        alienTexture2 = assetManager.loadTexture("Textures/alien2.jpg");
-        alienTexture2.setWrap(Texture.WrapMode.Repeat);
-        alienMaterial2 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        alienMaterial2.setTexture("ColorMap", alienTexture2);
-        alienTexture3 = assetManager.loadTexture("Textures/alien3.jpg");
-        alienTexture3.setWrap(Texture.WrapMode.Repeat);
-        alienMaterial3 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        alienMaterial3.setTexture("ColorMap", alienTexture3);
-    }
-    
-
-    
-    // END OF TEMPORARY CODE!
-    ///////////
-    
     @Override
     public void cleanup() {
         super.cleanup();
@@ -226,11 +210,11 @@ public class SimulatorAppState extends AbstractAppState {
         this.simRoot.removeFromParent();
         this.currentAlienBrain = null;
         if (this.currentSim != null) {
-            synchronized(this.currentSim){
-            this.currentSim.notifyAll();
-            }
+            // push unfinished simulation back to queue
+            queue.add(this.currentSim);
         }
         this.currentSim = null;
+        this.physics.setSpeed(originalSpeed);
     }
 
     @Override
@@ -241,10 +225,25 @@ public class SimulatorAppState extends AbstractAppState {
     @Override
     public void update(float tpf) {
 
-        if (simInProgress && ((System.nanoTime() - simStartTime) > simTimeLimit)) {
-            // stop simulation and report result
-            stopSimulation();
-            reset();
+        if (simInProgress) {
+            simTimeLimit -= tpf * physics.getSpeed();
+            if (simTimeLimit < 0f) {
+                // stop simulation and report result
+                stopSimulation();
+            }
+        } else {
+            // try to poll task from the queue
+            if (toKill)
+            {
+                this.stateManager.detach(this);
+            } else {
+                SimulationData s;
+            s = this.queue.peek();
+            if (s != null) {
+                System.out.println(Thread.currentThread().getId() + ": starting simulation!");
+                stateManager.getState(SimulatorAppState.class).startSimulation(s);
+            }
+            }
         }
     }
 }

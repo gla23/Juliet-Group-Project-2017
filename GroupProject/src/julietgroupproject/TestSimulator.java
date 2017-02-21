@@ -19,19 +19,28 @@ public class TestSimulator extends SimpleApplication {
 
     private BulletAppState bulletAppState;
     private Queue<SimulationData> queue;
+    private boolean waiting;
+    private boolean toDisplay;
+    private volatile boolean toKill;
 
-    public TestSimulator(Queue queue) {
+    public TestSimulator(Queue queue, boolean _toDisplay) {
         super();
         this.queue = queue;
+        waiting = true;
+        toDisplay = _toDisplay;
+        toKill = false;
     }
 
+    public void kill()
+    {
+        toKill = true;
+    }
+    
     @Override
     public void simpleInitApp() {
 
         bulletAppState = new BulletAppState();
-        
-        // try changing BulletAppState.speed and Brain.TICK_CYCLE
-        bulletAppState.setSpeed(100.0f);
+
         stateManager.attach(bulletAppState);
 
 
@@ -51,20 +60,17 @@ public class TestSimulator extends SimpleApplication {
         legLeft.addLimb(flipper2);
         flipper = new Alien(rootBlock);
 
-        stateManager.attach(new SimulatorAppState(flipper));
+        if (!toDisplay) {
+            stateManager.attach(new SimulatorAppState(flipper,queue,1.0));
+        } else {
+            stateManager.attach(new DrawingSimulatorAppState(flipper,queue,1.0));
+        }
     }
 
     @Override
     public void simpleUpdate(float tpf) {
-        if (!stateManager.getState(SimulatorAppState.class).isRunningSimulation()) {
-            SimulationData s = this.queue.poll();
-            if (s != null) {
-                System.out.println("running simulation! " + s.toString());
-                stateManager.getState(SimulatorAppState.class).startSimulation(s);
-            } else {
-                System.out.println("Waiting for simulation data!");
-            }
-        }
-
+       if (toKill) {
+           this.stop();
+       }
     }
 }

@@ -37,15 +37,11 @@ public class Brain extends AbstractControl {
     private static final float MAX_VELOCITY = 2f;
     private static final float MIN_VELOCITY = 0.1f;
     private static final float MAX_POWER = 1f;
-
-
-    private static final int TICK_CYCLE = 10;
-
+    private int tickCycle = 100;
     private int tick = 0;
 
-    public Vector3f getPosition(Node node) {
-        return node.getControl(RigidBodyControl.class).getPhysicsLocation();
-    }
+    public int getTickCycle() { return tickCycle; }
+    public void setTickCycle(int _tickCycle) { this.tickCycle = _tickCycle; }
     
     public MLRegression getNN() {
         return this.nn;
@@ -60,7 +56,7 @@ public class Brain extends AbstractControl {
          * fetch physical information into nnInput.
          */
 
-        for (int i = 0; i < nnInput.length; i++) {
+        for (int i = 0; i < nnInput.length - 1; i++) { //TODO class to describe input categories
             
             // normalise input to range from 0 to 1
             // Angles are in radians. 0 indicates no
@@ -72,6 +68,16 @@ public class Brain extends AbstractControl {
             if (in > 1.0) in = 1.0;
             nnInput[i] = in;
 
+        }
+        
+        
+        double bearing = this.geometries.get(0).getControl(RigidBodyControl.class).getPhysicsRotation().toAngles(null)[2];
+        
+        nnInput[nnInput.length - 1] = (bearing + Math.PI) / (2.0 * Math.PI);
+        
+        if ((bearing + Math.PI) / (2.0 * Math.PI) < 0.0 || (bearing + Math.PI) / (2.0 * Math.PI) > 1.0)
+        {
+            throw new RuntimeException("Angle normalisation incorrect");
         }
     }
 
@@ -106,7 +112,7 @@ public class Brain extends AbstractControl {
 
         tick++;
 
-        if (tick == TICK_CYCLE) {
+        if (tick >= this.tickCycle) {
             tick = 0;
             
             updateInput();
@@ -124,11 +130,11 @@ public class Brain extends AbstractControl {
                     // try to stop moving
                     j.enableMotor(true, 0f, 0f);
                     // debug
-                    System.out.println("Suspending limb #" + i);
+                    //System.out.println("Suspending limb #" + i);
                 } else {
                     j.enableMotor(true, v, p);
                     // debug
-                    System.out.println("Moving limb #" + i + " with velocity " + v + ", power " + p);
+                    //System.out.println("Moving limb #" + i + " with velocity " + v + ", power " + p);
                 }
 
             }
