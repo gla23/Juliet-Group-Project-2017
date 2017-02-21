@@ -62,7 +62,7 @@ public class Editor extends SimpleApplication implements ActionListener {
     int simsRunning = 0;
     Editor parent;
     Alien alienToSim;
-    Brain brainOfAlienCurrentlyBeingSimulated;
+    AlienNode brainOfAlienCurrentlyBeingSimulated;
     
     boolean mainApplication = false;
     boolean runningPhysics = true;
@@ -78,7 +78,7 @@ public class Editor extends SimpleApplication implements ActionListener {
     float minSphereDimention = 0.4f;
     Random rng = new Random();
     private BulletAppState bulletAppState = new BulletAppState();
-    private Brain brainToControl;
+    private AlienNode brainToControl;
     private Texture alienTexture1;
     private Texture alienTexture2;
     private Texture alienTexture3;
@@ -105,7 +105,7 @@ public class Editor extends SimpleApplication implements ActionListener {
     Alien smallBlock;
     Alien flipper;
     Alien cuboid;
-    Brain prevAlien;
+    AlienNode prevAlien;
     
 
     int[] jointKeys = { // Used for automatically giving limbs keys
@@ -116,9 +116,9 @@ public class Editor extends SimpleApplication implements ActionListener {
         KeyInput.KEY_V, KeyInput.KEY_B,
         KeyInput.KEY_N, KeyInput.KEY_M};
     
-    public void removeAlien(Brain brain) {
-        bulletAppState.getPhysicsSpace().removeAll(brain.nodeOfLimbGeometries);
-        brain.nodeOfLimbGeometries.removeFromParent();
+    public void removeAlien(AlienNode alienNode) {
+        bulletAppState.getPhysicsSpace().removeAll(alienNode);
+        alienNode.removeFromParent();
     }
     
     
@@ -529,24 +529,21 @@ public class Editor extends SimpleApplication implements ActionListener {
         }
     }
     
-    public Brain instantiateAlien(Alien alien, Vector3f location) {
+    public AlienNode instantiateAlien(Alien alien, Vector3f location) {
 
-        Brain brain = new Brain();
-
-        Node nodeOfLimbGeometries = new Node();
+        AlienNode brain = new AlienNode();
         
         Block rootBlock = alien.rootBlock;
         Geometry rootBlockGeometry = createLimb(rootBlock.collisionShapeType, rootBlock.width, rootBlock.height, rootBlock.length, location, rootBlock.mass);
         rootBlock.applyProperties(rootBlockGeometry);
         
-        nodeOfLimbGeometries.attachChild(rootBlockGeometry);
+        brain.attachChild(rootBlockGeometry);
         brain.geometries.add(rootBlockGeometry);
 
-        recursivelyAddBlocks(rootBlock, rootBlock, rootBlockGeometry, nodeOfLimbGeometries, brain);
+        recursivelyAddBlocks(rootBlock, rootBlock, rootBlockGeometry, brain);
         
-        bulletAppState.getPhysicsSpace().addAll(nodeOfLimbGeometries);
-        rootNode.attachChild(nodeOfLimbGeometries);
-        brain.nodeOfLimbGeometries = nodeOfLimbGeometries;
+        bulletAppState.getPhysicsSpace().addAll(brain);
+        rootNode.attachChild(brain);
 
         
         final int jointCount = brain.joints.size();
@@ -569,7 +566,6 @@ public class Editor extends SimpleApplication implements ActionListener {
         nn.addLayer(new BasicLayer(jointCount));
         nn.getStructure().finalizeStructure();
         nn.reset();
-        brain.setNN(nn);
         
         // uncomment this line to allow control from ANN
         //brain.nodeOfLimbGeometries.addControl(brain);
@@ -578,7 +574,7 @@ public class Editor extends SimpleApplication implements ActionListener {
         return brain;
     }
 
-    public void recursivelyAddBlocks(Block rootBlock, Block parentBlock, Geometry parentGeometry, Node geometries, Brain brain) {
+    public void recursivelyAddBlocks(Block rootBlock, Block parentBlock, Geometry parentGeometry, AlienNode brain) {
         for (Block b : parentBlock.getConnectedLimbs()) {
             Geometry g = createLimb(b.collisionShapeType, b.width, b.height, b.length, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getPosition()), b.mass);
             b.applyProperties(g);
@@ -586,10 +582,10 @@ public class Editor extends SimpleApplication implements ActionListener {
             //printVector3f(b.getHingePosition());
 
             HingeJoint joint = joinHingeJoint(parentGeometry, g, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getHingePosition()), b.hingeType);
-            geometries.attachChild(g);
+            brain.attachChild(g);
             brain.joints.add(joint);
             brain.geometries.add(g);
-            recursivelyAddBlocks(rootBlock, b, g, geometries, brain);
+            recursivelyAddBlocks(rootBlock, b, g, brain);
         }
     }
 
@@ -750,7 +746,7 @@ public class Editor extends SimpleApplication implements ActionListener {
 
     }
 
-    public void setupKeys(Brain brain) {
+    public void setupKeys(AlienNode brain) {
         // Creates keyboard bindings for the joints with keys in jointKeys, limited by umber of joints or keys specified in jointKeys
         int numberOfJoints = Math.min(brain.joints.size(), jointKeys.length / 2);
         for (int i = 0; i < numberOfJoints; i++) {

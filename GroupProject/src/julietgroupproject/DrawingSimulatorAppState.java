@@ -89,15 +89,15 @@ public class DrawingSimulatorAppState extends SimulatorAppState
     }
     
     @Override
-    protected Brain instantiateAlien(Alien a, Vector3f location, MLRegression nn) {
+    protected AlienNode instantiateAlien(Alien a, Vector3f location, MLRegression nn) {
         /*
          * Spawn a new alien at a specified location.
          */
         
-        Brain b = super.instantiateAlien(a, location, nn);
+        AlienNode b = super.instantiateAlien(a, location, nn);
         
         // TEMP
-        b.nodeOfLimbGeometries.setMaterial(alienMaterial2);
+        b.setMaterial(alienMaterial2);
 
         return b;
     }

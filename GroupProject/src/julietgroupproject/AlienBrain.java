@@ -1,37 +1,28 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package julietgroupproject;
 
 import com.jme3.bullet.control.RigidBodyControl;
-import java.util.ArrayList;
 import com.jme3.bullet.joints.HingeJoint;
-import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
+import java.util.ArrayList;
 import org.encog.ml.MLRegression;
 import org.encog.ml.data.MLData;
 import org.encog.ml.data.basic.BasicMLData;
 
-public class Brain extends AbstractControl {
-    
-    /*
-     * Brain is created when the Alien class is instatiated in the simulation.
-     * It is added to the rootNode of Alien as a Control,
-     * which will control the alien using a provided ANN,
-     * set by the setNN() method.
-     * 
-     * TODO: adapt to refactored Simulator class and
-     * better encapsulation.
-     * 
-     * @author ss2324
-     */
-
-
-    public ArrayList<HingeJoint> joints = new ArrayList<HingeJoint>();
-    public ArrayList<Geometry> geometries = new ArrayList<Geometry>();
-    public Node nodeOfLimbGeometries;
+/**
+ *
+ * @author GeorgeLenovo
+ */
+public class AlienBrain extends AbstractControl {
+    private AlienNode alien;
     private MLRegression nn;
     private double[] nnInput;
     private static final float MAX_VELOCITY = 2f;
@@ -43,12 +34,8 @@ public class Brain extends AbstractControl {
     public int getTickCycle() { return tickCycle; }
     public void setTickCycle(int _tickCycle) { this.tickCycle = _tickCycle; }
     
-    public MLRegression getNN() {
-        return this.nn;
-    }
-
-    public void setNN(MLRegression nn) {
-        this.nn = nn;
+    public AlienBrain(MLRegression _nn) {
+        this.nn = _nn;
     }
     
     private void updateInput() {
@@ -63,7 +50,7 @@ public class Brain extends AbstractControl {
             // rotation, positive and negative values
             // denote clockwise and anticlockwise rotations
             // (PS: I'm not sure about which is which though)
-            double in = ((double)joints.get(i).getHingeAngle())/(1.5 * Math.PI) + 0.5;
+            double in = ((double)this.alien.joints.get(i).getHingeAngle())/(1.5 * Math.PI) + 0.5;
             if (in < 0.0) in = 0.0;
             if (in > 1.0) in = 1.0;
             nnInput[i] = in;
@@ -71,7 +58,7 @@ public class Brain extends AbstractControl {
         }
         
         
-        double bearing = this.geometries.get(0).getControl(RigidBodyControl.class).getPhysicsRotation().toAngles(null)[2];
+        double bearing = this.alien.geometries.get(0).getControl(RigidBodyControl.class).getPhysicsRotation().toAngles(null)[2];
         
         nnInput[nnInput.length - 1] = (bearing + Math.PI) / (2.0 * Math.PI);
         
@@ -88,7 +75,9 @@ public class Brain extends AbstractControl {
         // initialise nn input/output arrays
         if (spatial != null) {
             nnInput = new double[nn.getInputCount()];
-
+            if (spatial instanceof AlienNode) {
+                this.alien = (AlienNode)spatial;
+            }
         }
     }
 
@@ -120,8 +109,8 @@ public class Brain extends AbstractControl {
             MLData out = this.nn.compute(in);
             double[] nnOutput = out.getData();
 
-            for (int i = 0; i < joints.size(); i++) {
-                HingeJoint j = joints.get(i);
+            for (int i = 0; i < this.alien.joints.size(); i++) {
+                HingeJoint j = this.alien.joints.get(i);
                 j.getBodyA().activate();
                 j.getBodyB().activate();
                 float v = MAX_VELOCITY * (float) (2 * (nnOutput[i] - 0.5));

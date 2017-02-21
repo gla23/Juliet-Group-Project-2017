@@ -53,7 +53,7 @@ public class SimulatorAppState extends AbstractAppState {
     protected float simSpeed;
     private float originalSpeed;
     protected SimulationData currentSim;
-    protected Brain currentAlienBrain;
+    protected AlienNode currentAlienBrain;
     // flags
     private volatile boolean toKill;
     protected boolean simInProgress;
@@ -173,30 +173,28 @@ public class SimulatorAppState extends AbstractAppState {
         physics.getPhysicsSpace().add(floorGeometry);
     }
 
-    protected Brain instantiateAlien(Alien a, Vector3f location, MLRegression nn) {
+    protected AlienNode instantiateAlien(Alien a, Vector3f location, MLRegression nn) {
         /*
          * Spawn a new alien at a specified location.
          */
 
-        Brain b = new Brain();
-        Node alienNode = new Node("Alien");
+        AlienNode alienNode = new AlienNode();
 
         Block rootBlock = a.rootBlock;
         Geometry rootBlockGeometry = AlienHelper.assembleBlock(rootBlock, location);
         rootBlock.applyProperties(rootBlockGeometry);
         alienNode.attachChild(rootBlockGeometry);
-        b.geometries.add(rootBlockGeometry);
+        alienNode.geometries.add(rootBlockGeometry);
 
-        AlienHelper.recursivelyAddBlocks(rootBlock, rootBlock, rootBlockGeometry, alienNode, b);
+        AlienHelper.recursivelyAddBlocks(rootBlock, rootBlock, rootBlockGeometry, alienNode);
 
         physics.getPhysicsSpace().addAll(alienNode);
         simRoot.attachChild(alienNode);
-        b.nodeOfLimbGeometries = alienNode;
-        b.setNN(nn);
+        AlienBrain b = new AlienBrain(nn);
         b.setTickCycle(nnUpdateCycle);
         alienNode.addControl(b);
 
-        return b;
+        return alienNode;
     }
 
     public boolean isRunningSimulation() {

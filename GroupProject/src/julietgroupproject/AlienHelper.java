@@ -26,19 +26,20 @@ public class AlienHelper {
     public static Geometry assembleBlock(Block block, Vector3f location) {
         return createLimb(block.collisionShapeType, block.width, block.height, block.length, location, block.mass);
     }
-    
-    public static void recursivelyAddBlocks(Block rootBlock, Block parentBlock, Geometry parentGeometry, Node geometries, Brain brain) {
+    public static void recursivelyAddBlocks(Block rootBlock, Block parentBlock, Geometry parentGeometry, AlienNode brain) {
         for (Block b : parentBlock.getConnectedLimbs()) {
             Geometry g = createLimb(b.collisionShapeType, b.width, b.height, b.length, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getPosition()), b.mass);
             b.applyProperties(g);
+
+            //printVector3f(b.getHingePosition());
+
             HingeJoint joint = joinHingeJoint(parentGeometry, g, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getHingePosition()), b.hingeType);
-            geometries.attachChild(g);
+            brain.attachChild(g);
             brain.joints.add(joint);
             brain.geometries.add(g);
-            recursivelyAddBlocks(rootBlock, b, g, geometries, brain);
+            recursivelyAddBlocks(rootBlock, b, g, brain);
         }
     }
-
     public static Geometry createLimb(String meshShape, float width, float height, float length, Vector3f location, float mass) {
 
         Mesh mesh;
