@@ -1,5 +1,9 @@
 # Created by https://www.gitignore.io/api/java,windows,macos,netbeans
 
+### dynamically linked libraries ###
+*.dll
+*.dylib
+
 ### Population saves ###
 *.pop
 
