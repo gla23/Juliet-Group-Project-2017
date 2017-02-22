@@ -14,6 +14,7 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Cylinder;
+import com.jme3.scene.shape.Sphere;
 import com.jme3.scene.shape.Torus;
 
 /**
@@ -47,6 +48,8 @@ public class AlienHelper {
             mesh = new Cylinder(40, 40, width, length, true);
         } else if (meshShape.equals("Torus")) {
             mesh = new Torus(40, 40, width, length);
+        } else if (meshShape.equals("Sphere")) {
+            mesh = new Sphere(40, 40, width);
         } else {
             mesh = new Box(width, height, length);
         }

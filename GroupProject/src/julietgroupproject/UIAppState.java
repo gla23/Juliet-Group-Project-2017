@@ -170,7 +170,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     public void createNewBody() {
         if (prevAlien == null) {
-
+            
             //Take the entries from text fields for limb size, do some error handling
             Slider widthField = nifty.getCurrentScreen().findNiftyControl("bodyWidthSlider", Slider.class);
             Slider heightField = nifty.getCurrentScreen().findNiftyControl("bodyHeightSlider", Slider.class);
@@ -197,7 +197,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
             //Instantiate the new alien
             Vector3f pos = new Vector3f(-10 + 20 * rng.nextFloat(), -10 + 20 * rng.nextFloat(), -10 + 20 * rng.nextFloat());
-
+            
             Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", bodyWeight);
             cuboid = new Alien(bodyBlock);
             prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));

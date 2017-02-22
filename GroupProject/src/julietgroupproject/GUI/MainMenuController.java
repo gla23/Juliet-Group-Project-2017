@@ -58,9 +58,13 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
       DropDown shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector", DropDown.class);
       shapeSelect.removeItem("Cuboid");
       shapeSelect.removeItem("Sphere");
+      shapeSelect.removeItem("Cylinder");
+      shapeSelect.removeItem("Torus");
       //shapeSelect.removeItem("Option3");
       shapeSelect.addItem("Cuboid");
       shapeSelect.addItem("Sphere");
+      shapeSelect.addItem("Cylinder");
+      shapeSelect.addItem("Torus");
       //shapeSelect.addItem("Option3");
       
       
@@ -81,12 +85,17 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
        Thread thread = new Thread() {
             public void run() {
                 try {
-                  this.sleep(75);DropDown shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector_body", DropDown.class);
+                  this.sleep(150);
+                  DropDown shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector_body", DropDown.class);
                   shapeSelect.removeItem("Cuboid");
                   shapeSelect.removeItem("Sphere");
+                  shapeSelect.removeItem("Cylinder");
+                  shapeSelect.removeItem("Torus");
                   //shapeSelect.removeItem("Option3");
                   shapeSelect.addItem("Cuboid");
                   shapeSelect.addItem("Sphere");
+                  shapeSelect.addItem("Cylinder");
+                  shapeSelect.addItem("Torus");
                   //shapeSelect.addItem("Option3");
                   TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
                 // tabs.addTab(addBody);
@@ -155,7 +164,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
        app.toggleWireMesh();
    }
     
-   public void setCurrentLimbShape() {
+   public void setCurrentLimbShape() {  
        DropDown shapeSelect = nifty.getCurrentScreen().findNiftyControl("shape_selector", DropDown.class);
        String current = "Box";
        current = (String) shapeSelect.getSelection();
@@ -166,7 +175,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
        
    }
    
-   public void setCurrentBodyShape() {
+   public void setCurrentBodyShape() {      
        DropDown shapeSelect = nifty.getCurrentScreen().findNiftyControl("shape_selector_body", DropDown.class);
        String current = "Box";
        current = (String) shapeSelect.getSelection();
