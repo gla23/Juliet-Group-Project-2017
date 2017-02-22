@@ -54,6 +54,8 @@ import org.encog.neural.networks.layers.BasicLayer;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.scene.shape.Sphere;
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.controls.DropDown;
+import de.lessvoid.nifty.controls.Slider;
 import julietgroupproject.GUI.MainMenuController;
 
 public class UIAppState extends DrawingAppState implements ActionListener {
@@ -104,6 +106,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         reset();
     }
     
+    public void setCurrentShape(String shape) {
+        currentShape = shape;
+    }
     
     public void toggleGravityOn() {
         physics.getPhysicsSpace().setGravity(new Vector3f(0, -9.81f, 0));
@@ -171,67 +176,38 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         chaseCam.setMaxDistance(150);
     }
     
-    public void setShapeToCuboid() {
-        currentShape = "Box";
-        System.out.println(currentShape);
-        
-    }
-    
-    public void setShapeToSphere() {
-        currentShape = "Sphere";
-        System.out.println(currentShape);
-    }
+   
     public void createNewBody() {
         if (prevAlien==null){
             
             //Take the entries from text fields for limb size, do some error handling
-            TextField widthField = nifty.getCurrentScreen().findNiftyControl("bodyWidthTextField", TextField.class);
-            TextField heightField = nifty.getCurrentScreen().findNiftyControl("bodyHeightTextField", TextField.class);
-            TextField lengthField = nifty.getCurrentScreen().findNiftyControl("bodyLengthTextField", TextField.class);
-            float bodyWidth = 0f;
-            float bodyHeight = 0f;
-            float bodyLength = 0f;
+            Slider widthField = nifty.getCurrentScreen().findNiftyControl("bodyWidthSlider", Slider.class);
+            Slider heightField = nifty.getCurrentScreen().findNiftyControl("bodyHeightSlider", Slider.class);
+            Slider lengthField = nifty.getCurrentScreen().findNiftyControl("bodyLengthSlider", Slider.class);
+            Slider weightField = nifty.getCurrentScreen().findNiftyControl("bodyWeightSlider", Slider.class);
+            
+            float bodyWidth;
+            float bodyHeight;
+            float bodyLength;
+            float bodyWeight;
             
             
-            try {
-                bodyWidth = Float.valueOf(widthField.getText());
-            } catch (NumberFormatException e) {
-                System.out.println("Whoops - Incorrect number format");
-            } finally {
-                if (bodyWidth <0) {
-                    bodyWidth = -bodyWidth;
-                } else if (bodyWidth ==0) {
-                    bodyWidth = 2.1f;//4*rng.nextFloat();
-                }
-            } 
-            
-            try {
-                bodyHeight = Float.valueOf(heightField.getText());
-            } catch (NumberFormatException e) {
-                System.out.println("Whoops - Incorrect number format");
-            } finally {
-                if (bodyHeight <0) {
-                    bodyHeight = -bodyHeight;
-                } else if (bodyHeight ==0) {
-                    bodyHeight = 0.7f;//4*rng.nextFloat();
-                }
-            } 
+            bodyWidth = widthField.getValue();
            
-            try {
-                bodyLength = Float.valueOf(lengthField.getText());
-            } catch (NumberFormatException e) {
-                System.out.println("Whoops - Incorrect number format");
-            } finally {
-                if (bodyLength <0) {
-                    bodyLength = -bodyLength;
-                } else if (bodyLength ==0) {
-                    bodyLength = 1.6f;//4*rng.nextFloat();
-                }
-            } 
+    
+            bodyHeight = heightField.getValue();
+            
+           
+           
+            bodyLength = lengthField.getValue();
+            
+            bodyWeight = weightField.getValue();
+            
             
             //Instantiate the new alien
             Vector3f pos = new Vector3f(-10+20*rng.nextFloat(),-10+20*rng.nextFloat(),-10+20*rng.nextFloat());
-            Block bodyBlock   = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", 2.2f);
+            
+            Block bodyBlock   = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", bodyWeight);
             cuboid = new Alien(bodyBlock);
             prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
             setChaseCam(cuboid);
@@ -240,7 +216,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         
     }
     
-    
+    /*
     //To be run when addLimb button pressed, adds random limb anywhere around body
     public void addLimb() {
         
@@ -265,7 +241,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             Vector3f newPos = newDir.mult(radius+boxRad);
 
             //Make limb and add it to body
-            Block flipper  = new Block(newPos,newHingePos, boxWidth, boxHeight, boxLength, currentShape, "XAxis", 1f);
+            Block flipper  = new Block(newPos,newHingePos, boxWidth, boxHeight, boxLength, getCurrentShape(), "XAxis", 1f);
             cuboid.rootBlock.addLimb(flipper);
             
              //Instantiate the new alien
@@ -276,7 +252,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
      
        
     }
-   
+   */
     //To be run when right click on body, adds new limb with dimensions defined in text fields
     public void addLimb(Block block, Vector3f contactPt, Vector3f normal) {
         
@@ -286,46 +262,25 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         } 
    
        
-        //Take the entries from text fields for limb size, do some error handling
-        TextField widthField = nifty.getCurrentScreen().findNiftyControl("widthTextField", TextField.class);
-        TextField heightField = nifty.getCurrentScreen().findNiftyControl("heightTextField", TextField.class);
-        TextField lengthField = nifty.getCurrentScreen().findNiftyControl("lengthTextField", TextField.class);
-        float boxWidth  = -1.8f;
-        float boxHeight = -0.4f;
-        float boxLength = -0.4f;
-        try {
-            boxWidth = Float.valueOf(widthField.getText());
-        } catch (NumberFormatException e) {
-            System.out.println("Whoops - Incorrect number format");
-        } finally {
-            if (boxWidth <0) {
-                boxWidth = -boxWidth;
-            } else if (boxWidth ==0) {
-                boxWidth = 0.4f;
-            }
-        }
-        try {
-            boxHeight = Float.valueOf(heightField.getText());
-        } catch (NumberFormatException e) {
-            System.out.println("Whoops - Incorrect number format");
-        } finally {
-            if (boxHeight <0) {
-                boxHeight = -boxHeight;
-            } else if (boxHeight ==0) {
-                boxHeight = 0.4f;
-            }
-        }
-        try {
-            boxLength = Float.valueOf(lengthField.getText());
-        } catch (NumberFormatException e) {
-            System.out.println("Whoops - Incorrect number format");
-        } finally {
-            if (boxLength <0) {
-                boxLength = -boxLength;
-            } else if (boxLength ==0) {
-                boxLength = 1.3f;
-            }
-        } 
+        //Take the entries from the sliders for limb size
+        Slider widthField = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
+        Slider heightField = nifty.getCurrentScreen().findNiftyControl("limbHeightSlider", Slider.class);
+        Slider lengthField = nifty.getCurrentScreen().findNiftyControl("limbLengthSlider", Slider.class);
+        Slider weightField = nifty.getCurrentScreen().findNiftyControl("limbWeightSlider", Slider.class);
+        float boxWidth;
+        float boxHeight;
+        float boxLength;
+        float weight;
+        
+        boxWidth = widthField.getValue();
+        
+        
+        boxHeight = heightField.getValue();
+        
+        boxLength = lengthField.getValue();
+        
+        weight = weightField.getValue();
+        
         
             
         Vector3f whlVec = new Vector3f(boxWidth,boxHeight,boxLength);
@@ -346,9 +301,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (whlVec.x<whlVec.z){
             axisToUse = "XAxis";
         }
-        
         //Build the new limb
-        Block limb  = new Block(newPos,newHingePos,whlVec.x , whlVec.y, whlVec.z, currentShape, axisToUse, 1f);
+        myMainMenuController.setCurrentLimbShape();
+        Block limb  = new Block(newPos,newHingePos,whlVec.x , whlVec.y, whlVec.z, currentShape, axisToUse, weight);
         Matrix3f rotation = new Matrix3f();
         rotation.fromStartEndVectors(new Vector3f(0,1,0), normal);
         
@@ -473,7 +428,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         myMainMenuController = new MainMenuController(this);
 
         stateManager.attach(myMainMenuController);
-        
+     
         //Set up nifty
         NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
 
@@ -481,7 +436,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
 
         guiViewPort.addProcessor(niftyDisplay);
-        nifty.fromXml("Interface/MainMenuLayout.xml", "start", myMainMenuController);
+        nifty.fromXml("Interface/MainMenuLayout.xml", "begin", myMainMenuController);
         //nifty.setDebugOptionPanelColors(true); //un-comment this line to use DebugPanelColors and make sure Nifty is running correctly.
         
 
