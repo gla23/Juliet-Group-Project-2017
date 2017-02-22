@@ -60,11 +60,8 @@ import julietgroupproject.GUI.MainMenuController;
 
 public class UIAppState extends DrawingAppState implements ActionListener {
 
-    
     boolean runningPhysics = true;
-    
     private MainMenuController myMainMenuController;
-
     float limbPower = 0.8f;
     float limbTargetVolcity = 2f;
     float time;
@@ -73,23 +70,17 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     Random rng = new Random();
     private Nifty nifty;
     private boolean wireMesh = true;
-    
     private ChaseCamera chaseCam;
     private float horizontalAngle = 0;
     private float verticalAngle = 0;
     private float cameraZoom = 10;
     private boolean smoothCam = true;
-    
     private String currentShape = "Box";
-           
-    
     Alien simpleAlien;
     Alien smallBlock;
     Alien flipper;
     Alien cuboid;
     AlienNode prevAlien;
-    
-
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
@@ -97,58 +88,59 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         KeyInput.KEY_J, KeyInput.KEY_K,
         KeyInput.KEY_V, KeyInput.KEY_B,
         KeyInput.KEY_N, KeyInput.KEY_M};
-    
-    public  UIAppState(Alien _alien, double _simSpeed) {
+
+    public UIAppState(Alien _alien, double _simSpeed) {
         super(_alien, _simSpeed);
     }
-    
+
     public void removeAlien(AlienNode alienNode) {
         reset();
     }
-    
+
     public void setCurrentShape(String shape) {
         currentShape = shape;
     }
-    
+
     public void toggleGravityOn() {
         physics.getPhysicsSpace().setGravity(new Vector3f(0, -9.81f, 0));
     }
-    
+
     public void toggleGravityOff() {
         physics.getPhysicsSpace().setGravity(Vector3f.ZERO);
     }
-    
+
     public void resetAlien() {
         if (prevAlien != null) {
             removeAlien(prevAlien);
             prevAlien = null;
         }
-        
+
     }
-    
+
     public void toggleSmoothness() {
         smoothCam = !smoothCam;
         chaseCam.setSmoothMotion(smoothCam);
-        
-        
+
+
     }
+
     public void toggleWireMesh() {
         physics.setDebugEnabled(wireMesh);
         wireMesh = !wireMesh;
     }
-    
+
     //Method for easily printing out vectors for debugging
     public void printVector3f(Vector3f vec) {
         System.out.println(vec);
     }
-    
+
     public void setChaseCam(Alien shape) {
-        if (chaseCam !=null) { 
+        if (chaseCam != null) {
             horizontalAngle = chaseCam.getHorizontalRotation();
             verticalAngle = chaseCam.getVerticalRotation();
             cameraZoom = chaseCam.getDistanceToTarget();
             chaseCam.setSmoothMotion(false);
-            
+
         }
         //toggleSmoothness();
         chaseCam = new ChaseCamera(cam, shape.rootBlock.getGeometry(), inputManager);
@@ -161,107 +153,69 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
         chaseCam.setDefaultHorizontalRotation(horizontalAngle);
         chaseCam.setDefaultVerticalRotation(verticalAngle);
-        
-        chaseCam.setMinVerticalRotation((float) (Math.PI)*-0.25f);
+
+        chaseCam.setMinVerticalRotation((float) (Math.PI) * -0.25f);
         //chaseCam.setTrailingEnabled(true);
         chaseCam.setChasingSensitivity(1f);
-        
-        chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_LEFT),new KeyTrigger(KeyInput.KEY_P));
+
+        chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_LEFT), new KeyTrigger(KeyInput.KEY_P));
         chaseCam.setTrailingRotationInertia(0.1f);
-        chaseCam.setUpVector(new Vector3f(0,1,0));
+        chaseCam.setUpVector(new Vector3f(0, 1, 0));
         chaseCam.setZoomInTrigger(new KeyTrigger(KeyInput.KEY_LBRACKET));
         chaseCam.setZoomOutTrigger(new KeyTrigger(KeyInput.KEY_RBRACKET));
         chaseCam.setZoomSensitivity(10);
         chaseCam.setInvertVerticalAxis(true);
         chaseCam.setMaxDistance(150);
     }
-    
-   
+
     public void createNewBody() {
-        if (prevAlien==null){
-            
+        if (prevAlien == null) {
+
             //Take the entries from text fields for limb size, do some error handling
             Slider widthField = nifty.getCurrentScreen().findNiftyControl("bodyWidthSlider", Slider.class);
             Slider heightField = nifty.getCurrentScreen().findNiftyControl("bodyHeightSlider", Slider.class);
             Slider lengthField = nifty.getCurrentScreen().findNiftyControl("bodyLengthSlider", Slider.class);
             Slider weightField = nifty.getCurrentScreen().findNiftyControl("bodyWeightSlider", Slider.class);
-            
+
             float bodyWidth;
             float bodyHeight;
             float bodyLength;
             float bodyWeight;
-            
-            
+
+
             bodyWidth = widthField.getValue();
-           
-    
+
+
             bodyHeight = heightField.getValue();
-            
-           
-           
+
+
+
             bodyLength = lengthField.getValue();
-            
+
             bodyWeight = weightField.getValue();
-            
-            
+
+
             //Instantiate the new alien
-            Vector3f pos = new Vector3f(-10+20*rng.nextFloat(),-10+20*rng.nextFloat(),-10+20*rng.nextFloat());
-            
-            Block bodyBlock   = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", bodyWeight);
+            Vector3f pos = new Vector3f(-10 + 20 * rng.nextFloat(), -10 + 20 * rng.nextFloat(), -10 + 20 * rng.nextFloat());
+
+            Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", bodyWeight);
             cuboid = new Alien(bodyBlock);
             prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
             setChaseCam(cuboid);
             setupKeys(prevAlien);
         }
-        
+
     }
     
-    /*
-    //To be run when addLimb button pressed, adds random limb anywhere around body
-    public void addLimb() {
-        
-        //Get rid of old alien on screen
-        if (prevAlien!=null){
-            removeAlien(prevAlien);
-        
-            //Find safe distance for hinge point from body
-            float radius = (float) Math.sqrt((cuboid.rootBlock.height*cuboid.rootBlock.height)+(cuboid.rootBlock.width*cuboid.rootBlock.width)+(cuboid.rootBlock.length*cuboid.rootBlock.length));
-            
-            //Choose a random diretion to add limb and find hinge point
-            Vector3f newDir = new Vector3f(rng.nextFloat(),rng.nextFloat(),rng.nextFloat()).normalize();
-            Vector3f newHingePos = newDir.mult(radius);
-            
-            //Build random sizes for new limb
-            float boxWidth = rng.nextFloat();
-            float boxHeight = 0.3f*rng.nextFloat();
-            float boxLength = 4*rng.nextFloat();
-            
-            //Find safe distance from limb and get postion vector
-            float boxRad = (float) Math.sqrt((boxWidth*boxWidth)+(boxHeight*boxHeight)+(boxLength*boxLength));
-            Vector3f newPos = newDir.mult(radius+boxRad);
-
-            //Make limb and add it to body
-            Block flipper  = new Block(newPos,newHingePos, boxWidth, boxHeight, boxLength, getCurrentShape(), "XAxis", 1f);
-            cuboid.rootBlock.addLimb(flipper);
-            
-             //Instantiate the new alien
-            prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
-            setChaseCam(cuboid);
-            setupKeys(prevAlien);
-        }
-     
-       
-    }
-   */
     //To be run when right click on body, adds new limb with dimensions defined in text fields
     public void addLimb(Block block, Vector3f contactPt, Vector3f normal) {
-        
+
         //Get rid of old alien on screen
-         if (prevAlien!=null){
+        if (prevAlien != null) {
             removeAlien(prevAlien);
-        } 
-   
-       
+        }
+
+
         //Take the entries from the sliders for limb size
         Slider widthField = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
         Slider heightField = nifty.getCurrentScreen().findNiftyControl("limbHeightSlider", Slider.class);
@@ -271,164 +225,68 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         float boxHeight;
         float boxLength;
         float weight;
-        
+
         boxWidth = widthField.getValue();
-        
-        
+
+
         boxHeight = heightField.getValue();
-        
+
         boxLength = lengthField.getValue();
-        
+
         weight = weightField.getValue();
-        
-        
-            
-        Vector3f whlVec = new Vector3f(boxWidth,boxHeight,boxLength);
+
+
+
+        Vector3f whlVec = new Vector3f(boxWidth, boxHeight, boxLength);
         Matrix3f rotator = new Matrix3f();
-        rotator.fromStartEndVectors(normal, new Vector3f(1,0,0));
+        rotator.fromStartEndVectors(normal, new Vector3f(1, 0, 0));
         whlVec = rotator.mult(whlVec);
         whlVec.x = Math.abs(whlVec.x);
         whlVec.y = Math.abs(whlVec.y);
         whlVec.z = Math.abs(whlVec.z);
-        
-        
-        
-        
+
+
+
+
         //Find hinge and postion vectors given shape and click position
         Vector3f newHingePos = contactPt.add(normal.mult(0.5f));
-        Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(boxLength,boxHeight),boxWidth)+1.0f));
+        Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(boxLength, boxHeight), boxWidth) + 1.0f));
         String axisToUse = "ZAxis";
-        if (whlVec.x<whlVec.z){
+        if (whlVec.x < whlVec.z) {
             axisToUse = "XAxis";
         }
         //Build the new limb
         myMainMenuController.setCurrentLimbShape();
-        Block limb  = new Block(newPos,newHingePos,whlVec.x , whlVec.y, whlVec.z, currentShape, axisToUse, weight);
+        Block limb = new Block(newPos, newHingePos, whlVec.x, whlVec.y, whlVec.z, currentShape, axisToUse, weight);
         Matrix3f rotation = new Matrix3f();
-        rotation.fromStartEndVectors(new Vector3f(0,1,0), normal);
-        
+        rotation.fromStartEndVectors(new Vector3f(0, 1, 0), normal);
+
         limb.rotation = rotation;
-        
+
         //Still working on getting this to rotate
         limb.setNormal(normal);
-        
+
         //Add new limb to alien and instantiate
         block.addLimb(limb);
         prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
         setChaseCam(cuboid);
         setupKeys(prevAlien);
     }
-   
-    
+
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
 
         // turn the wireframe off
         physics.setDebugEnabled(false);
-        
-        //TODO ?
-        viewPort.setBackgroundColor(new ColorRGBA(98 / 255f, 167 / 255f, 224 / 255f, 1f));
-        //setupBackground();
-        
-
-            Alien simpleAlien;
-            Alien smallBlock;
-            Alien flipper;
-
-            // Create an examples of aliens (what the editor will do) - we can add serialising them and saving later
-            Block chip = new Block(new Vector3f( 0.0f, 0.0f, 0.0f), new Vector3f( 0.0f, 0.0f, 0.0f), 0.1f, 0.1f, 0.1f, "Box", "ZAxis", 1.0f);
-            smallBlock = new Alien(chip);
-
-            Block body = new Block(new Vector3f( 0.0f, 0.0f, 0.0f), new Vector3f( 0.0f, 0.0f, 0.0f), 1.0f, 0.1f, 1.0f, "Box", "ZAxis", 1.0f);
-            body.setRotation(new Matrix3f(1f,0f,0f,0f,0f,-1f,0f,1f,0f));
-            Block left = new Block(new Vector3f(-3.0f, 0.0f, 0.0f), new Vector3f(-1.5f, 0.0f, 0.0f), 1.0f, 0.1f, 1.0f, "Box", "ZAxis", 1.0f);
-            left.setRotation(new Matrix3f(1f,0f,0f,0f,0f,-1f,0f,1f,0f));
-            body.addLimb(left);
-            simpleAlien = new Alien(body);
-
-            float flipperTranslation = 0.8f;
-            Block rootBlock = new Block(new Vector3f( 0.0f, 0.0f, 0.0f), new Vector3f( 0.0f, 0.0f, 0.0f), 0.9f, 0.1f, 0.0f, "Torus", "ZAxis", 1.5f);
-            Block legLeft   = new Block(new Vector3f(-2.9f, 0.0f, 0.0f), new Vector3f(-1.3f, 0.0f, 0.0f), 0.7f, 0.1f, 0.6f, "Torus", "ZAxis", 2.2f);
-            legLeft.setRotation(new Matrix3f(1f,0f,0f,0f,0f,-1f,0f,1f,0f));
-            Block legRight  = new Block(new Vector3f( 2.6f, 0.0f, 0.0f), new Vector3f( 1.3f, 0.0f, 0.0f), 1.5f, 0.1f, 1.3f, "Box", "YAxis", 1.2f);
-            Block flipper1  = new Block(new Vector3f( flipperTranslation, 0.0f, 3.6f), new Vector3f( flipperTranslation, 0.0f, 1.3f), 0.6f, 0.1f, 2.1f, "Box", "XAxis", 1f);
-            flipper1.setRotation(new Matrix3f(0.0f,  1.0f,  0.0f, -1.0f,  0.0f,  -0.0f,  -0.0f,  0.0f,  1.0f));
-            Block flipper2  = new Block(new Vector3f( flipperTranslation, 0.0f,-3.6f), new Vector3f( flipperTranslation, 0.0f,-1.3f), 0.6f, 0.1f, 2.1f, "Box", "XAxis", 1f);
-            Block head      = new Block(new Vector3f(-2.0f, 0.0f, 0.0f), new Vector3f(-1.3f, 0.0f, 0.0f), 0.5f, 0.5f, 0.5f, "Cylinder", "ZAxis", 1f);
-            rootBlock.addLimb(legRight);
-            rootBlock.addLimb(legLeft);
-            legLeft.addLimb(flipper1);
-            legLeft.addLimb(flipper2);
-            flipper = new Alien(rootBlock);
-
-            // Create that alien in the simulation, with the Brain interface used to control it.
-            //brainOfAlienCurrentlyBeingSimulated = instantiateAlien(flipper, new Vector3f(-12f, 0f, -10f));
-            //setupKeys(brainOfAlienCurrentlyBeingSimulated);
-            //Brain flipperb = instantiateAlien(flipper, new Vector3f(10f, 30f, -30f));
-            //Brain flipperc = instantiateAlien(flipper, new Vector3f(-15f, 90f, -60f));
-
-            /*
-            Simulator app2 = new Simulator();
-            app2.simTime = 1000;
-            app2.alienToSim = flipper;
-            app2.parent = this;
-            app2.start(JmeContext.Type.Headless);
-            Simulator app3 = new Simulator();
-            app3.simTime = 1000;
-            app3.alienToSim = flipper;
-            app3.parent = this;
-            app3.start(JmeContext.Type.Headless);
-            simsRunning = 2;
-            
-            
-        }
-        if (!mainApplication) {
-            brainOfAlienCurrentlyBeingSimulated = instantiateAlien(alienToSim, Vector3f.ZERO);
-            // Control the instantiated alien (what the neural network will do)
-            setupKeys(brainOfAlienCurrentlyBeingSimulated);
-        }
-
-            */
-            
-        
-        /*if (!mainApplication) {
-            brainOfAlienCurrentlyBeingSimulated = instantiateAlien(alienToSim, Vector3f.ZERO);
-            // Control the instantiated alien (what the neural network will do)
-            setupKeys(brainOfAlienCurrentlyBeingSimulated);
-        }*/
-
-
-        
-        /*
-        Vector3f pos = new Vector3f(-10+20*rng.nextFloat(),-10+20*rng.nextFloat(),-10+20*rng.nextFloat());
-        Block randomCuboid   = new Block(pos, pos.mult(0.5f), 4*rng.nextFloat(), 4*rng.nextFloat(), 4*rng.nextFloat(), "Box", "ZAxis", 2.2f);
-        cuboid = new Alien(randomCuboid);
-        
-        Block body = new Block(new Vector3f( 0.0f, 0.0f, 0.0f), new Vector3f( 0.0f, 0.0f, 0.0f), 1.0f, 0.1f, 1.0f, "Box", "ZAxis", 1.0f);
-        body.setRotation(new Matrix3f(1f,0f,0f,0f,0f,-1f,0f,1f,0f));
-        Block left = new Block(new Vector3f(-3.0f, 0.0f, 0.0f), new Vector3f(-1.5f, 0.0f, 0.0f), 1.0f, 0.1f, 1.0f, "Box", "ZAxis", 1.0f);
-        left.setRotation(new Matrix3f(1f,0f,0f,0f,0f,-1f,0f,1f,0f));
-        body.addLimb(left);
-        simpleAlien = new Alien(body);
-        */
-        
-        
-        
-        //removeAlien(flippera);
-
-        // Control the instantiated alien (what the neural network will do)
-        //setupKeys(flippera);
-
+  
+        // disable gravity initially
         toggleGravityOff();
 
-        //toggleGravityOff();
-
-                
         myMainMenuController = new MainMenuController(this);
 
         stateManager.attach(myMainMenuController);
-     
+
         //Set up nifty
         NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
 
@@ -439,85 +297,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         nifty.fromXml("Interface/MainMenuLayout.xml", "begin", myMainMenuController);
         //nifty.setDebugOptionPanelColors(true); //un-comment this line to use DebugPanelColors and make sure Nifty is running correctly.
         
-
         //flyCam.setDragToRotate(true); //detaches camera from mouse unless you click/drag.a
-        
+
         flyCam.setEnabled(false);
-        
+
     }
-/*
-    private Geometry createLimb(String meshShape, float width, float height, float length, Vector3f location, float mass) {
-        
-        
-        Mesh mesh;
-        if (meshShape.equals("Cylinder")) {
-            mesh = new Cylinder(40,40,width,length,true);
-        } else if (meshShape.equals("Torus")) {
-            mesh = new Torus(40,40,width,length);
-        } else if (meshShape.equals("Sphere")) {
-            mesh = new Sphere(40,40,Math.max(width,minSphereDimension));
-        } else {
-            mesh = new Box(Math.max(minBoxDimension,width),Math.max(minBoxDimension,height),Math.max(minBoxDimension,length));
-        }
-        Geometry limb = new Geometry("Limb",mesh);
-        RigidBodyControl r;
-        r = new RigidBodyControl(CollisionShapeFactory.createDynamicMeshShape(limb),mass);
-        
-        //Quaternion q = new Quaternion().fromAngles(0f, 1f, 0.5f); //fromRotationMatrix(new Matrix3f(1f,0f,0f,0f,0f,-1f,0f,1f,0f));
-        //r.setPhysicsRotation(q); //setLocalRotation(q);
-        
-        limb.addControl(r); //limb.setMesh(CollisionShapeFactory.createMeshShape(limb));
-        limb.setMaterial(alienMaterial2);
-        //limb.getMesh().scaleTextureCoordinates(new Vector2f(1f,1f));
-        limb.getControl(RigidBodyControl.class).setPhysicsLocation(location);
-        
-        
-        
-        return limb;
-    } 
-    private Node createLimbNode(String collisionType, float width, float height, float length, Vector3f location, boolean rotate, float mass) {
-        
-        int axis = rotate ? PhysicsSpace.AXIS_X : PhysicsSpace.AXIS_Y;
-        Node node = new Node("Limb");
-        RigidBodyControl rigidBodyControl;
-        if (collisionType.equals("Capsule")) {
-            CapsuleCollisionShape shape = new CapsuleCollisionShape(width, height, axis);
-            rigidBodyControl = new RigidBodyControl(shape, mass);
-        } else {
-            BoxCollisionShape shape = new BoxCollisionShape(new Vector3f(width, height, length));
-            rigidBodyControl = new RigidBodyControl(shape, mass);
-        }
-        node.setLocalTranslation(location);
-        node.addControl(rigidBodyControl);
-        node.setMaterial(alienMaterial3);
-        return node;
-    }
-    private HingeJoint joinHingeJoint(Geometry A, Geometry B, Vector3f connectionPoint, String hingeType) {
-        RigidBodyControl rigidBodyControlA = A.getControl(RigidBodyControl.class);
-        RigidBodyControl rigidBodyControlB = B.getControl(RigidBodyControl.class);
-        Vector3f pivotA = connectionPoint.add(rigidBodyControlA.getPhysicsLocation().mult(-1f));
-        Vector3f pivotB = connectionPoint.add(rigidBodyControlB.getPhysicsLocation().mult(-1f));
-        Vector3f axisA;
-        Vector3f axisB;
-        if (hingeType.equals("XAxis")) {
-            axisA = Vector3f.UNIT_X;
-            axisB = Vector3f.UNIT_X;
-        } else if (hingeType.equals("YAxis")) {
-            axisA = Vector3f.UNIT_Y;
-            axisB = Vector3f.UNIT_Y;
-        } else if (hingeType.equals("ZAxis")) {
-            axisA = Vector3f.UNIT_Z;
-            axisB = Vector3f.UNIT_Z;
-        } else {
-            axisA = Vector3f.UNIT_Z;
-            axisB = Vector3f.UNIT_Z;
-        }
-        HingeJoint joint = new HingeJoint(rigidBodyControlA, rigidBodyControlB, pivotA, pivotB, axisA, axisB);
-        if (hingeType.equals("XAxis")) {
-            //joint.setLimit(0.5f, 1f, 0.5f,0.2f,0.5f);
-        }
-        return joint;
-    }*/
 
     public void onAction(String string, boolean bln, float tpf) {
 
@@ -548,12 +332,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             }
         }
         if ("Spawn Alien".equals(string)) {
-            if (!bln){
+            if (!bln) {
                 //spawnAlien();
             }
         }
 
-        
+
         //When right mouse button clicked, fire ray to see if intersects with body
         if ("AddLimb".equals(string) && !bln) {
             //Generate the ray from position of click
@@ -561,28 +345,28 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             Vector2f click2d = inputManager.getCursorPosition();
             Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
             Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
-            
+
             // Aim the ray from the clicked spot forwards.
             Ray ray = new Ray(click3d, dir);
-            
+
             //Check for collisions with body recursively
             rootNode.collideWith(ray, results);
             CollisionResult collision = results.getClosestCollision();
-            
-            
+
+
             //If collided then generate new limb at collision point
-            if (results.size()>0) {
+            if (results.size() > 0) {
                 Geometry geo = collision.getGeometry();
                 Vector3f colpt = collision.getContactPoint();
                 Vector3f pt = colpt.add(geo.getWorldTranslation().negate());
                 Vector3f norm = collision.getContactNormal();
-                
+
                 //Find block assoicated with collision geometry
                 Block block = null;
-                
+
                 LinkedList<Block> q = new LinkedList<Block>();
                 q.push(cuboid.rootBlock);
-                
+
                 while (!q.isEmpty()) {
                     Block head = q.pop();
                     if (geo == head.getGeometry()) {
@@ -594,9 +378,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                         }
                     }
                 }
-                
+
                 if (block != null) {
-                    addLimb(block,pt,norm);
+                    addLimb(block, pt, norm);
                 }
             }
         }
@@ -618,11 +402,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         inputManager.addMapping("Spawn Alien", new KeyTrigger(KeyInput.KEY_SPACE));
         inputManager.addListener(this, "Spawn Alien");
 
-        
-        //Add the key binding for the right click to add limb funtionality
-        inputManager.addMapping("AddLimb",new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-        inputManager.addListener(this, "AddLimb");
-        
-    }
 
+        //Add the key binding for the right click to add limb funtionality
+        inputManager.addMapping("AddLimb", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+        inputManager.addListener(this, "AddLimb");
+
+    }
 }
