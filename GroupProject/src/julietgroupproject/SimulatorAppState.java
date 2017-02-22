@@ -105,6 +105,8 @@ public class SimulatorAppState extends AbstractAppState {
         this.physics = this.stateManager.getState(BulletAppState.class);
         this.originalSpeed = this.physics.getSpeed();
         this.physics.setSpeed((float) simSpeed);
+        setupTextures();
+        this.reset();
     }
 
     public void reset() {
@@ -120,10 +122,12 @@ public class SimulatorAppState extends AbstractAppState {
         this.initialiseWorld();
         this.rootNode.attachChild(simRoot);
     }
-
+    
+    protected void setupTextures() {}
+    
     protected void initialiseWorld() {
 
-        Box floorBox = new Box(140, 1f, 140);
+        Box floorBox = new Box(140f, 1f, 140f);
         floorGeometry = new Geometry("Floor", floorBox);
         floorGeometry.setLocalTranslation(0, -5, 0);
         floorGeometry.addControl(new RigidBodyControl(0));

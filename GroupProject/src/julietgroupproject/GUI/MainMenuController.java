@@ -9,16 +9,16 @@ import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
-import julietgroupproject.Editor;
+import julietgroupproject.UIAppState;
 
 public class MainMenuController extends AbstractAppState implements ScreenController {
 
-  private Editor app;
+  private UIAppState app;
   private AppStateManager stateManager;
   private Nifty nifty;
   private Screen screen;
     
-  public MainMenuController(Editor App) {
+  public MainMenuController(UIAppState App) {
       this.app = App;
   }
   
