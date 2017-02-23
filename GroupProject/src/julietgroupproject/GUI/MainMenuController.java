@@ -37,6 +37,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     private boolean Y = false;
     private boolean Z = false;
     private boolean auto = false;
+    private volatile boolean initialising = false;
 
     public MainMenuController(UIAppState App) {
         this.app = App;
@@ -89,14 +90,74 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         nifty.gotoScreen("start");
         addValues();
     }
+    
+    public void addOptionsValues() {
+        Thread thread = new Thread() {
+            public void run() {
+                try {
+                    //Shhhhhh..... there's nothing to see here
+                    boolean working = false;
+                    DropDown textureBox = null;
+                    while(!working) {
+                        this.sleep(20);
+                        textureBox = nifty.getScreen("editor_options").findNiftyControl("textureDropDown", DropDown.class);
+                        try {
+                            textureBox.removeItem("");
+                            working = true;
+                        } catch (NullPointerException e) {
+                            
+                        } 
+                    }
+                    
+                    initialising = true;
+                    
+                    textureBox.removeItem("Alien1");
+                    textureBox.removeItem("Alien2");
+                    textureBox.removeItem("Alien3");
+        
+                    textureBox.addItem("Alien1");
+                    textureBox.addItem("Alien2");
+                    textureBox.addItem("Alien3");
+                    
+                    String tex = "Alien1";
+                    int textNo = app.getTextureNo();
+                    if (textNo==0) {
+                        tex = "Alien1";
+                    } else if(textNo==1) {
+                        tex = "Alien2";
+                    } else if (textNo==2) {
+                        tex = "Alien3";
+                    }
+                    textureBox.selectItem(tex);
+                    
+                    initialising = false;
+                } catch (InterruptedException e) {
+                    
+                }
+
+            }
+        };
+        thread.start();
+    }
 
     public void addValues() {
         Thread thread = new Thread() {
             public void run() {
                 try {
-                    this.sleep(150);
-                    DropDown shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector_body", DropDown.class);
-
+                    //Shhhhhh..... there's nothing to see here
+                    boolean working = false;
+                    DropDown shapeSelect = null;
+                    while(!working) {
+                        this.sleep(20);
+                        shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector_body", DropDown.class);
+                        try {
+                            shapeSelect.removeItem("");
+                            working = true;
+                        } catch (NullPointerException e) {
+                            
+                        } 
+                    }
+                    
                     shapeSelect.removeItem("Cuboid");
                     shapeSelect.removeItem("Sphere");
                     shapeSelect.removeItem("Cylinder");
@@ -117,6 +178,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     }
 
                 } catch (InterruptedException e) {
+                    
                 }
 
             }
@@ -174,6 +236,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         //TODO
         nifty.gotoScreen("editor_options");
         //Window window = nifty.getCurrentScreen().findNiftyControl("editor_options_window", Window.class);
+        addOptionsValues();
 
     }
 
@@ -190,6 +253,23 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         //TODO
     }
 
+    @NiftyEventSubscriber(id="textureDropDown")
+    public void onDropDownTextureSelectionChanged(final String id, final DropDownSelectionChangedEvent<String> event) {
+        if (!initialising)
+        {
+            String selectedTex = event.getSelection();
+            int textno = 1;
+            if (selectedTex.equals("Alien1")) {
+                textno= 0;
+            } else if (selectedTex.equals("Alien2")) {
+                textno= 1;
+            } else if (selectedTex.equals("Alien3")) {
+                textno=2;
+            }
+            app.setTexture(textno);
+        }
+    }
+    
    @NiftyEventSubscriber(id="shape_selector")
     public void onDropDownLimbSelectionChanged(final String id, final DropDownSelectionChangedEvent<String> event) {
         System.out.println(id);

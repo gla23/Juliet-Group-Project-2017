@@ -123,10 +123,11 @@ public class SimulatorAppState extends AbstractAppState {
      */
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
-
+        
         this.app = (SimpleApplication) app; // can cast Application to something more specific
         this.rootNode = this.app.getRootNode();
         this.assetManager = this.app.getAssetManager();
+        setupTextures();
         this.stateManager = this.app.getStateManager();
         this.inputManager = this.app.getInputManager();
         this.viewPort = this.app.getViewPort();
@@ -134,7 +135,7 @@ public class SimulatorAppState extends AbstractAppState {
         this.originalSpeed = this.physics.getSpeed();
         this.physics.setSpeed((float) simSpeed);
         this.setToKill(false);
-        setupTextures();
+        
         this.reset();
     }
 
@@ -180,7 +181,7 @@ public class SimulatorAppState extends AbstractAppState {
     protected AlienNode instantiateAlien(Alien a, Vector3f location) {
 
         this.currentAlienNode = AlienHelper.assembleAlien(a, location);
-
+        this.alien = a;
         physics.getPhysicsSpace().addAll(this.currentAlienNode);
         simRoot.attachChild(this.currentAlienNode);
 

@@ -106,6 +106,20 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public UIAppState(Alien _alien, double _simSpeed) {
         super(_alien, _simSpeed);
     }
+    
+    public void setTexture(int textno) {
+        System.out.println("Setting texture to " + textno);
+        removeAlien(currentAlienNode);
+        alien.materialCode = textno;
+        instantiateAlien(alien, new Vector3f(0f, 5f, -10f));
+        setChaseCam(this.currentAlienNode);
+        setupKeys(this.currentAlienNode);
+    }
+    
+    public int getTextureNo() {
+        System.out.println(alien.getCode());
+        return alien.getCode();
+    }
 
     public void removeAlien(AlienNode alienNode) {
         if (alienNode != null) {
@@ -223,7 +237,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             Vector3f pos = Vector3f.ZERO;
 
             Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", bodyWeight);
+            int texturecode = alien != null ? alien.materialCode : 1;
             alien = new Alien(bodyBlock);
+            alien.materialCode = texturecode;
             instantiateAlien(alien, new Vector3f(0f, 5f, -10f));
             setChaseCam(this.currentAlienNode);
             setupKeys(this.currentAlienNode);
