@@ -215,25 +215,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         }
 
     }
-
-    @NiftyEventSubscriber(id = "shape_selector_body")
-    public void onDropDownBodySelectionChanged(final String id, final DropDownSelectionChangedEvent<String> event) {
-        System.out.println(id);
-        Element getWidth = nifty.getCurrentScreen().findElementByName("bodyWidthSlider");
-        Element getHeight = nifty.getCurrentScreen().findElementByName("bodyHeightSlider");
-        Element getLength = nifty.getCurrentScreen().findElementByName("bodyLengthSlider");
-        Element firstLabelE = nifty.getCurrentScreen().findElementByName("first_body_label");
-        Element secondLabelE = nifty.getCurrentScreen().findElementByName("second_body_label");
-        Element thirdLabelE = nifty.getCurrentScreen().findElementByName("third_body_label");
-
-        Label firstLabel = nifty.getCurrentScreen().findNiftyControl("first_body_label", Label.class);
-        Label secondLabel = nifty.getCurrentScreen().findNiftyControl("second_body_label", Label.class);
-        Label thirdLabel = nifty.getCurrentScreen().findNiftyControl("third_body_label", Label.class);
-        if (event.getSelection().equals("Cylinder")) {
-
-       }
-       
-   }
    
    @NiftyEventSubscriber(id="chaseCamCheckBox")
    public void onChaseCamChange(final String id, final CheckBoxStateChangedEvent event) {
