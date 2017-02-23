@@ -88,7 +88,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private float cameraZoom = 10;
     private boolean smoothCam = false;
     private String currentShape = "Box";
-    private final int SIM_COUNT = 3;
+    private final int SIM_COUNT = 0;
     private List<SlaveSimulator> slaves = new ArrayList<>(SIM_COUNT);
     private Queue<SimulationData> simulationQueue = new ConcurrentLinkedQueue<>();
     private AlienTrainer trainer;
@@ -268,6 +268,16 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Slider seperationField = nifty.getCurrentScreen().findNiftyControl("limbSeperationSlider", Slider.class);
         CheckBox symmeticBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
 
+        
+        Slider rollSlider = nifty.getCurrentScreen().findNiftyControl("rollSlider", Slider.class);
+        Slider yawSlider = nifty.getCurrentScreen().findNiftyControl("yawSlider", Slider.class);
+        Slider pitchSlider = nifty.getCurrentScreen().findNiftyControl("pitchSlider", Slider.class);
+        Slider jointPosSlider = nifty.getCurrentScreen().findNiftyControl("jointPosSlider", Slider.class);
+        Slider jointRotSlider = nifty.getCurrentScreen().findNiftyControl("jointRotSlider", Slider.class);
+        
+        
+        
+
         float limbWidth;
         float limbHeight;
         float limbLength;
@@ -276,6 +286,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         float strength;
         float limbSeperation;
         boolean symmetric;
+        float roll;
+        float yaw;
+        float pitch;
+        float jointPositionFraction;
+        float jointStartRotation;
         // currentHingeAxis Will be either "X", "Y", "Z" or "A" for auto
 
         limbWidth = widthField.getValue();
@@ -286,6 +301,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         strength = strengthField.getValue();
         limbSeperation = seperationField.getValue();
         symmetric = symmeticBox.isChecked();
+        roll = rollSlider.getValue();
+        yaw = yawSlider.getValue();
+        pitch = pitchSlider.getValue();
+        jointPositionFraction = jointPosSlider.getValue();
+        jointStartRotation = jointRotSlider.getValue();
 
 
         //Get the current shape from the selector
