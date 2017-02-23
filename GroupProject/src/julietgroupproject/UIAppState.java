@@ -84,6 +84,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private float cameraZoom = 10;
     private boolean smoothCam = true;
     private String currentShape = "Box";
+    private String currentHingeAxis ="X";
     Alien simpleAlien;
     Alien smallBlock;
     Alien flipper;
@@ -251,6 +252,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         float friction;
         float strength;
         float limbSeperation;
+        // currentHingeAxis Will be either "X", "Y", "Z" or "A"
 
         boxWidth = widthField.getValue();
         boxHeight = heightField.getValue();
