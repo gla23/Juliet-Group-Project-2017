@@ -56,12 +56,7 @@
                                  <control id="gravitySlider" valign = "center"name="horizontalSlider" initial = "0.0"  min = "-10.0" max = "10.0" stepSize = "0.1"/>
                               </panel>
                               
-                              <panel id = "restartPanel" align = "center" width = "100%" height = "15%" childLayout = "vertical" >
-                                
-                                 <control name ="button" label="Restart Alien" height = "60%" width = "100%"  id = "restartAlienButton" visibleToMouse="true">
-                                    <interact onClick="restartAlien()"/>
-                                 </control>
-                              </panel>
+                              
                               
                          </panel>
                          <panel id = "return_options_panel" childLayout = "vertical" valign = "bottom" height = "8%" width = "100%">
@@ -268,6 +263,9 @@
                             <control name ="button" label="New Alien" height = "*" width = "*" id = "new_alien" visibleToMouse="true">
                                 <interact onClick="resetAlien()"/>
                             </control>
+                            <control name ="button" label="Restart Alien" height = "*" width = "*"  id = "restartAlienButtonMain" visibleToMouse="true">
+                                    <interact onClick="restartAlien()"/>
+                            </control>
                             <control name ="button" label="Save Alien" height = "*" width = "*" id = "save_alien" visibleToMouse="true">
                                 <interact onClick="saveAlien()"/>
                             </control>
@@ -278,7 +276,7 @@
                                 <interact onClick="runNewSimulation()"/>
                             </control>
                             <control name ="button" label="Load Previous Simualtion" height = "*" width = "*" id = "prev_sim" visibleToMouse="true">
-                                <interact onClick="setCurrentShape()"/>
+                                <interact onClick="runPreviousSimulation()"/>
                             </control>
                             <control name ="button" label="Hide Editor" height = "*" width = "*" id = "hide_editor" visibleToMouse="true">
                                 <interact onClick="hideEditor()"/>
