@@ -61,12 +61,12 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         tabs.setSelectedTab(addLimb);
         DropDown shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector", DropDown.class);
         shapeSelect.removeItem("Cuboid");
-        shapeSelect.removeItem("Sphere");
+        shapeSelect.removeItem("Ellipsoid");
         shapeSelect.removeItem("Cylinder");
         shapeSelect.removeItem("Torus");
         //shapeSelect.removeItem("Option3");
         shapeSelect.addItem("Cuboid");
-        shapeSelect.addItem("Sphere");
+        shapeSelect.addItem("Ellipsoid");
         shapeSelect.addItem("Cylinder");
         shapeSelect.addItem("Torus");
         //shapeSelect.addItem("Option3");
@@ -159,12 +159,12 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     }
                     
                     shapeSelect.removeItem("Cuboid");
-                    shapeSelect.removeItem("Sphere");
+                    shapeSelect.removeItem("Ellipsoid");
                     shapeSelect.removeItem("Cylinder");
                     shapeSelect.removeItem("Torus");
                     //shapeSelect.removeItem("Option3");
                     shapeSelect.addItem("Cuboid");
-                    shapeSelect.addItem("Sphere");
+                    shapeSelect.addItem("Ellipsoid");
                     shapeSelect.addItem("Cylinder");
                     shapeSelect.addItem("Torus");
                     //shapeSelect.addItem("Option3");
@@ -208,12 +208,12 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             tabs.setSelectedTab(addLimb);
             DropDown shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector", DropDown.class);
             shapeSelect.removeItem("Cuboid");
-            shapeSelect.removeItem("Sphere");
+            shapeSelect.removeItem("Ellipsoid");
             shapeSelect.removeItem("Cylinder");
             shapeSelect.removeItem("Torus");
             //shapeSelect.removeItem("Option3");
             shapeSelect.addItem("Cuboid");
-            shapeSelect.addItem("Sphere");
+            shapeSelect.addItem("Ellipsoid");
             shapeSelect.addItem("Cylinder");
             shapeSelect.addItem("Torus");
             //TODO: inform user load was successful
@@ -292,14 +292,16 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             thirdLabelE.show();
             firstLabel.setText("Radius:");
             thirdLabel.setText("Height:");
-        } else if (event.getSelection().equals("Sphere")) {
+        } else if (event.getSelection().equals("Ellipsoid")) {
             getWidth.show();
-            getHeight.hide();
-            getLength.hide();
+            getHeight.show();
+            getLength.show();
             firstLabelE.show();
-            secondLabelE.hide();
-            thirdLabelE.hide();
-            firstLabel.setText("Radius:");
+            secondLabelE.show();
+            thirdLabelE.show();
+            firstLabel.setText("X-Radius:");
+            secondLabel.setText("Y-Radius");
+            thirdLabel.setText("Z-Radius");
         } else if (event.getSelection().equals("Torus")) {
             getWidth.show();
             getHeight.hide();
@@ -383,14 +385,16 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             thirdLabelE.show();
             firstLabel.setText("Radius:");
             thirdLabel.setText("Height:");
-        } else if (event.getSelection().equals("Sphere")) {
+        } else if (event.getSelection().equals("Ellipsoid")) {
             getWidth.show();
-            getHeight.hide();
-            getLength.hide();
+            getHeight.show();
+            getLength.show();
             firstLabelE.show();
-            secondLabelE.hide();
-            thirdLabelE.hide();
-            firstLabel.setText("Radius:");
+            secondLabelE.show();
+            thirdLabelE.show();
+            firstLabel.setText("X-Radius:");
+            secondLabel.setText("Y-Radius");
+            thirdLabel.setText("Z-Radius");
         } else if (event.getSelection().equals("Torus")) {
             getWidth.show();
             getHeight.hide();
@@ -430,6 +434,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         current = (String) shapeSelect.getSelection();
         if (current.equals("Cuboid")) {
             current = "Box";
+        } else if (current.equals("Ellipsoid")) {
+            current = "Sphere";
         }
         app.setCurrentShape(current);
 

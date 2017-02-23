@@ -462,7 +462,20 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
         if ("ToggleMesh".equals(string)) {
             if (!bln) {
-                toggleWireMesh();
+                CheckBox mesh = nifty.getScreen("editor_options").findNiftyControl("wireMeshCheckBox", CheckBox.class);
+                mesh.setChecked(!mesh.isChecked());
+            }
+        }
+        if ("ToggleSmooth".equals(string)) {
+            if (!bln) {
+                CheckBox chasecam = nifty.getScreen("editor_options").findNiftyControl("chaseCamCheckBox", CheckBox.class);
+                chasecam.setChecked(!chasecam.isChecked());
+            }
+        }
+        
+        if ("GoToEditor".equals(string)) {
+            if (!bln) {
+                myMainMenuController.editorOptions();
             }
         }
 
@@ -532,6 +545,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         inputManager.addListener(this, "AddLimb");
         inputManager.addMapping("ToggleMesh",new KeyTrigger(KeyInput.KEY_Q));
         inputManager.addListener(this, "ToggleMesh");
+        inputManager.addMapping("ToggleSmooth",new KeyTrigger(KeyInput.KEY_S));
+        inputManager.addListener(this, "ToggleSmooth");
+        inputManager.addMapping("GoToEditor",new KeyTrigger(KeyInput.KEY_E));
+        inputManager.addListener(this, "GoToEditor");
 
     }
     

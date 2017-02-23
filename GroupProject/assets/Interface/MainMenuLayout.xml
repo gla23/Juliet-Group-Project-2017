@@ -13,6 +13,7 @@
                          <effect>
                              <onActive name="fade" start ="#00" end = "ff" length = "2000"/>
                             <!-- <onClick name = "fade" start = "#ff" end = "#00" length = "2000"/>-->
+                             <onActive name="changeFont" font = "Interface/Fonts/Begin.fnt"/>
                         </effect>
                         <interact onClick="showEditor()"/>
                      </control>
@@ -20,6 +21,7 @@
                                     visibleToMouse="true" > 
                           <effect>
                              <onActive name="fade" start ="#00" end = "ff" length = "2000"/>
+                             <onActive name="changeFont" font = "Interface/Fonts/Begin.fnt"/>
                         </effect>
                            <interact onClick="loadAlienButtonClick()"/>
                      </control>
@@ -41,13 +43,13 @@
 
 
                                  <panel id = "chaseCamPanel" height = "15%" childLayout = "horizontal" >
-                                    <control name="label" valign = "center" id = "chaseCam_label" width = "50%" text="Smooth Camera:"  />
+                                    <control name="label" valign = "center" id = "chaseCam_label" width = "50%" text="Smooth Camera: (S)"  />
                                     <panel id = "chaseCamCheckPanel" valign = "center" width = "50%" childLayout = "vertical" >
                                        <control id="chaseCamCheckBox" checked="false" align = "center"  name="checkbox" />
                                     </panel>
                                  </panel>
                                  <panel id = "wireMeshPanel" height = "15%" childLayout = "horizontal" >
-                                    <control name="label" valign = "center" id = "wireMesh_label" width = "50%" text="Wire Mesh:"  />
+                                    <control name="label" valign = "center" id = "wireMesh_label" width = "50%" text="Wire Mesh:(Q)"  />
                                     <panel id = "chaseCamCheckPanel" valign = "center" width = "50%" childLayout = "vertical" >
                                        <control id="wireMeshCheckBox" align = "center" valign = "center" name="checkbox" />
                                     </panel>
@@ -85,6 +87,7 @@
             <panel id="panel_background" width = "100%" height="100%" childLayout="vertical">
                 <effect >
                              <onActive name="fade" start ="#00" end = "ff" length = "1500" post = "true" />
+                             <!--<onActive name="colorPulsate" startColor = "#FF0000FF" endColor = "#0000FFFF"/>-->
                              <!--<onEndScreen name="fade" start ="#ff" end = "00" length = "1500" />-->
                             <!-- <onCustom name = "fade" start = "#ff" end = "#00"  length = "1500"/>-->
                             <!-- <onClick name = "fade" start = "#ff" end = "#00" length = "2000"/>-->
@@ -178,37 +181,43 @@
                                                 <control id="newLimbScrollbar"  name="scrollPanel" style="autoscroll"  horizontal="false" height="100%">
   
 
-                                                    <panel id="myScrollStuff" backgroundColor = "#88888800" width="100%" height = "150%" childLayout="vertical" >
-                                                        <control name="label" height = "7%"text="Shape Selector:" />
+                                                    <panel id="myScrollStuff" backgroundColor = "#88888800" width="100%" height = "200%" childLayout="vertical" >
+                                                        <control name="label" id = "basic_label" height = "3%" text="Basic Options" >
+                                                            <effect>
+                                                                <onActive name="changeFont" font = "Interface/Fonts/ArialBold.fnt"/>
+                             
+                                                            </effect>
+                                                        </control>
+                                                        <control name="label" height = "3%"text="Shape Selector:" />
                                                         <control id="shape_selector" name="dropDown" />
                                                         <panel id = "rect_options"  childLayout = "vertical" >
                                                                 
-                                                            <control name="label" id = "first_label" height = "5%" text="Select  Width:" />
+                                                            <control name="label" id = "first_label" height = "3%" text="Select  Width:" />
                                                             <control id="limbWidthSlider" name="horizontalSlider" initial = "1.3" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>
                                                                 
-                                                            <control name="label" id = "third_label" height = "5%"text="Select  Length:" />
+                                                            <control name="label" id = "third_label" height = "3%"text="Select  Length:" />
                                                             <control id="limbLengthSlider" name="horizontalSlider" initial = "0.4" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>
                                                                 
-                                                            <control name="label" id = "second_label" height = "5%"text="Select  Height:" />
+                                                            <control name="label" id = "second_label" height = "3%"text="Select  Height:" />
                                                             <control id="limbHeightSlider" name="horizontalSlider" initial = "0.4" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>     
                                                                                
-                                                            <control name="label" id = "forth_label" height = "5%"text="Weight:"  />
+                                                            <control name="label" id = "forth_label" height = "3%"text="Weight:"  />
                                                             <control id="limbWeightSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1"/>
                                                                 
-                                                            <control name="label" id = "fifth_label" height = "5%"text="Friction:"  />
+                                                            <control name="label" id = "fifth_label" height = "3%"text="Friction:"  />
                                                             <control id="limbFrictionSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1"/>
                                                                 
-                                                            <control name="label" id = "sixth_label" height = "5%"text="Strength:"  />
+                                                            <control name="label" id = "sixth_label" height = "3%"text="Strength:"  />
                                                             <control id="limbStrengthSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1"/>
                                                                 
-                                                            <control name="label" id = "seventh_label" height = "5%"text="Limb Seperation:"  />
+                                                            <control name="label" id = "seventh_label" height = "3%"text="Limb Seperation:"  />
                                                             <control id="limbSeperationSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1"/>
                                                                 
-                                                            <panel id = "symmetricPanel" height = "7%" childLayout = "horizontal" >
+                                                            <panel id = "symmetricPanel" height = "5%" childLayout = "horizontal" >
                                                                 <control name="label" valign = "center" id = "symmetric_label" width = "70%" text="Symmetric:"  />
                                                                 <control id="symmetricCheckBox" valign = "center" name="checkbox" />
                                                             </panel>
-                                                            <panel id = "hingeAxisPanel" height = "22%" childLayout = "vertical">
+                                                            <panel id = "hingeAxisPanel" height = "15%" childLayout = "vertical">
                                                                 <control id="hingeAxisButtons" name="radioButtonGroup"/>
                                                                 <control name="label" valign = "center" id = "hinge_axis_label" width = "100%" height = "25%" text="Hinge Axis:"/>
                                                                 
@@ -230,12 +239,31 @@
                                                                     <control name="label" valign = "center" id = "ZAxisLabel" width = "70%" text="Z:"  />
                                                                     <control id="ZCheckBox" valign = "center" name="radioButton" group="hingeAxisButtons"/>
                                                                 </panel>
-                                                                
-                                                                
-                                                                
-                                                                
                                                             </panel>  
-                                                            <panel id ="space_taker" childLayout = "vertical" height = "8%"/>     
+                                                                <control name="label" id = "advanced_label" height = "5%" text="Advanced Options" >
+                                                                    <effect>
+                                                                        <onActive name="changeFont" font = "Interface/Fonts/ArialBold.fnt"/>
+                             
+                                                                    </effect>
+                                                                </control>
+                                                                
+                                                                <control name="label" id = "eigth_label" height = "3%" text="Pitch:" />
+                                                                <control id="pitchSlider" name="horizontalSlider" initial = "1.3" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>
+                                                                
+                                                                <control name="label" id = "ninth_label" height = "3%" text="Yaw:" />
+                                                                <control id="yawSlider" name="horizontalSlider" initial = "1.3" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>
+                                                                
+                                                                <control name="label" id = "tenth_label" height = "3%" text="Roll:" />
+                                                                <control id="rollSlider" name="horizontalSlider" initial = "1.3" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>
+                                                                
+                                                                <control name="label" id = "eleventh_label" height = "3%" text="Joint Position Fraction:" />
+                                                                <control id="jointPosSlider" name="horizontalSlider" initial = "1.3" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>
+                                                                
+                                                                <control name="label" id = "twelth_label" height = "3%" text="Joint Start Rotation:" />
+                                                                <control id="jointRotSlider" name="horizontalSlider" initial = "1.3" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>
+                                                              
+                                                            
+                                                            <panel id ="space_taker_2" childLayout = "vertical" height = "8%"/>     
                                                             <control name ="button" label="Save Limb" height = "4%" align = "center" width = "80%" id = "save_limb_button" visibleToMouse="true">
                                                                 <interact onClick="saveLimb()"/>
                                                             </control>
