@@ -54,6 +54,7 @@ import org.encog.neural.networks.layers.BasicLayer;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.scene.shape.Sphere;
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.controls.DropDown;
 import de.lessvoid.nifty.controls.Slider;
 import java.io.File;
@@ -115,23 +116,19 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         System.out.println(axis);
     }
 
-    public void toggleGravityOn() {
-        physics.getPhysicsSpace().setGravity(new Vector3f(0, -9.81f, 0));
-    }
-
-    public void toggleGravityOff() {
-        physics.getPhysicsSpace().setGravity(Vector3f.ZERO);
-    }
-    
-    public void setGravity(float newGrav) {
-        physics.getPhysicsSpace().setGravity(new Vector3f(0,-newGrav,0));
-        
+    public void restartAlien() {
         if (prevAlien != null) {
             removeAlien(prevAlien);
             prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
             setChaseCam(cuboid);
             setupKeys(prevAlien);
         }
+    }
+    
+    public void setGravity(float newGrav) {
+        physics.getPhysicsSpace().setGravity(new Vector3f(0,-newGrav,0));
+        restartAlien();
+        
     }
 
     public void resetAlien() {
@@ -249,6 +246,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Slider frictionField = nifty.getCurrentScreen().findNiftyControl("limbFrictionSlider", Slider.class);
         Slider strengthField = nifty.getCurrentScreen().findNiftyControl("limbStrengthSlider", Slider.class);
         Slider seperationField = nifty.getCurrentScreen().findNiftyControl("limbSeperationSlider", Slider.class);
+        CheckBox symmeticBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
         
         float limbWidth;
         float limbHeight;
@@ -257,6 +255,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         float friction;
         float strength;
         float limbSeperation;
+        boolean symmetric;
         // currentHingeAxis Will be either "X", "Y", "Z" or "A" for auto
 
         limbWidth = widthField.getValue();
@@ -266,6 +265,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         friction = frictionField.getValue();
         strength = strengthField.getValue();
         limbSeperation = seperationField.getValue();
+        symmetric = symmeticBox.isChecked();
 
 
         //Get the current shape from the selector
@@ -362,7 +362,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         physics.setDebugEnabled(false);
 
         // disable gravity initially
-        toggleGravityOff();
+        setGravity(0.0f);
 
         myMainMenuController = new MainMenuController(this);
 

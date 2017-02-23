@@ -55,6 +55,12 @@
                                  <control name="label" valign = "center" id = "gravtity_label" width = "50%" text="Gravity:"  />
                                  <control id="gravitySlider" valign = "center"name="horizontalSlider" initial = "0.0"  min = "-10.0" max = "10.0" stepSize = "0.1"/>
                               </panel>
+                              <panel id = "resetPanel" height = "15%" childLayout = "horizontal" >
+                                 <control name="button" valign = "center" id = "reset_options_button" width = "70%" label="Reset Alien" visibleToMouse = "true" >
+                                      <interact onClick="restartAlien()"/>
+                                 </control>    
+  
+                              </panel>
                               
                               
                               <!--
@@ -178,62 +184,38 @@
                                                 <control id="newLimbScrollbar"  name="scrollPanel" style="autoscroll"  horizontal="false" height="100%">
   
 
-                                                    <panel id="myScrollStuff" backgroundColor = "#88888800" width="100%" height = "150%" childLayout="vertical" >
+                                                    <panel id="myScrollStuff" backgroundColor = "#88888800" width="100%" height = "100%" childLayout="vertical" >
                                                         <control name="label" height = "7%"text="Shape Selector:" />
                                                         <control id="shape_selector" name="dropDown" />
                                                         <panel id = "rect_options"  childLayout = "vertical" >
                                                                 
-                                                            <control name="label" id = "first_label" height = "5%" text="Select  Width:" />
+                                                            <control name="label" id = "first_label" height = "7%" text="Select  Width:" />
                                                             <control id="limbWidthSlider" name="horizontalSlider" initial = "1.3" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>
                                                                 
-                                                            <control name="label" id = "third_label" height = "5%"text="Select  Length:" />
+                                                            <control name="label" id = "third_label" height = "7%"text="Select  Length:" />
                                                             <control id="limbLengthSlider" name="horizontalSlider" initial = "0.4" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>
                                                                 
-                                                            <control name="label" id = "second_label" height = "5%"text="Select  Height:" />
+                                                            <control name="label" id = "second_label" height = "7%"text="Select  Height:" />
                                                             <control id="limbHeightSlider" name="horizontalSlider" initial = "0.4" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>     
                                                                                
-                                                            <control name="label" id = "forth_label" height = "5%"text="Weight:"  />
+                                                            <control name="label" id = "forth_label" height = "7%"text="Weight:"  />
                                                             <control id="limbWeightSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1"/>
                                                                 
-                                                            <control name="label" id = "fifth_label" height = "5%"text="Friction:"  />
+                                                            <control name="label" id = "fifth_label" height = "7%"text="Friction:"  />
                                                             <control id="limbFrictionSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1"/>
                                                                 
-                                                            <control name="label" id = "sixth_label" height = "5%"text="Strength:"  />
+                                                            <control name="label" id = "sixth_label" height = "7%"text="Strength:"  />
                                                             <control id="limbStrengthSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1"/>
                                                                 
-                                                            <control name="label" id = "seventh_label" height = "5%"text="Limb Seperation:"  />
+                                                            <control name="label" id = "seventh_label" height = "7%"text="Limb Seperation:"  />
                                                             <control id="limbSeperationSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1"/>
                                                                 
-                                                            <panel id = "symmetricPanel" height = "7%" childLayout = "horizontal" >
+                                                            <panel id = "symmetricPanel" height = "10%" childLayout = "horizontal" >
                                                                 <control name="label" valign = "center" id = "symmetric_label" width = "70%" text="Symmetric:"  />
                                                                 <control id="symmetricCheckBox" valign = "center" name="checkbox" />
                                                             </panel>
-                                                            <panel id = "hingeAxisPanel" height = "22%" childLayout = "vertical">
-                                                                <control id="hingeAxisButtons" name="radioButtonGroup"/>
-                                                                <control name="label" valign = "center" id = "hinge_axis_label" width = "100%" height = "25%" text="Hinge Axis:"/>
-                                                                
-                                                                <panel id = "XAxisPanel" height = "15%" childLayout = "horizontal" >
-                                                                    <control name="label" valign = "center" id = "XAxisLabel" width = "70%" text="X:"  />
-                                                                    <control id="XCheckBox" checked = "true" valign = "center" name="radioButton" group="hingeAxisButtons" />
-                                                                </panel>
-                                                                <panel id = "YAxisPanel" height = "15%" childLayout = "horizontal" >
-                                                                    <control name="label" valign = "center" id = "YAxisLabel" width = "70%" text="Y:"  />
-                                                                    <control id="YCheckBox" valign = "center" name="radioButton" group="hingeAxisButtons"/>
-                                                                </panel>
-                                                                <panel id = "ZAxisPanel" height = "15%" childLayout = "horizontal" >
-                                                                    <control name="label" valign = "center" id = "ZAxisLabel" width = "70%" text="Z:"  />
-                                                                    <control id="ZCheckBox" valign = "center" name="radioButton" group="hingeAxisButtons"/>
-                                                                </panel>
-                                                                <panel id = "AutoAxisPanel" height = "15%" childLayout = "horizontal" >
-                                                                    <control name="label" valign = "center" id = "AutoAxisLabel" width = "70%" text="Auto:"  />
-                                                                    <control id="AutoCheckBox" valign = "center" name="radioButton" group="hingeAxisButtons"/>
-                                                                </panel>
-                                                                
-                                                                
-                                                                
-                                                            </panel>  
-                                                            <panel id ="space_taker" childLayout = "vertical" height = "8%"/>     
-                                                            <control name ="button" label="Save Limb" height = "4%" align = "center" width = "80%" id = "save_limb_button" visibleToMouse="true">
+                                                                    
+                                                            <control name ="button" label="Save Limb" height = "5%" align = "center" width = "80%" id = "save_limb_button" visibleToMouse="true">
                                                                 <interact onClick="saveLimb()"/>
                                                             </control>
                                                         </panel>

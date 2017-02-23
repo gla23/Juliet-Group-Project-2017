@@ -47,13 +47,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         this.screen = screen;
     }
 
-    public void toggleGravOn() {
-        app.toggleGravityOn();
-    }
-
-    public void toggleGravOff() {
-        app.toggleGravityOff();
-    }
 
     public void newBody() {
         setCurrentBodyShape();
@@ -256,7 +249,9 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
        app.toggleSmoothness();
    }
    
-   
+   public void restartAlien() {
+       app.restartAlien();
+   }
    
    
    @NiftyEventSubscriber(id="hingeAxisButtons")
