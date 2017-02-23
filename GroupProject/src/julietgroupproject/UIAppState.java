@@ -411,9 +411,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 }
             }
         }
-        if ("Spawn Alien".equals(string)) {
+        if ("ToggleMesh".equals(string)) {
             if (!bln) {
-                //spawnAlien();
+                toggleWireMesh();
             }
         }
 
@@ -477,15 +477,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             inputManager.addListener(this, "Alien joint " + ((Integer) i).toString() + " anticlockwise");
         }
         currentAlienNode = brain;
-        inputManager.addMapping("Pull ragdoll up", new MouseButtonTrigger(0));
-        inputManager.addListener(this, "Pull ragdoll up");
-        inputManager.addMapping("Spawn Alien", new KeyTrigger(KeyInput.KEY_SPACE));
-        inputManager.addListener(this, "Spawn Alien");
-
 
         //Add the key binding for the right click to add limb funtionality
         inputManager.addMapping("AddLimb", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         inputManager.addListener(this, "AddLimb");
+        inputManager.addMapping("ToggleMesh",new KeyTrigger(KeyInput.KEY_Q));
+        inputManager.addListener(this, "ToggleMesh");
 
     }
 }
