@@ -120,6 +120,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void setGravity(float newGrav) {
         physics.getPhysicsSpace().setGravity(new Vector3f(0,-newGrav,0));
         
+        if (prevAlien != null) {
+            removeAlien(prevAlien);
+            prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
+            setChaseCam(cuboid);
+            setupKeys(prevAlien);
+        }
     }
 
     public void resetAlien() {
