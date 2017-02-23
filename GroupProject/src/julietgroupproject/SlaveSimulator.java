@@ -12,8 +12,9 @@ import com.jme3.system.JmeContext;
 import java.util.Queue;
 
 /**
- *
- * @author Sunny <ss2324@cam.ac.uk>
+ * A background simulator dedicated to training process.
+ * 
+ * @author Sunny
  */
 public class SlaveSimulator extends SimpleApplication {
 
@@ -32,6 +33,10 @@ public class SlaveSimulator extends SimpleApplication {
         stateManager.attach(simulatorAppState);
     }
     
+    /**
+     * Gracefully terminate this simulator after current
+     * simulation finishes.
+     */
     public void kill()
     {
         simulatorAppState.setToKill(true);

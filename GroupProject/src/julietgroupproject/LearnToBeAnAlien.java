@@ -9,7 +9,10 @@ import com.jme3.bullet.BulletAppState;
 import com.jme3.input.controls.ActionListener;
 
 /**
- *
+ * The main application running at front end.
+ * It handles input from user and uses
+ * appropriate AppStates for alien editing/simulation.
+ * 
  * @author GeorgeLenovo
  */
 public class LearnToBeAnAlien extends SimpleApplication {

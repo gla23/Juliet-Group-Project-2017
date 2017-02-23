@@ -9,7 +9,11 @@ import java.util.logging.Logger;
 import org.encog.ml.MLRegression;
 
 /**
- *
+ * A simulation task to be performed by simulator.
+ * It contains the neural network and some other
+ * parameters for simulation, as well as the
+ * setFitness method to retain the simulation result.
+ * 
  * @author Peter
  */
 public class SimulationData {
@@ -26,6 +30,13 @@ public class SimulationData {
         fitnessCalculated = false;
     }
     
+    /**
+     * Get the fitness of the neural network to evaluate.
+     * This method should be called by AlienEvaluator,
+     * which will be woken up after a result is obtained.
+     * 
+     * @return the fitness value of evaluated neural network
+     */
     public synchronized double getFitness()
     {
         while (!fitnessCalculated)
@@ -39,6 +50,13 @@ public class SimulationData {
         return fitness;
     }
     
+    /**
+     * Set the resultant fitness of current neural network.
+     * This method should be called by simulator after simulation
+     * for this task completes.
+     * 
+     * @param _fitness fitness value of neural network evaluated
+     */
     public synchronized void setFitness(double _fitness)
     {
         fitness = _fitness;
@@ -46,6 +64,10 @@ public class SimulationData {
         this.notifyAll();
     }
     
+    /**
+     * Get the neural network to evaluate for this task.
+     * @return the neural network to evaluate
+     */
     public MLRegression getToEvaluate()
     {
         return toEvaluate;

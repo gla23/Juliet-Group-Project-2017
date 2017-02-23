@@ -14,9 +14,12 @@ import org.encog.ml.MLRegression;
 import org.encog.ml.data.MLData;
 import org.encog.ml.data.basic.BasicMLData;
 
+/**
+ * A Node containing all the geometries of an alien,
+ * with two additional Lists of references to the joints and geometries
+ * for convenience of interacting with the alien.
+ */
 public class AlienNode extends Node {
-    
-
     public ArrayList<HingeJoint> joints = new ArrayList<HingeJoint>();
     public ArrayList<Geometry> geometries = new ArrayList<Geometry>();
     

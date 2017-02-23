@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Sunny <ss2324@cam.ac.uk>
+ * @author Sunny
  */
 public class TestAlienTrainer {
     
