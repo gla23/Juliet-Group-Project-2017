@@ -134,7 +134,25 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     public void loadAlien() {
         //TODO
-       
+        if (app.loadAlien("alien.sav")) {
+            TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
+            addLimb = screen.findNiftyControl("add_limb_tab", Tab.class);
+            addBody = screen.findNiftyControl("add_body_tab", Tab.class);
+            tabs.setSelectedTab(addLimb);
+            DropDown shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector", DropDown.class);
+            shapeSelect.removeItem("Cuboid");
+            shapeSelect.removeItem("Sphere");
+            shapeSelect.removeItem("Cylinder");
+            shapeSelect.removeItem("Torus");
+            //shapeSelect.removeItem("Option3");
+            shapeSelect.addItem("Cuboid");
+            shapeSelect.addItem("Sphere");
+            shapeSelect.addItem("Cylinder");
+            shapeSelect.addItem("Torus");
+            //TODO: inform user load was successful
+        } else {
+            //TODO: inform user load was unsuccessful
+        }
 
     }
 
