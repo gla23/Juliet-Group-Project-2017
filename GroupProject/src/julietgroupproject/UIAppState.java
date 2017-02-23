@@ -88,13 +88,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private float cameraZoom = 10;
     private boolean smoothCam = false;
     private String currentShape = "Box";
-    private final int SIM_COUNT = 0;
+    private final int SIM_COUNT = 3;
     private List<SlaveSimulator> slaves = new ArrayList<>(SIM_COUNT);
     private Queue<SimulationData> simulationQueue = new ConcurrentLinkedQueue<>();
     private AlienTrainer trainer;
-    
-    private String currentHingeAxis ="A";
-    
+    private boolean editing = true;
+    private SimulationData currentSim;
+    private float simTimeLimit;
+    private String currentHingeAxis = "A";
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
@@ -131,10 +132,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void setCurrentShape(String shape) {
         currentShape = shape;
     }
-    
+
     public void setCurrentHingeAxis(String axis) {
         currentHingeAxis = axis;
     }
+
 
     public void restartAlien() {
         if (currentAlienNode != null) {
@@ -144,11 +146,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             setupKeys(currentAlienNode);
         }
     }
-    
+
     public void setGravity(float newGrav) {
-        physics.getPhysicsSpace().setGravity(new Vector3f(0,-newGrav,0));
+        physics.getPhysicsSpace().setGravity(new Vector3f(0, -newGrav, 0));
         restartAlien();
-        
+
     }
 
     public void resetAlien() {
@@ -265,7 +267,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Slider strengthField = nifty.getCurrentScreen().findNiftyControl("limbStrengthSlider", Slider.class);
         Slider seperationField = nifty.getCurrentScreen().findNiftyControl("limbSeperationSlider", Slider.class);
         CheckBox symmeticBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
-        
+
         float limbWidth;
         float limbHeight;
         float limbLength;
@@ -289,6 +291,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         //Get the current shape from the selector
         myMainMenuController.setCurrentLimbShape();
         /*
+
         if (currentShape.equals("Box")) {
             // Rotate the x y z for making boxes rotate to the normal
             Vector3f whlVec = new Vector3f(limbWidth, limbHeight, limbLength);
@@ -298,33 +301,31 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             limbWidth = Math.abs(whlVec.x);
             limbHeight = Math.abs(whlVec.y);
             limbLength = Math.abs(whlVec.z);
-            
+
         } else if (currentShape.equals("Sphere")) {
             //TODO things for attahcing sphere
-            
         } else if (currentShape.equals("Torus")) {
             //TODO things for attahcing torus
-            
         } else if (currentShape.equals("Cylinder")) {
             //TODO things for attahcing cylinder
-            
         }
         */
         
+
         //Find hinge and postion vectors given shape and click position
         //TODO fix this so that is gets the actual distance, and also make that distance correct when it is rotated
         Vector3f newHingePos = contactPt.add(normal.mult(-0.36f));
         Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeperation));
-        
+
         String axisToUse = "ZAxis";
-        if (currentHingeAxis.equals("A")){
-            if (Math.abs(normal.x)<Math.abs(normal.z)) {
+        if (currentHingeAxis.equals("A")) {
+            if (Math.abs(normal.x) < Math.abs(normal.z)) {
                 axisToUse = "XAxis";
             }
         } else {
             axisToUse = currentHingeAxis;
         }
-        
+
         //Build the new limb
         Block limb = new Block(newPos, newHingePos, limbWidth, limbHeight, limbLength, currentShape, axisToUse, weight);
         Matrix3f rotation = new Matrix3f();
@@ -402,60 +403,64 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         flyCam.setEnabled(false);
 
     }
-    
-    public boolean beginTraining()
-    {
-        if (alien == null)
-        {
+
+    public boolean beginTraining() {
+        if (alien == null) {
             return false;
         }
+
+        editing = false;
         
-        if (currentAlienNode == null)
-        {
+        this.physics.setEnabled(false);
+        resetGravity();
+        
+        if (currentAlienNode == null) {
             instantiateAlien(alien, Vector3f.ZERO);
         }
-        
-        this.trainer = new AlienTrainer(0.5,"saved.pop",
-                simulationQueue,currentAlienNode.joints.size() + 1,
+
+        this.trainer = new AlienTrainer(0.5, "saved.pop",
+                simulationQueue, currentAlienNode.joints.size() + 1,
                 currentAlienNode.joints.size());
-        
-        while (this.slaves.size() < SIM_COUNT)
-        {
-            SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(this.alien, this.simulationQueue,1.0f));
+
+        while (this.slaves.size() < SIM_COUNT) {
+            SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(this.alien, this.simulationQueue, 1.0f));
             this.slaves.add(toAdd);
             toAdd.start(JmeContext.Type.Headless);
         }
-        
+
         this.trainer.start();
-        
+
+
         return true;
     }
 
     @Override
     public void onAction(String string, boolean bln, float tpf) {
 
-        // Controls the joints with keys in jointKeys
-        if (currentAlienNode != null) {
-            int numberOfJoints = Math.min(currentAlienNode.joints.size(), jointKeys.length / 2);
+        if (editing) {
+            // Controls the joints with keys in jointKeys
+            if (currentAlienNode != null) {
+                int numberOfJoints = Math.min(currentAlienNode.joints.size(), jointKeys.length / 2);
 
-            for (int i = 0; i < numberOfJoints; i++) {
+                for (int i = 0; i < numberOfJoints; i++) {
 
-                if (("Alien joint " + ((Integer) i).toString() + " clockwise").equals(string)) {
-                    if (bln) {
-                        currentAlienNode.joints.get(i).getBodyA().activate();
-                        currentAlienNode.joints.get(i).getBodyB().activate();
-                        currentAlienNode.joints.get(i).enableMotor(true, 1 * limbTargetVolcity, limbPower);
-                    } else {
-                        currentAlienNode.joints.get(i).enableMotor(false, 0, 0);
+                    if (("Alien joint " + ((Integer) i).toString() + " clockwise").equals(string)) {
+                        if (bln) {
+                            currentAlienNode.joints.get(i).getBodyA().activate();
+                            currentAlienNode.joints.get(i).getBodyB().activate();
+                            currentAlienNode.joints.get(i).enableMotor(true, 1 * limbTargetVolcity, limbPower);
+                        } else {
+                            currentAlienNode.joints.get(i).enableMotor(false, 0, 0);
+                        }
                     }
-                }
-                if (("Alien joint " + ((Integer) i).toString() + " anticlockwise").equals(string)) {
-                    if (bln) {
-                        currentAlienNode.joints.get(i).getBodyA().activate();
-                        currentAlienNode.joints.get(i).getBodyB().activate();
-                        currentAlienNode.joints.get(i).enableMotor(true, -1 * limbTargetVolcity, limbPower);
-                    } else {
-                        currentAlienNode.joints.get(i).enableMotor(false, 0, 0);
+                    if (("Alien joint " + ((Integer) i).toString() + " anticlockwise").equals(string)) {
+                        if (bln) {
+                            currentAlienNode.joints.get(i).getBodyA().activate();
+                            currentAlienNode.joints.get(i).getBodyB().activate();
+                            currentAlienNode.joints.get(i).enableMotor(true, -1 * limbTargetVolcity, limbPower);
+                        } else {
+                            currentAlienNode.joints.get(i).enableMotor(false, 0, 0);
+                        }
                     }
                 }
             }
@@ -483,56 +488,55 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             if (!bln) {
                 myMainMenuController.pulsateToggle();
             }
-        }
 
 
-        //When right mouse button clicked, fire ray to see if intersects with body
-        if ("AddLimb".equals(string) && !bln) {
-            //Generate the ray from position of click
-            CollisionResults results = new CollisionResults();
-            Vector2f click2d = inputManager.getCursorPosition();
-            Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
-            Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
+            //When right mouse button clicked, fire ray to see if intersects with body
+            if ("AddLimb".equals(string) && !bln) {
+                //Generate the ray from position of click
+                CollisionResults results = new CollisionResults();
+                Vector2f click2d = inputManager.getCursorPosition();
+                Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
+                Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
 
-            // Aim the ray from the clicked spot forwards.
-            Ray ray = new Ray(click3d, dir);
+                // Aim the ray from the clicked spot forwards.
+                Ray ray = new Ray(click3d, dir);
 
-            //Check for collisions with body recursively
-            rootNode.collideWith(ray, results);
-            CollisionResult collision = results.getClosestCollision();
+                //Check for collisions with body recursively
+                rootNode.collideWith(ray, results);
+                CollisionResult collision = results.getClosestCollision();
 
 
-            //If collided then generate new limb at collision point
-            if (results.size() > 0) {
-                Geometry geo = collision.getGeometry();
-                Vector3f colpt = collision.getContactPoint();
-                Vector3f pt = colpt.add(geo.getWorldTranslation().negate());
-                Vector3f norm = collision.getContactNormal();
+                //If collided then generate new limb at collision point
+                if (results.size() > 0) {
+                    Geometry geo = collision.getGeometry();
+                    Vector3f colpt = collision.getContactPoint();
+                    Vector3f pt = colpt.add(geo.getWorldTranslation().negate());
+                    Vector3f norm = collision.getContactNormal();
 
-                //Find block assoicated with collision geometry
-                Block block = null;
+                    //Find block assoicated with collision geometry
+                    Block block = null;
 
-                LinkedList<Block> q = new LinkedList<>();
-                q.push(alien.rootBlock);
+                    LinkedList<Block> q = new LinkedList<>();
+                    q.push(alien.rootBlock);
 
-                while (!q.isEmpty()) {
-                    Block head = q.pop();
-                    if (geo == head.getGeometry()) {
-                        block = head;
-                        break;
-                    } else {
-                        for (Block child : head.getConnectedLimbs()) {
-                            q.push(child);
+                    while (!q.isEmpty()) {
+                        Block head = q.pop();
+                        if (geo == head.getGeometry()) {
+                            block = head;
+                            break;
+                        } else {
+                            for (Block child : head.getConnectedLimbs()) {
+                                q.push(child);
+                            }
                         }
                     }
-                }
 
-                if (block != null) {
-                    addLimb(block, pt, norm);
+                    if (block != null) {
+                        addLimb(block, pt, norm);
+                    }
                 }
             }
         }
-
     }
 
     public void setupKeys(AlienNode brain) {
@@ -549,7 +553,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         //Add the key binding for the right click to add limb funtionality
         inputManager.addMapping("AddLimb", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         inputManager.addListener(this, "AddLimb");
-        inputManager.addMapping("ToggleMesh",new KeyTrigger(KeyInput.KEY_Q));
+        inputManager.addMapping("ToggleMesh", new KeyTrigger(KeyInput.KEY_Q));
         inputManager.addListener(this, "ToggleMesh");
         inputManager.addMapping("ToggleSmooth",new KeyTrigger(KeyInput.KEY_S));
         inputManager.addListener(this, "ToggleSmooth");
@@ -560,19 +564,76 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     }
     
+    /**
+     * Start a new simulation. This method should not be called externally by
+     * another thread.
+     *
+     * @param data the SimulationData object containing the ANN to be tested and
+     * other parameters
+     */
+    protected void startSimulation(SimulationData data) {
+        // turn physics back on
+        this.physics.setEnabled(true);
+        this.reset();
+        this.currentSim = data;
+        this.simTimeLimit = (float) data.getSimTime();
+        this.currentAlienNode = instantiateAlien(this.alien, this.startLocation);
+        setChaseCam(currentAlienNode);
+        this.currentAlienNode.addControl(new AlienBrain(data.getToEvaluate()));
+        this.simInProgress = true;
+    }
+    
+     /**
+     * Stop simulation and set fitness value.
+     */
+    protected void stopSimulation() {
+
+        this.simInProgress = false;
+        if (this.currentSim != null) {
+            double fitness = this.calcFitness();
+            this.currentSim.setFitness(fitness);
+            System.out.println("Stopping simulation! " + this.currentSim.toString());
+        }
+        // turn physics off to save CPU time
+        this.physics.setEnabled(false);
+    }
+    
     @Override
-    public void cleanup()
-    {
-        for (SimulationData sim : this.simulationQueue)
-        {
+    public void reset() {
+        super.reset();
+        this.currentSim = null;
+        this.simInProgress = false;
+        this.simTimeLimit = 0.0f;
+    }
+    
+    @Override
+    public void update(float tpf) {
+        if (simInProgress) {
+            simTimeLimit -= tpf * physics.getSpeed();
+            if (simTimeLimit < 0f) {
+                // stop simulation and report result
+                stopSimulation();
+            }
+        } else {
+            // try to poll task from the queue
+                SimulationData s;
+                s = this.simulationQueue.peek();
+                if (s != null) {
+                    System.out.println(Thread.currentThread().getId() + ": starting simulation!");
+                    startSimulation(s);
+            }
+        }
+    }
+
+    @Override
+    public void cleanup() {
+        for (SimulationData sim : this.simulationQueue) {
             sim.terminate();
         }
-        if (this.trainer != null)
-        {
+        if (this.trainer != null) {
             this.trainer.terminateTraining();
         }
-        for (SlaveSimulator slave : this.slaves)
-        {
+        for (SlaveSimulator slave : this.slaves) {
             slave.kill();
         }
     }

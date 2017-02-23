@@ -58,8 +58,10 @@ public class SimulatorAppState extends AbstractAppState {
     protected volatile boolean toKill;
     protected boolean simInProgress;
     // World related
-    final protected Vector3f startLocation = Vector3f.ZERO;
+    protected final Vector3f startLocation = Vector3f.ZERO;
     protected Geometry floorGeometry;
+    public final Vector3f standardG;
+        
 
     /**
      * Constructs a minimal AppState for simulation which provides basic utility
@@ -73,6 +75,9 @@ public class SimulatorAppState extends AbstractAppState {
         this.simSpeed = _simSpeed;
         this.alien = _alien;
         this.nnUpdateCycle = (int) (DEFAULT_UPDATE_CYCLE / this.simSpeed);
+        Vector3f temp = new Vector3f();
+        Vector3f.UNIT_Y.mult(-9.81f, temp);
+        standardG = temp;
     }
 
     /**
@@ -137,6 +142,11 @@ public class SimulatorAppState extends AbstractAppState {
         this.setToKill(false);
         
         this.reset();
+    }
+    
+    protected void resetGravity()
+    {
+        this.physics.getPhysicsSpace().setGravity(standardG);
     }
 
     /**

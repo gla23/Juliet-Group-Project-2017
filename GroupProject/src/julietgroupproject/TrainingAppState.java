@@ -47,7 +47,7 @@ public class TrainingAppState extends SimulatorAppState {
      * @param data the SimulationData object containing the ANN to be tested and
      * other parameters
      */
-    public void startSimulation(SimulationData data) {
+    protected void startSimulation(SimulationData data) {
         // turn physics back on
         this.physics.setEnabled(true);
         this.reset();
@@ -81,6 +81,7 @@ public class TrainingAppState extends SimulatorAppState {
         super.initialize(stateManager, app);
         // turn physics off to save CPU time
         this.physics.setEnabled(false);
+        resetGravity();
     }
 
     @Override
