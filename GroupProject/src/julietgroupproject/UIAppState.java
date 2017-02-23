@@ -84,7 +84,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private float cameraZoom = 10;
     private boolean smoothCam = true;
     private String currentShape = "Box";
-    private String currentHingeAxis ="X";
+    private String currentHingeAxis ="A";
     Alien simpleAlien;
     Alien smallBlock;
     Alien flipper;
@@ -245,18 +245,18 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Slider strengthField = nifty.getCurrentScreen().findNiftyControl("limbStrengthSlider", Slider.class);
         Slider seperationField = nifty.getCurrentScreen().findNiftyControl("limbSeperationSlider", Slider.class);
         
-        float boxWidth;
-        float boxHeight;
-        float boxLength;
+        float limbWidth;
+        float limbHeight;
+        float limbLength;
         float weight;
         float friction;
         float strength;
         float limbSeperation;
-        // currentHingeAxis Will be either "X", "Y", "Z" or "A"
+        // currentHingeAxis Will be either "X", "Y", "Z" or "A" for auto
 
-        boxWidth = widthField.getValue();
-        boxHeight = heightField.getValue();
-        boxLength = lengthField.getValue();
+        limbWidth = widthField.getValue();
+        limbHeight = heightField.getValue();
+        limbLength = lengthField.getValue();
         weight = weightField.getValue();
         friction = frictionField.getValue();
         strength = strengthField.getValue();
@@ -267,7 +267,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         myMainMenuController.setCurrentLimbShape();
         
         if (currentShape.equals("Box")) {
-            //TODO things for attaching box 
+            // Rotate the x y z for making boxes rotate to the normal
+            Vector3f whlVec = new Vector3f(limbWidth, limbHeight, limbLength);
+            Matrix3f rotator = new Matrix3f();
+            rotator.fromStartEndVectors(normal, new Vector3f(1, 0, 0));
+            whlVec = rotator.mult(whlVec);
+            limbWidth = Math.abs(whlVec.x);
+            limbHeight = Math.abs(whlVec.y);
+            limbLength = Math.abs(whlVec.z);
             
         } else if (currentShape.equals("Sphere")) {
             //TODO things for attahcing sphere
@@ -278,34 +285,30 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         } else if (currentShape.equals("Cylinder")) {
             //TODO things for attahcing cylinder
             
-        } 
-        Vector3f whlVec = new Vector3f(boxWidth, boxHeight, boxLength);
-        Matrix3f rotator = new Matrix3f();
-        rotator.fromStartEndVectors(normal, new Vector3f(1, 0, 0));
-        whlVec = rotator.mult(whlVec);
-        whlVec.x = Math.abs(whlVec.x);
-        whlVec.y = Math.abs(whlVec.y);
-        whlVec.z = Math.abs(whlVec.z);
-
-
-
-
-        //Find hinge and postion vectors given shape and click position
-        Vector3f newHingePos = contactPt.add(normal.mult(0.5f));
-        Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(boxLength, boxHeight), boxWidth) + 1.0f));
-        String axisToUse = "ZAxis";
-        if (whlVec.x < whlVec.z) {
-            axisToUse = "XAxis";
         }
-        //Build the new limb
         
-        Block limb = new Block(newPos, newHingePos, whlVec.x, whlVec.y, whlVec.z, currentShape, axisToUse, weight);
+        //Find hinge and postion vectors given shape and click position
+        //TODO fix this so that is gets the actual distance, and also make that distance correct when it is rotated
+        Vector3f newHingePos = contactPt.add(normal.mult(0.5f));
+        Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeperation));
+        
+        String axisToUse = "ZAxis";
+        if (currentHingeAxis.equals("A")){
+            if (Math.abs(normal.x)<Math.abs(normal.z)) {
+                axisToUse = "XAxis";
+            }
+        } else {
+            axisToUse = currentHingeAxis;
+        }
+        
+        //Build the new limb
+        Block limb = new Block(newPos, newHingePos, limbWidth, limbHeight, limbLength, currentShape, axisToUse, weight);
         Matrix3f rotation = new Matrix3f();
         rotation.fromStartEndVectors(new Vector3f(0, 1, 0), normal);
 
         limb.rotation = rotation;
 
-        //Still working on getting this to rotate
+        // Stores the normal the limb was created at in the limb for future use
         limb.setNormal(normal);
 
         //Add new limb to alien and instantiate
