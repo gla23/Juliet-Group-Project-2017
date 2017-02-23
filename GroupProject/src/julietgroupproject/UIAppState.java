@@ -116,6 +116,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void toggleGravityOff() {
         physics.getPhysicsSpace().setGravity(Vector3f.ZERO);
     }
+    
+    public void setGravity(float newGrav) {
+        physics.getPhysicsSpace().setGravity(new Vector3f(0,-newGrav,0));
+        
+    }
 
     public void resetAlien() {
         if (prevAlien != null) {
