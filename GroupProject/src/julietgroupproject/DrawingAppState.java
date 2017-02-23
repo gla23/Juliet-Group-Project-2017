@@ -52,6 +52,9 @@ public class DrawingAppState extends SimulatorAppState {
     private Material alienMaterial3;
     private Material grassMaterial;
     private Material skyMaterial;
+    
+    private Material[] materials;
+    
 
     public DrawingAppState(Alien _alien, double _simSpeed) {
         super(_alien, _simSpeed);
@@ -134,6 +137,8 @@ public class DrawingAppState extends SimulatorAppState {
         alienTexture3.setWrap(Texture.WrapMode.Repeat);
         alienMaterial3 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         alienMaterial3.setTexture("ColorMap", alienTexture3);
+        
+        materials = new Material[]{alienMaterial1,alienMaterial2,alienMaterial3};
     }
 
     /**
@@ -145,7 +150,9 @@ public class DrawingAppState extends SimulatorAppState {
         AlienNode node = super.instantiateAlien(a, location);
 
         // TEMP
-        node.setMaterial(alienMaterial2);
+        node.setMaterial(materials[a.materialCode]);
+        System.out.println(materials[a.materialCode]);
+        //node.setMaterial(alienMaterial2);
 
         return node;
     }

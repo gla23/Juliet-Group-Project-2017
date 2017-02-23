@@ -12,8 +12,14 @@ import java.io.Serializable;
 public class Alien implements Serializable {
     public Block rootBlock;
     
+    public int materialCode = 1;
+    
     public Alien(Block rootBlock) {
         this.rootBlock = rootBlock;
+    }
+    
+    public int getCode() {
+        return materialCode;
     }
     
 }

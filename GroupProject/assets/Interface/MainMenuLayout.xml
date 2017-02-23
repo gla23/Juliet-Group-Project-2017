@@ -36,36 +36,41 @@
                             <!-- <onClick name = "fade" start = "#ff" end = "#00" length = "2000"/>-->
                     </effect>
                      <control id="editor_options_window" name="window" closeable= "false" height = "300px" title="Editor Options" width="400px" y = "300px" x="400px" >
-                         <panel id = "actual_options_panel" childLayout = "vertical" height = "95%" width = "100%">
-                             
-                             
-                              <panel id = "chaseCamPanel" height = "15%" childLayout = "horizontal" >
-                                 <control name="label" valign = "center" id = "chaseCam_label" width = "50%" text="Smooth Camera:"  />
-                                 <panel id = "chaseCamCheckPanel" valign = "center" width = "50%" childLayout = "vertical" >
-                                    <control id="chaseCamCheckBox" checked="false" align = "center"  name="checkbox" />
+                         <panel height = "100%" width = "100%" childLayout = "vertical" >
+                            <panel id = "actual_options_panel" childLayout = "vertical" height = "92%" width = "100%">
+
+
+                                 <panel id = "chaseCamPanel" height = "15%" childLayout = "horizontal" >
+                                    <control name="label" valign = "center" id = "chaseCam_label" width = "50%" text="Smooth Camera:"  />
+                                    <panel id = "chaseCamCheckPanel" valign = "center" width = "50%" childLayout = "vertical" >
+                                       <control id="chaseCamCheckBox" checked="false" align = "center"  name="checkbox" />
+                                    </panel>
                                  </panel>
-                              </panel>
-                              <panel id = "wireMeshPanel" height = "15%" childLayout = "horizontal" >
-                                 <control name="label" valign = "center" id = "wireMesh_label" width = "50%" text="Wire Mesh:"  />
-                                 <panel id = "chaseCamCheckPanel" valign = "center" width = "50%" childLayout = "vertical" >
-                                    <control id="wireMeshCheckBox" align = "center" valign = "center" name="checkbox" />
+                                 <panel id = "wireMeshPanel" height = "15%" childLayout = "horizontal" >
+                                    <control name="label" valign = "center" id = "wireMesh_label" width = "50%" text="Wire Mesh:"  />
+                                    <panel id = "chaseCamCheckPanel" valign = "center" width = "50%" childLayout = "vertical" >
+                                       <control id="wireMeshCheckBox" align = "center" valign = "center" name="checkbox" />
+                                    </panel>
                                  </panel>
-                              </panel>
-                              <panel id = "gravityPanel" height = "15%" childLayout = "horizontal" >
-                                 <control name="label" valign = "center" id = "gravtity_label" width = "50%" text="Gravity:"  />
-                                 <control id="gravitySlider" valign = "center"name="horizontalSlider" initial = "0.0"  min = "-10.0" max = "10.0" stepSize = "0.1"/>
-                              </panel>
-                              
-                              
-                              
+                                 <panel id = "gravityPanel" height = "15%" childLayout = "horizontal" >
+                                    <control name="label" valign = "center" id = "gravtity_label" width = "50%" text="Gravity:"  />
+                                    <control id="gravitySlider" valign = "center"name="horizontalSlider" initial = "0.0"  min = "-10.0" max = "10.0" stepSize = "0.1"/>
+                                 </panel>
+                                 <panel id = "texturePanel" height = "15%" childLayout = "horizontal" >
+                                    <control name="label" valign = "center" id = "texture_label" width = "50%" text="Texture:"  />
+                                    <control id="textureDropDown" name="dropDown" />
+                                 </panel>
+
+
+
+                            </panel>
+                            <panel id = "return_options_panel" childLayout = "vertical"  height = "8%" width = "100%">
+                                <control name ="button" label="Go Back to Editor"  width = "*" id = "returnToEditor" visibleToMouse="true">
+                                   <interact onClick="showEditor()"/>
+                                </control>
+                                <!--<panel height = "10%" valign = "bottom" backgroundColor = "#333333FF"  childLayout = "vertical"/>-->
+                            </panel>    
                          </panel>
-                         <panel id = "return_options_panel" childLayout = "vertical" valign = "bottom" height = "8%" width = "100%">
-                             <control name ="button" label="Go Back to Editor" height = "*" width = "*" id = "returnToEditor" visibleToMouse="true">
-                                <interact onClick="showEditor()"/>
-                             </control>
-                             
-                         </panel>    
-                        
                         
                     </control>
                     
