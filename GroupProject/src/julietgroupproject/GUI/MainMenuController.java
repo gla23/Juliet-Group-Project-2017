@@ -80,8 +80,12 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         nifty.gotoScreen("start");
 
         addValues();
-
-
+    }
+    
+    public void stopSimulation() {
+        
+        nifty.gotoScreen("start");
+        addValues();
     }
 
     public void addValues() {
@@ -128,6 +132,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     public void runNewSimulation() {
         //TODO
+        nifty.gotoScreen("simulation");
     }
 
     public void loadAlien() {

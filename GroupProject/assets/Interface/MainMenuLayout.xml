@@ -150,66 +150,66 @@
                                     <panel id ="panel_new_limb_size_entry" backgroundColour="#33333333" width = "*" height = "70%" childLayout = "vertical">
                                         <control name="label"text="Limb Properties:" height = "10%" valign = "top"/>
                                         
-                                            <control id="limb_prop_tabs" name="tabGroup"  buttonHeight="50px">
+                                        <control id="limb_prop_tabs" name="tabGroup"  buttonHeight="50px">
                                                 
-                                                <control id="new_limb_tab" name="tab"  caption="New">
+                                            <control id="new_limb_tab" name="tab"  caption="New">
                                                     
-                                                    <control id="newLimbScrollbar"  name="scrollPanel" style="autoscroll"  horizontal="false" height="100%">
+                                                <control id="newLimbScrollbar"  name="scrollPanel" style="autoscroll"  horizontal="false" height="100%">
   
 
-                                                        <panel id="myScrollStuff" backgroundColor = "#88888800" width="100%" height = "100%" childLayout="vertical" >
-                                                            <control name="label" height = "7%"text="Shape Selector:" />
-                                                            <control id="shape_selector" name="dropDown" />
-                                                            <panel id = "rect_options"  childLayout = "vertical" >
+                                                    <panel id="myScrollStuff" backgroundColor = "#88888800" width="100%" height = "100%" childLayout="vertical" >
+                                                        <control name="label" height = "7%"text="Shape Selector:" />
+                                                        <control id="shape_selector" name="dropDown" />
+                                                        <panel id = "rect_options"  childLayout = "vertical" >
                                                                 
-                                                                <control name="label" id = "first_label" height = "7%" text="Select  Width:" />
-                                                                <control id="limbWidthSlider" name="horizontalSlider" initial = "1.3" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>
+                                                            <control name="label" id = "first_label" height = "7%" text="Select  Width:" />
+                                                            <control id="limbWidthSlider" name="horizontalSlider" initial = "1.3" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>
                                                                 
-                                                                <control name="label" id = "third_label" height = "7%"text="Select  Length:" />
-                                                                <control id="limbLengthSlider" name="horizontalSlider" initial = "0.4" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>
+                                                            <control name="label" id = "third_label" height = "7%"text="Select  Length:" />
+                                                            <control id="limbLengthSlider" name="horizontalSlider" initial = "0.4" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>
                                                                 
-                                                                <control name="label" id = "second_label" height = "7%"text="Select  Height:" />
-                                                                <control id="limbHeightSlider" name="horizontalSlider" initial = "0.4" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>     
+                                                            <control name="label" id = "second_label" height = "7%"text="Select  Height:" />
+                                                            <control id="limbHeightSlider" name="horizontalSlider" initial = "0.4" width="100%" min = "0.3" max = "10.0" stepSize = "0.1"/>     
                                                                                
-                                                                <control name="label" id = "forth_label" height = "7%"text="Weight:"  />
-                                                                <control id="limbWeightSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1"/>
+                                                            <control name="label" id = "forth_label" height = "7%"text="Weight:"  />
+                                                            <control id="limbWeightSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1"/>
                                                                 
-                                                                <control name="label" id = "fifth_label" height = "7%"text="Friction:"  />
-                                                                <control id="limbFrictionSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1"/>
+                                                            <control name="label" id = "fifth_label" height = "7%"text="Friction:"  />
+                                                            <control id="limbFrictionSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1"/>
                                                                 
-                                                                <control name="label" id = "sixth_label" height = "7%"text="Strength:"  />
-                                                                <control id="limbStrengthSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1"/>
+                                                            <control name="label" id = "sixth_label" height = "7%"text="Strength:"  />
+                                                            <control id="limbStrengthSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1"/>
                                                                 
-                                                                <control name="label" id = "seventh_label" height = "7%"text="Limb Seperation:"  />
-                                                                <control id="limbSeperationSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1"/>
+                                                            <control name="label" id = "seventh_label" height = "7%"text="Limb Seperation:"  />
+                                                            <control id="limbSeperationSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1"/>
                                                                 
-                                                                <panel id = "symmetricPanel" height = "10%" childLayout = "horizontal" >
-                                                                    <control name="label" valign = "center" id = "symmetric_label" width = "70%" text="Symmetric:"  />
-                                                                    <control id="symmetricCheckBox" valign = "center" name="checkbox" />
-                                                                </panel>
-                                                                    
-                                                                <control name ="button" label="Save Limb" height = "5%" align = "center" width = "80%" id = "save_limb_button" visibleToMouse="true">
-                                                                    <interact onClick="saveLimb()"/>
-                                                                </control>
+                                                            <panel id = "symmetricPanel" height = "10%" childLayout = "horizontal" >
+                                                                <control name="label" valign = "center" id = "symmetric_label" width = "70%" text="Symmetric:"  />
+                                                                <control id="symmetricCheckBox" valign = "center" name="checkbox" />
                                                             </panel>
+                                                                    
+                                                            <control name ="button" label="Save Limb" height = "5%" align = "center" width = "80%" id = "save_limb_button" visibleToMouse="true">
+                                                                <interact onClick="saveLimb()"/>
+                                                            </control>
+                                                        </panel>
                                                             
                                                             
                                                                 
                                                            
             
-                                                        </panel>
+                                                    </panel>
 
-                                                     </control>
                                                 </control>
+                                            </control>
                                                 
                                                 
                                             <control id="saved_limb_tab" name="tab" caption="Saved">
-                                                   <control id="savedLimbScrollbar" style="autoscroll"  name="scrollPanel" horizontal="false" height="100%"> 
+                                                <control id="savedLimbScrollbar" style="autoscroll"  name="scrollPanel" horizontal="false" height="100%"> 
                                                     
                                                     
                                                     
                                                     
-                                                   </control>
+                                                </control>
                                             </control>
                                         </control>
                                     </panel>
@@ -254,30 +254,41 @@
             </panel> <!-- End of whole screen panel-->
         </layer>
     </screen>
-        <screen id="hidden" controller="julietgroupproject.GUI.MainMenuController" childLayout="right">
-            <layer id="hidden_layer" childLayout="center" width = "100%" >
-                <panel id = "hidden_center" width= "100%" valign = "bottom" height = "5%" childLayout = "vertical">
-                    <control name = "button" label = "Show Editor" id = "show_editor" height = "100%" align = "right"  width = "13%"
-                            visibleToMouse = "true" >
-                            <interact onClick="showEditor()"/>
-                    </control>
-                </panel>
+    <screen id="hidden" controller="julietgroupproject.GUI.MainMenuController" childLayout="right">
+        <layer id="hidden_layer" childLayout="center" width = "100%" >
+            <panel id = "hidden_center" width= "100%" valign = "bottom" height = "5%" childLayout = "vertical">
+                <control name = "button" label = "Show Editor" id = "show_editor" height = "100%" align = "right"  width = "13%"
+                         visibleToMouse = "true" >
+                    <interact onClick="showEditor()"/>
+                </control>
+            </panel>
             
-            </layer>
-        </screen>
-     <screen id="loadAlien" controller="julietgroupproject.GUI.MainMenuController">
-         <layer id="foreground" childLayout="center">
+        </layer>
+    </screen>
+    <screen id="simulation" controller="julietgroupproject.GUI.MainMenuController" childLayout="right">
+        <layer id="simluation_layer" childLayout="center" width = "100%" >
+            <panel id = "simulation_center" width= "100%" valign = "bottom" height = "5%" childLayout = "vertical">
+                <control name = "button" label = "Stop Simulation" id = "stop_simulation" height = "100%" align = "right"  width = "13%"
+                         visibleToMouse = "true" >
+                    <interact onClick="stopSimulation()"/>
+                </control>
+            </panel>
             
-                <panel id="load_panel"  height = "7%" width = "30%" childLayout="horizontal">
-                     <control name="label" text="Choose your alien"  height = "*" width = "*" align="center" valign="center" 
-                                   /> 
+        </layer>
+    </screen>
+    <screen id="loadAlien" controller="julietgroupproject.GUI.MainMenuController">
+        <layer id="foreground" childLayout="center">
+            
+            <panel id="load_panel"  height = "7%" width = "30%" childLayout="horizontal">
+                <control name="label" text="Choose your alien"  height = "*" width = "*" align="center" valign="center" 
+                /> 
                        
-                     <control name = "button" label = "Select" id = "show_editor" align = "right" width = "50%"
-                            visibleToMouse = "true" >
-                            <interact onClick="showEditor()"/>
-                    </control>    
+                <control name = "button" label = "Select" id = "show_editor" align = "right" width = "50%"
+                         visibleToMouse = "true" >
+                    <interact onClick="showEditor()"/>
+                </control>    
                     
-                </panel>
+            </panel>
            
         </layer>
     </screen>
