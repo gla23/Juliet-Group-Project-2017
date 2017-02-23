@@ -235,27 +235,48 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
 
 
-        //Take the entries from the sliders for limb size
+        //Take the entries from the sliders for limb properties
         Slider widthField = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
         Slider heightField = nifty.getCurrentScreen().findNiftyControl("limbHeightSlider", Slider.class);
         Slider lengthField = nifty.getCurrentScreen().findNiftyControl("limbLengthSlider", Slider.class);
         Slider weightField = nifty.getCurrentScreen().findNiftyControl("limbWeightSlider", Slider.class);
+        Slider frictionField = nifty.getCurrentScreen().findNiftyControl("limbFrictionSlider", Slider.class);
+        Slider strengthField = nifty.getCurrentScreen().findNiftyControl("limbStrengthSlider", Slider.class);
+        Slider seperationField = nifty.getCurrentScreen().findNiftyControl("limbSeperationSlider", Slider.class);
+        
         float boxWidth;
         float boxHeight;
         float boxLength;
         float weight;
+        float friction;
+        float strength;
+        float limbSeperation;
 
         boxWidth = widthField.getValue();
-
-
         boxHeight = heightField.getValue();
-
         boxLength = lengthField.getValue();
-
         weight = weightField.getValue();
+        friction = frictionField.getValue();
+        strength = strengthField.getValue();
+        limbSeperation = seperationField.getValue();
 
 
-
+        //Get the current shape from the selector
+        myMainMenuController.setCurrentLimbShape();
+        
+        if (currentShape.equals("Box")) {
+            //TODO things for attaching box 
+            
+        } else if (currentShape.equals("Sphere")) {
+            //TODO things for attahcing sphere
+            
+        } else if (currentShape.equals("Torus")) {
+            //TODO things for attahcing torus
+            
+        } else if (currentShape.equals("Cylinder")) {
+            //TODO things for attahcing cylinder
+            
+        } 
         Vector3f whlVec = new Vector3f(boxWidth, boxHeight, boxLength);
         Matrix3f rotator = new Matrix3f();
         rotator.fromStartEndVectors(normal, new Vector3f(1, 0, 0));
@@ -275,7 +296,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             axisToUse = "XAxis";
         }
         //Build the new limb
-        myMainMenuController.setCurrentLimbShape();
+        
         Block limb = new Block(newPos, newHingePos, whlVec.x, whlVec.y, whlVec.z, currentShape, axisToUse, weight);
         Matrix3f rotation = new Matrix3f();
         rotation.fromStartEndVectors(new Vector3f(0, 1, 0), normal);
