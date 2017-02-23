@@ -133,7 +133,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     public void runNewSimulation() {
-        //TODO
+        app.beginTraining();
         nifty.gotoScreen("simulation");
     }
 
