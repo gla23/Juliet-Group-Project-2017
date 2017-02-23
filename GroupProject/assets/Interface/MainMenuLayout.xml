@@ -55,12 +55,6 @@
                                  <control name="label" valign = "center" id = "gravtity_label" width = "50%" text="Gravity:"  />
                                  <control id="gravitySlider" valign = "center"name="horizontalSlider" initial = "0.0"  min = "-10.0" max = "10.0" stepSize = "0.1"/>
                               </panel>
-                              <panel id = "resetPanel" height = "15%" childLayout = "horizontal" >
-                                 <control name="button" valign = "center" id = "reset_options_button" width = "70%" label="Reset Alien" visibleToMouse = "true" >
-                                      <interact onClick="restartAlien()"/>
-                                 </control>    
-  
-                              </panel>
                               
                               
                               <!--
