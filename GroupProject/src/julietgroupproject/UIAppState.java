@@ -109,6 +109,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void setCurrentShape(String shape) {
         currentShape = shape;
     }
+    
+    public void setCurrentHingeAxis(String axis) {
+        currentHingeAxis = axis;
+        System.out.println(axis);
+    }
 
     public void toggleGravityOn() {
         physics.getPhysicsSpace().setGravity(new Vector3f(0, -9.81f, 0));
