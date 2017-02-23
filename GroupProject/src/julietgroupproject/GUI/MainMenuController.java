@@ -7,10 +7,13 @@ import com.jme3.math.Vector3f;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.controls.Button;
+import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.controls.CheckBoxStateChangedEvent;
 import de.lessvoid.nifty.controls.DropDown;
 import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
 import de.lessvoid.nifty.controls.Label;
+import de.lessvoid.nifty.controls.RadioButtonGroupStateChangedEvent;
+import de.lessvoid.nifty.controls.Slider;
 import de.lessvoid.nifty.controls.SliderChangedEvent;
 import de.lessvoid.nifty.controls.Tab;
 import de.lessvoid.nifty.controls.TabGroup;
@@ -30,6 +33,10 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     private Tab addLimb;
     private Tab addBody;
     private boolean firstBody = false;
+    private boolean X = true;
+    private boolean Y = false;
+    private boolean Z = false;
+    private boolean auto = false;
 
     public MainMenuController(UIAppState App) {
         this.app = App;
@@ -40,13 +47,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         this.screen = screen;
     }
 
-    public void toggleGravOn() {
-        app.toggleGravityOn();
-    }
-
-    public void toggleGravOff() {
-        app.toggleGravityOff();
-    }
 
     public void newBody() {
         setCurrentBodyShape();
@@ -82,8 +82,12 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         nifty.gotoScreen("start");
 
         addValues();
-
-
+    }
+    
+    public void stopSimulation() {
+        
+        nifty.gotoScreen("start");
+        addValues();
     }
 
     public void addValues() {
@@ -130,7 +134,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     public void runNewSimulation() {
         app.beginTraining();
-        this.hideEditor();
+        nifty.gotoScreen("simulation");
     }
 
     public void loadAlien() {
@@ -175,6 +179,11 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     public void attachLimb() {
         //TODO
+        Slider getWidth = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
+        getWidth.setValue(5.0f);
+        CheckBox getAuto = nifty.getCurrentScreen().findNiftyControl("AutoCheckBox", CheckBox.class);
+        
+        getAuto.setChecked(!getAuto.isChecked());
     }
 
     public void saveLimb() {
@@ -239,6 +248,27 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
    public void onChaseCamChange(final String id, final CheckBoxStateChangedEvent event) {
        app.toggleSmoothness();
    }
+   
+   public void restartAlien() {
+       app.restartAlien();
+   }
+   
+   
+   @NiftyEventSubscriber(id="hingeAxisButtons")
+   public void onXChange(final String id, final RadioButtonGroupStateChangedEvent  event) {
+       
+       if (event.getSelectedId().equals("XCheckBox")) {
+           app.setCurrentHingeAxis("X");
+       } else if (event.getSelectedId().equals("YCheckBox")) {
+           app.setCurrentHingeAxis("Y");
+       } else if (event.getSelectedId().equals("ZCheckBox")) {
+           app.setCurrentHingeAxis("Z");
+       } else if (event.getSelectedId().equals("AutoCheckBox")) {
+           app.setCurrentHingeAxis("A");
+       }
+       
+   }
+  
    
    @NiftyEventSubscriber(id="wireMeshCheckBox")
    public void onWireMeshChange(final String id, final CheckBoxStateChangedEvent event) {

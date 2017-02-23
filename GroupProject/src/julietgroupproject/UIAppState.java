@@ -54,6 +54,7 @@ import org.encog.neural.networks.layers.BasicLayer;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.scene.shape.Sphere;
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.controls.DropDown;
 import de.lessvoid.nifty.controls.Slider;
 import java.io.File;
@@ -85,12 +86,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private float horizontalAngle = 0;
     private float verticalAngle = 0;
     private float cameraZoom = 10;
-    private boolean smoothCam = true;
+    private boolean smoothCam = false;
     private String currentShape = "Box";
     private final int SIM_COUNT = 0;
     private List<SlaveSimulator> slaves = new ArrayList<>(SIM_COUNT);
     private Queue<SimulationData> simulationQueue = new ConcurrentLinkedQueue<>();
     private AlienTrainer trainer;
+    
+    private String currentHingeAxis ="A";
     
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
@@ -114,24 +117,24 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void setCurrentShape(String shape) {
         currentShape = shape;
     }
-
-    public void toggleGravityOn() {
-        physics.getPhysicsSpace().setGravity(new Vector3f(0, -9.81f, 0));
+    
+    public void setCurrentHingeAxis(String axis) {
+        currentHingeAxis = axis;
     }
 
-    public void toggleGravityOff() {
-        physics.getPhysicsSpace().setGravity(Vector3f.ZERO);
+    public void restartAlien() {
+        if (currentAlienNode != null) {
+            removeAlien(currentAlienNode);
+            instantiateAlien(alien, new Vector3f(0f, 5f, -10f));
+            setChaseCam(currentAlienNode);
+            setupKeys(currentAlienNode);
+        }
     }
     
     public void setGravity(float newGrav) {
         physics.getPhysicsSpace().setGravity(new Vector3f(0,-newGrav,0));
+        restartAlien();
         
-        if (prevAlien != null) {
-            removeAlien(prevAlien);
-            prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
-            setChaseCam(cuboid);
-            setupKeys(prevAlien);
-        }
     }
 
     public void resetAlien() {
@@ -245,29 +248,40 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Slider frictionField = nifty.getCurrentScreen().findNiftyControl("limbFrictionSlider", Slider.class);
         Slider strengthField = nifty.getCurrentScreen().findNiftyControl("limbStrengthSlider", Slider.class);
         Slider seperationField = nifty.getCurrentScreen().findNiftyControl("limbSeperationSlider", Slider.class);
+        CheckBox symmeticBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
         
-        float boxWidth;
-        float boxHeight;
-        float boxLength;
+        float limbWidth;
+        float limbHeight;
+        float limbLength;
         float weight;
         float friction;
         float strength;
         float limbSeperation;
+        boolean symmetric;
+        // currentHingeAxis Will be either "X", "Y", "Z" or "A" for auto
 
-        boxWidth = widthField.getValue();
-        boxHeight = heightField.getValue();
-        boxLength = lengthField.getValue();
+        limbWidth = widthField.getValue();
+        limbHeight = heightField.getValue();
+        limbLength = lengthField.getValue();
         weight = weightField.getValue();
         friction = frictionField.getValue();
         strength = strengthField.getValue();
         limbSeperation = seperationField.getValue();
+        symmetric = symmeticBox.isChecked();
 
 
         //Get the current shape from the selector
         myMainMenuController.setCurrentLimbShape();
         
         if (currentShape.equals("Box")) {
-            //TODO things for attaching box 
+            // Rotate the x y z for making boxes rotate to the normal
+            Vector3f whlVec = new Vector3f(limbWidth, limbHeight, limbLength);
+            Matrix3f rotator = new Matrix3f();
+            rotator.fromStartEndVectors(normal, new Vector3f(1, 0, 0));
+            whlVec = rotator.mult(whlVec);
+            limbWidth = Math.abs(whlVec.x);
+            limbHeight = Math.abs(whlVec.y);
+            limbLength = Math.abs(whlVec.z);
             
         } else if (currentShape.equals("Sphere")) {
             //TODO things for attahcing sphere
@@ -278,34 +292,30 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         } else if (currentShape.equals("Cylinder")) {
             //TODO things for attahcing cylinder
             
-        } 
-        Vector3f whlVec = new Vector3f(boxWidth, boxHeight, boxLength);
-        Matrix3f rotator = new Matrix3f();
-        rotator.fromStartEndVectors(normal, new Vector3f(1, 0, 0));
-        whlVec = rotator.mult(whlVec);
-        whlVec.x = Math.abs(whlVec.x);
-        whlVec.y = Math.abs(whlVec.y);
-        whlVec.z = Math.abs(whlVec.z);
-
-
-
-
-        //Find hinge and postion vectors given shape and click position
-        Vector3f newHingePos = contactPt.add(normal.mult(0.5f));
-        Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(boxLength, boxHeight), boxWidth) + 1.0f));
-        String axisToUse = "ZAxis";
-        if (whlVec.x < whlVec.z) {
-            axisToUse = "XAxis";
         }
-        //Build the new limb
         
-        Block limb = new Block(newPos, newHingePos, whlVec.x, whlVec.y, whlVec.z, currentShape, axisToUse, weight);
+        //Find hinge and postion vectors given shape and click position
+        //TODO fix this so that is gets the actual distance, and also make that distance correct when it is rotated
+        Vector3f newHingePos = contactPt.add(normal.mult(0.5f));
+        Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeperation));
+        
+        String axisToUse = "ZAxis";
+        if (currentHingeAxis.equals("A")){
+            if (Math.abs(normal.x)<Math.abs(normal.z)) {
+                axisToUse = "XAxis";
+            }
+        } else {
+            axisToUse = currentHingeAxis;
+        }
+        
+        //Build the new limb
+        Block limb = new Block(newPos, newHingePos, limbWidth, limbHeight, limbLength, currentShape, axisToUse, weight);
         Matrix3f rotation = new Matrix3f();
         rotation.fromStartEndVectors(new Vector3f(0, 1, 0), normal);
 
         limb.rotation = rotation;
 
-        //Still working on getting this to rotate
+        // Stores the normal the limb was created at in the limb for future use
         limb.setNormal(normal);
 
         //Add new limb to alien and instantiate
@@ -354,7 +364,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         physics.setDebugEnabled(false);
 
         // disable gravity initially
-        toggleGravityOff();
+        setGravity(0.0f);
 
         myMainMenuController = new MainMenuController(this);
 
@@ -433,9 +443,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 }
             }
         }
-        if ("Spawn Alien".equals(string)) {
+        if ("ToggleMesh".equals(string)) {
             if (!bln) {
-                //spawnAlien();
+                toggleWireMesh();
             }
         }
 
@@ -499,15 +509,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             inputManager.addListener(this, "Alien joint " + ((Integer) i).toString() + " anticlockwise");
         }
         currentAlienNode = brain;
-        inputManager.addMapping("Pull ragdoll up", new MouseButtonTrigger(0));
-        inputManager.addListener(this, "Pull ragdoll up");
-        inputManager.addMapping("Spawn Alien", new KeyTrigger(KeyInput.KEY_SPACE));
-        inputManager.addListener(this, "Spawn Alien");
-
 
         //Add the key binding for the right click to add limb funtionality
         inputManager.addMapping("AddLimb", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         inputManager.addListener(this, "AddLimb");
+        inputManager.addMapping("ToggleMesh",new KeyTrigger(KeyInput.KEY_Q));
+        inputManager.addListener(this, "ToggleMesh");
 
     }
     
