@@ -252,6 +252,10 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     public void saveLimb() {
         //TODO
     }
+    
+    public void pulsateToggle() {
+        nifty.getScreen("start").findElementByName("panel_background").startEffect(EffectEventId.onCustom);
+    }
 
     @NiftyEventSubscriber(id="textureDropDown")
     public void onDropDownTextureSelectionChanged(final String id, final DropDownSelectionChangedEvent<String> event) {

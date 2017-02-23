@@ -478,6 +478,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 myMainMenuController.editorOptions();
             }
         }
+        
+        if ("Pulsate".equals(string)) {
+            if (!bln) {
+                myMainMenuController.pulsateToggle();
+            }
+        }
 
 
         //When right mouse button clicked, fire ray to see if intersects with body
@@ -549,6 +555,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         inputManager.addListener(this, "ToggleSmooth");
         inputManager.addMapping("GoToEditor",new KeyTrigger(KeyInput.KEY_E));
         inputManager.addListener(this, "GoToEditor");
+        inputManager.addMapping("Pulsate",new KeyTrigger(KeyInput.KEY_W));
+        inputManager.addListener(this, "Pulsate");
 
     }
     
