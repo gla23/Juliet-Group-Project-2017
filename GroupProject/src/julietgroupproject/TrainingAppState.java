@@ -65,10 +65,8 @@ public class TrainingAppState extends SimulatorAppState {
 
         this.simInProgress = false;
         if (this.currentSim != null) {
-            synchronized (this.currentSim) {
-                double fitness = this.calcFitness();
-                this.currentSim.setFitness(fitness);
-            }
+            double fitness = this.calcFitness();
+            this.currentSim.setFitness(fitness);
             System.out.println("Stopping simulation! " + this.currentSim.toString());
         }
         // turn physics off to save CPU time
@@ -101,6 +99,7 @@ public class TrainingAppState extends SimulatorAppState {
             queue.add(this.currentSim);
         }
         this.currentSim = null;
+        System.out.println(Thread.currentThread().getId() + ": Cleanup for TrainingAppState");
     }
 
     @Override
@@ -114,10 +113,11 @@ public class TrainingAppState extends SimulatorAppState {
         } else {
             // try to poll task from the queue
             if (toKill) {
-                this.stateManager.detach(this);
+                System.out.println(Thread.currentThread().getId() + ": TrainingAppState detaching myself");
+                System.out.println("Detached:" + this.stateManager.detach(this));
             } else {
                 SimulationData s;
-                s = this.queue.peek();
+                s = this.queue.poll();
                 if (s != null) {
                     System.out.println(Thread.currentThread().getId() + ": starting simulation!");
                     startSimulation(s);

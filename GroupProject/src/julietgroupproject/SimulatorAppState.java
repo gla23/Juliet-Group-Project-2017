@@ -133,6 +133,7 @@ public class SimulatorAppState extends AbstractAppState {
         this.physics = this.stateManager.getState(BulletAppState.class);
         this.originalSpeed = this.physics.getSpeed();
         this.physics.setSpeed((float) simSpeed);
+        this.setToKill(false);
         setupTextures();
         this.reset();
     }
@@ -178,12 +179,12 @@ public class SimulatorAppState extends AbstractAppState {
      */
     protected AlienNode instantiateAlien(Alien a, Vector3f location) {
 
-        AlienNode alienNode = AlienHelper.assembleAlien(a, location);
+        this.currentAlienNode = AlienHelper.assembleAlien(a, location);
 
-        physics.getPhysicsSpace().addAll(alienNode);
-        simRoot.attachChild(alienNode);
+        physics.getPhysicsSpace().addAll(this.currentAlienNode);
+        simRoot.attachChild(this.currentAlienNode);
 
-        return alienNode;
+        return this.currentAlienNode;
     }
 
     /**
@@ -217,6 +218,7 @@ public class SimulatorAppState extends AbstractAppState {
     @Override
     public void update(float tpf) {
         if (toKill) {
+            System.out.println("Detatching myself");
             this.stateManager.detach(this);
         }
     }

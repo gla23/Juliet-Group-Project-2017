@@ -62,6 +62,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import julietgroupproject.GUI.MainMenuController;
@@ -75,7 +79,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     float time;
     float minBoxDimension = 0.4f;
     float minSphereDimension = 0.4f;
-    Random rng = new Random();
     private Nifty nifty;
     private boolean wireMesh = true;
     private ChaseCamera chaseCam;
@@ -84,11 +87,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private float cameraZoom = 10;
     private boolean smoothCam = true;
     private String currentShape = "Box";
-    Alien simpleAlien;
-    Alien smallBlock;
-    Alien flipper;
-    Alien cuboid;
-    AlienNode prevAlien;
+    private final int SIM_COUNT = 0;
+    private List<SlaveSimulator> slaves = new ArrayList<>(SIM_COUNT);
+    private Queue<SimulationData> simulationQueue = new ConcurrentLinkedQueue<>();
+    private AlienTrainer trainer;
+    
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
@@ -102,7 +105,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public void removeAlien(AlienNode alienNode) {
-        reset();
+        if (alienNode != null) {
+            this.physics.getPhysicsSpace().removeAll(alienNode);
+            alienNode.removeFromParent();
+        }
     }
 
     public void setCurrentShape(String shape) {
@@ -129,11 +135,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public void resetAlien() {
-        if (prevAlien != null) {
-            removeAlien(prevAlien);
-            prevAlien = null;
-        }
-
+        reset();
     }
 
     public void toggleSmoothness() {
@@ -153,7 +155,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         System.out.println(vec);
     }
 
-    public void setChaseCam(Alien shape) {
+    public void setChaseCam(AlienNode shape) {
         if (chaseCam != null) {
             horizontalAngle = chaseCam.getHorizontalRotation();
             verticalAngle = chaseCam.getVerticalRotation();
@@ -162,7 +164,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         }
         //toggleSmoothness();
-        chaseCam = new ChaseCamera(cam, shape.rootBlock.getGeometry(), inputManager);
+        chaseCam = new ChaseCamera(cam, shape.geometries.get(0), inputManager);
         //toggleSmoothness();
         chaseCam.setSmoothMotion(smoothCam);
         if (smoothCam) {
@@ -188,7 +190,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public void createNewBody() {
-        if (prevAlien == null) {
+        if (this.currentAlienNode == null) {
 
             //Take the entries from text fields for limb size, do some error handling
             Slider widthField = nifty.getCurrentScreen().findNiftyControl("bodyWidthSlider", Slider.class);
@@ -215,13 +217,13 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
 
             //Instantiate the new alien
-            Vector3f pos = new Vector3f(-10 + 20 * rng.nextFloat(), -10 + 20 * rng.nextFloat(), -10 + 20 * rng.nextFloat());
+            Vector3f pos = Vector3f.ZERO;
 
             Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", bodyWeight);
-            cuboid = new Alien(bodyBlock);
-            prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
-            setChaseCam(cuboid);
-            setupKeys(prevAlien);
+            alien = new Alien(bodyBlock);
+            instantiateAlien(alien, new Vector3f(0f, 5f, -10f));
+            setChaseCam(this.currentAlienNode);
+            setupKeys(this.currentAlienNode);
         }
 
     }
@@ -230,8 +232,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void addLimb(Block block, Vector3f contactPt, Vector3f normal) {
 
         //Get rid of old alien on screen
-        if (prevAlien != null) {
-            removeAlien(prevAlien);
+        if (this.currentAlienNode != null) {
+            removeAlien(this.currentAlienNode);
         }
 
 
@@ -308,16 +310,16 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         //Add new limb to alien and instantiate
         block.addLimb(limb);
-        prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
-        setChaseCam(cuboid);
-        setupKeys(prevAlien);
+        instantiateAlien(alien, new Vector3f(0f, 5f, -10f));
+        setChaseCam(this.currentAlienNode);
+        setupKeys(this.currentAlienNode);
     }
 
     public boolean saveAlien(String filename) {
-        if (cuboid != null) {
+        if (alien != null) {
             File f = new File(filename);
             try (ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(f))) {
-                o.writeObject(cuboid);
+                o.writeObject(alien);
                 return true;
             } catch (IOException ex) {
                 Logger.getLogger(UIAppState.class.getName()).log(Level.SEVERE, null, ex);
@@ -331,11 +333,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         try (ObjectInputStream o = new ObjectInputStream(new FileInputStream(f))) {
             Alien a = (Alien) o.readObject();
             if (a != null) {
-                cuboid = a;
+                alien = a;
                 resetAlien();
-                prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
-                setChaseCam(cuboid);
-                setupKeys(prevAlien);
+                instantiateAlien(alien, new Vector3f(0f, 5f, -10f));
+                setChaseCam(this.currentAlienNode);
+                setupKeys(this.currentAlienNode);
                 return true;
             }
         } catch (IOException | ClassNotFoundException ex) {
@@ -373,7 +375,36 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         flyCam.setEnabled(false);
 
     }
+    
+    public boolean beginTraining()
+    {
+        if (alien == null)
+        {
+            return false;
+        }
+        
+        if (currentAlienNode == null)
+        {
+            instantiateAlien(alien, Vector3f.ZERO);
+        }
+        
+        this.trainer = new AlienTrainer(0.5,"saved.pop",
+                simulationQueue,currentAlienNode.joints.size() + 1,
+                currentAlienNode.joints.size());
+        
+        while (this.slaves.size() < SIM_COUNT)
+        {
+            SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(this.alien, this.simulationQueue,1.0f));
+            this.slaves.add(toAdd);
+            toAdd.start(JmeContext.Type.Headless);
+        }
+        
+        this.trainer.start();
+        
+        return true;
+    }
 
+    @Override
     public void onAction(String string, boolean bln, float tpf) {
 
         // Controls the joints with keys in jointKeys
@@ -435,8 +466,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 //Find block assoicated with collision geometry
                 Block block = null;
 
-                LinkedList<Block> q = new LinkedList<Block>();
-                q.push(cuboid.rootBlock);
+                LinkedList<Block> q = new LinkedList<>();
+                q.push(alien.rootBlock);
 
                 while (!q.isEmpty()) {
                     Block head = q.pop();
@@ -478,5 +509,22 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         inputManager.addMapping("AddLimb", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         inputManager.addListener(this, "AddLimb");
 
+    }
+    
+    @Override
+    public void cleanup()
+    {
+        for (SimulationData sim : this.simulationQueue)
+        {
+            sim.terminate();
+        }
+        if (this.trainer != null)
+        {
+            this.trainer.terminateTraining();
+        }
+        for (SlaveSimulator slave : this.slaves)
+        {
+            slave.kill();
+        }
     }
 }

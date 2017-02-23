@@ -129,7 +129,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     public void runNewSimulation() {
-        //TODO
+        app.beginTraining();
+        this.hideEditor();
     }
 
     public void loadAlien() {
