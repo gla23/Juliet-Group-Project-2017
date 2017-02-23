@@ -29,6 +29,7 @@ import java.util.Queue;
 import org.encog.ml.MLRegression;
 
 /**
+ * A SimulatorAppState with graphics support.
  *
  * @author Peter
  */
@@ -39,22 +40,19 @@ public class DrawingAppState extends SimulatorAppState {
     protected ViewPort guiViewPort;
     protected AudioRenderer audioRenderer;
     protected RenderManager renderManager;
-
-    
     //Textures
     private Texture alienTexture1;
     private Texture alienTexture2;
     private Texture alienTexture3;
     private Texture grassTexture;
     private Texture skyTexture;
-    
     //Materials
     private Material alienMaterial1;
     private Material alienMaterial2;
     private Material alienMaterial3;
     private Material grassMaterial;
     private Material skyMaterial;
-    
+
     public DrawingAppState(Alien _alien, double _simSpeed) {
         super(_alien, _simSpeed);
     }
@@ -69,23 +67,26 @@ public class DrawingAppState extends SimulatorAppState {
         this.renderManager = this.app.getRenderManager();
     }
 
+    /**
+     * Additionally add ambient lighting, and add textures to the floor box.
+     */
     protected void initialiseWorld() {
 
         AmbientLight light = new AmbientLight();
         light.setColor(ColorRGBA.LightGray);
         simRoot.addLight(light);
         viewPort.setBackgroundColor(new ColorRGBA(98 / 255f, 167 / 255f, 224 / 255f, 1f));
-        
+
         Box floorBox = new Box(140f, 1f, 140f);
         floorGeometry = new Geometry("Floor", floorBox);
         floorGeometry.setLocalTranslation(0, -5, 0);
         floorGeometry.addControl(new RigidBodyControl(0));
         floorGeometry.setMaterial(grassMaterial);
         floorGeometry.getMesh().scaleTextureCoordinates(new Vector2f(40f, 40f));
-        
+
         simRoot.attachChild(floorGeometry);
         physics.getPhysicsSpace().add(floorGeometry);
-        
+
         //setupBackground();
     }
 
@@ -105,6 +106,9 @@ public class DrawingAppState extends SimulatorAppState {
 
     }
 
+    /**
+     * Load textures and materials from asset files.
+     */
     @Override
     public void setupTextures() {
         grassTexture = assetManager.loadTexture("Textures/grass4.png");
@@ -132,11 +136,11 @@ public class DrawingAppState extends SimulatorAppState {
         alienMaterial3.setTexture("ColorMap", alienTexture3);
     }
 
+    /**
+     * Spawn a new alien at a specified location with textures.
+     */
     @Override
     protected AlienNode instantiateAlien(Alien a, Vector3f location) {
-        /*
-         * Spawn a new alien at a specified location.
-         */
 
         AlienNode node = super.instantiateAlien(a, location);
 

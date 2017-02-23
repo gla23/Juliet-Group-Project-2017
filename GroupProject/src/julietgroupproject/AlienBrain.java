@@ -18,12 +18,13 @@ import org.encog.ml.data.MLData;
 import org.encog.ml.data.basic.BasicMLData;
 
 /**
+ * A controller that controls an alien contained in an AlienNode using neural
+ * network.
  *
- * @author GeorgeLenovo
- * 
- * Controls an alien contained in an AlienNode using neural network.
+ * @author Sunny
  */
 public class AlienBrain extends AbstractControl {
+
     private AlienNode alien;
     private MLRegression nn;
     private double[] nnInput;
@@ -33,39 +34,52 @@ public class AlienBrain extends AbstractControl {
     private int tickCycle = 100;
     private int tick = 0;
 
-    public int getTickCycle() { return tickCycle; }
-    public void setTickCycle(int _tickCycle) { this.tickCycle = _tickCycle; }
-    
+    public int getTickCycle() {
+        return tickCycle;
+    }
+
+    public void setTickCycle(int _tickCycle) {
+        this.tickCycle = _tickCycle;
+    }
+
+    /**
+     * Construct an AlienBrain for alien controlling.
+     *
+     * @param _nn the neural network that controls alien
+     */
     public AlienBrain(MLRegression _nn) {
+
         this.nn = _nn;
     }
-    
-    private void updateInput() {
-        /*
-         * fetch physical information into nnInput.
-         */
 
+    /**
+     * Fetch physical information into nnInput.
+     */
+    private void updateInput() {
         for (int i = 0; i < nnInput.length - 1; i++) { //TODO class to describe input categories
-            
+
             // normalise input to range from 0 to 1
             // Angles are in radians. 0 indicates no
             // rotation, positive and negative values
             // denote clockwise and anticlockwise rotations
             // (PS: I'm not sure about which is which though)
-            double in = ((double)this.alien.joints.get(i).getHingeAngle())/(1.5 * Math.PI) + 0.5;
-            if (in < 0.0) in = 0.0;
-            if (in > 1.0) in = 1.0;
+            double in = ((double) this.alien.joints.get(i).getHingeAngle()) / (1.5 * Math.PI) + 0.5;
+            if (in < 0.0) {
+                in = 0.0;
+            }
+            if (in > 1.0) {
+                in = 1.0;
+            }
             nnInput[i] = in;
 
         }
-        
-        
+
+
         double bearing = this.alien.geometries.get(0).getControl(RigidBodyControl.class).getPhysicsRotation().toAngles(null)[2];
-        
+
         nnInput[nnInput.length - 1] = (bearing + Math.PI) / (2.0 * Math.PI);
-        
-        if ((bearing + Math.PI) / (2.0 * Math.PI) < 0.0 || (bearing + Math.PI) / (2.0 * Math.PI) > 1.0)
-        {
+
+        if ((bearing + Math.PI) / (2.0 * Math.PI) < 0.0 || (bearing + Math.PI) / (2.0 * Math.PI) > 1.0) {
             throw new RuntimeException("Angle normalisation incorrect");
         }
     }
@@ -78,24 +92,20 @@ public class AlienBrain extends AbstractControl {
         if (spatial != null) {
             nnInput = new double[nn.getInputCount()];
             if (spatial instanceof AlienNode) {
-                this.alien = (AlienNode)spatial;
+                this.alien = (AlienNode) spatial;
             }
         }
     }
 
-
+    /**
+     * Updates state of alien. Every TICK_CYCLE ticks this method will pull new
+     * information from the simulation. Current implementation uses angles of
+     * joints. It will then feed the input to the ANN, computing output and
+     * reflect back to the simulation.
+     */
     @Override
-
     protected void controlUpdate(float tpf) {
-        /*
-         * Updates state of alien.
-         * Every TICK_CYCLE ticks this method will
-         * pull new information from the simulation.
-         * Current implementation uses angles of joints.
-         * It will then feed the input to the ANN, computing
-         * output and reflect back to the simulation.
-         */
-        
+
         if (nn == null) {
             System.err.println("No neural network set.");
             return;
@@ -105,7 +115,7 @@ public class AlienBrain extends AbstractControl {
 
         if (tick >= this.tickCycle) {
             tick = 0;
-            
+
             updateInput();
             MLData in = new BasicMLData(this.nnInput);
             MLData out = this.nn.compute(in);

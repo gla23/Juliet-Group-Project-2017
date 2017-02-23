@@ -14,6 +14,11 @@ import org.encog.neural.neat.NEATUtil;
 import org.encog.neural.neat.training.species.OriginalNEATSpeciation;
 import org.encog.util.Format;
 
+/**
+ * A framework for alien(ANN) training.
+ * 
+ * @author Peter
+ */
 public class AlienTrainer{
 
 	private NEATPopulation pop; //The population being trained

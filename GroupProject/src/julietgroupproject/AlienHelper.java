@@ -14,19 +14,39 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Cylinder;
+import com.jme3.scene.shape.Sphere;
 import com.jme3.scene.shape.Torus;
 
 /**
- *  Helper class to help instantiate
- * an Alien Block as a Node, with PhysicsControl attached.
- * @author George Andersen <gla23@cam.ac.uk>
+ * Helper class to help instantiate an Alien Block as a Node, with
+ * PhysicsControl attached.
+ *
+ * @author George Andersen
  */
 public class AlienHelper {
 
+    /**
+     * Assemble a limb geometry from definition in a Block. This is a wrapper
+     * function of createLimb.
+     *
+     * @param block the Block containing the limb to add
+     * @param location the world location of limb
+     * @return the assembled Geometry
+     */
     public static Geometry assembleBlock(Block block, Vector3f location) {
         return createLimb(block.collisionShapeType, block.width, block.height, block.length, location, block.mass);
     }
-    public static void recursivelyAddBlocks(Block rootBlock, Block parentBlock, Geometry parentGeometry, AlienNode brain) {
+
+    /**
+     * Assemble a full alien from rootBlock by adding limbs and joints
+     * recursively.
+     *
+     * @param rootBlock the root block containing definition of the alien
+     * @param parentBlock the parent block containing limbs
+     * @param parentGeometry the parent geometry described by parentBlock
+     * @param alienNode the AlienNode that all limb geometries should belong to
+     */
+    public static void recursivelyAddBlocks(Block rootBlock, Block parentBlock, Geometry parentGeometry, AlienNode alienNode) {
         for (Block b : parentBlock.getConnectedLimbs()) {
             Geometry g = createLimb(b.collisionShapeType, b.width, b.height, b.length, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getPosition()), b.mass);
             b.applyProperties(g);
@@ -34,12 +54,13 @@ public class AlienHelper {
             //printVector3f(b.getHingePosition());
 
             HingeJoint joint = joinHingeJoint(parentGeometry, g, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getHingePosition()), b.hingeType);
-            brain.attachChild(g);
-            brain.joints.add(joint);
-            brain.geometries.add(g);
-            recursivelyAddBlocks(rootBlock, b, g, brain);
+            alienNode.attachChild(g);
+            alienNode.joints.add(joint);
+            alienNode.geometries.add(g);
+            recursivelyAddBlocks(rootBlock, b, g, alienNode);
         }
     }
+
     public static Geometry createLimb(String meshShape, float width, float height, float length, Vector3f location, float mass) {
 
         Mesh mesh;
@@ -47,6 +68,8 @@ public class AlienHelper {
             mesh = new Cylinder(40, 40, width, length, true);
         } else if (meshShape.equals("Torus")) {
             mesh = new Torus(40, 40, width, length);
+        } else if (meshShape.equals("Sphere")) {
+            mesh = new Sphere(40, 40, width);
         } else {
             mesh = new Box(width, height, length);
         }
@@ -87,11 +110,18 @@ public class AlienHelper {
         }
         return joint;
     }
-    
+
     public static Vector3f getGeometryLocation(Geometry g) {
         return g.getControl(RigidBodyControl.class).getPhysicsLocation();
     }
-    
+
+    /**
+     * Assemble an alien from an abstract alien definition.
+     *
+     * @param a the abstract alien definition
+     * @param location the location where the instantiated alien should locate
+     * @return AlienNode containing the assembled alien
+     */
     public static AlienNode assembleAlien(Alien a, Vector3f location) {
         AlienNode alienNode = new AlienNode();
         Block rootBlock = a.rootBlock;
@@ -102,7 +132,4 @@ public class AlienHelper {
         recursivelyAddBlocks(rootBlock, rootBlock, rootBlockGeometry, alienNode);
         return alienNode;
     }
-    
-    
-    
 }

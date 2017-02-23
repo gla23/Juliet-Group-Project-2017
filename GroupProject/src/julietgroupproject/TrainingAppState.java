@@ -13,6 +13,7 @@ import java.util.Queue;
 import static julietgroupproject.SimulatorAppState.DEFAULT_UPDATE_CYCLE;
 
 /**
+ * An AppState providing useful functionalities for alien training process.
  *
  * @author GeorgeLenovo
  */
@@ -23,25 +24,30 @@ public class TrainingAppState extends SimulatorAppState {
     protected SimulationData currentSim;
     protected float simTimeLimit;
 
+    /**
+     * Constructor, taking an Alien object as the Alien to be tested in this
+     * simulator, the task queue with simulation data (neural network objects)
+     * and the simulation speed.
+     *
+     * @param _alien The alien to be tested.
+     * @param q The SimulationData queue. Must be thread-safe.
+     * @param _simSpeed Simulation speed. Default is 1.0.
+     */
     public TrainingAppState(Alien _alien, Queue<SimulationData> q, double _simSpeed) {
-        /*
-         * Constructor, taking an Alien object as the Alien
-         * to be tested in this simulator, the task queue with
-         * simulation data (neural network objects) and the
-         * simulation speed.
-         * 
-         * @param _alien The alien to be tested.
-         * @param q The SimulationData queue. Must be thread-safe.
-         * @param _simSpeed Simulation speed. Default is 1.0.
-         */
 
         super(_alien, _simSpeed);
 
         this.queue = q;
     }
 
+    /**
+     * Start a new simulation. This method should not be called externally by
+     * another thread.
+     *
+     * @param data the SimulationData object containing the ANN to be tested and
+     * other parameters
+     */
     public void startSimulation(SimulationData data) {
-
         // turn physics back on
         this.physics.setEnabled(true);
         this.reset();
@@ -52,10 +58,11 @@ public class TrainingAppState extends SimulatorAppState {
         this.simInProgress = true;
     }
 
+    /**
+     * Stop simulation and set fitness value.
+     */
     protected void stopSimulation() {
-        /*
-         * Stop simulation.
-         */
+
         this.simInProgress = false;
         if (this.currentSim != null) {
             synchronized (this.currentSim) {
@@ -68,6 +75,9 @@ public class TrainingAppState extends SimulatorAppState {
         this.physics.setEnabled(false);
     }
 
+    /**
+     * Perform initialisation and disable physics.
+     */
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
