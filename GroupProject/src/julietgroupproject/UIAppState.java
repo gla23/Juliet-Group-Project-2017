@@ -269,7 +269,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         //Get the current shape from the selector
         myMainMenuController.setCurrentLimbShape();
-        
+        /*
         if (currentShape.equals("Box")) {
             // Rotate the x y z for making boxes rotate to the normal
             Vector3f whlVec = new Vector3f(limbWidth, limbHeight, limbLength);
@@ -290,10 +290,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             //TODO things for attahcing cylinder
             
         }
+        */
         
         //Find hinge and postion vectors given shape and click position
         //TODO fix this so that is gets the actual distance, and also make that distance correct when it is rotated
-        Vector3f newHingePos = contactPt.add(normal.mult(0.5f));
+        Vector3f newHingePos = contactPt.add(normal.mult(-0.36f));
         Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeperation));
         
         String axisToUse = "ZAxis";
@@ -308,7 +309,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         //Build the new limb
         Block limb = new Block(newPos, newHingePos, limbWidth, limbHeight, limbLength, currentShape, axisToUse, weight);
         Matrix3f rotation = new Matrix3f();
-        rotation.fromStartEndVectors(new Vector3f(0, 1, 0), normal);
+        rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
 
         limb.rotation = rotation;
 

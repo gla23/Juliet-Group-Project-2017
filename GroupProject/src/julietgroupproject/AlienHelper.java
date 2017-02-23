@@ -7,15 +7,21 @@ package julietgroupproject;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.joints.HingeJoint;
 import com.jme3.bullet.util.CollisionShapeFactory;
-import com.jme3.material.Material;
+import com.jme3.math.Matrix3f;
+import com.jme3.math.Quaternion;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
-import com.jme3.scene.Node;
+import com.jme3.scene.VertexBuffer;
+import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.scene.shape.Torus;
+import com.jme3.util.BufferUtils;
+import java.nio.Buffer;
+import java.nio.FloatBuffer;
 
 /**
  * Helper class to help instantiate an Alien Block as a Node, with
@@ -34,7 +40,7 @@ public class AlienHelper {
      * @return the assembled Geometry
      */
     public static Geometry assembleBlock(Block block, Vector3f location) {
-        return createLimb(block.collisionShapeType, block.width, block.height, block.length, location, block.mass);
+        return createLimb(block.collisionShapeType, block.width, block.height, block.length, location, block.mass,block.rotation);
     }
 
     /**
@@ -48,7 +54,7 @@ public class AlienHelper {
      */
     public static void recursivelyAddBlocks(Block rootBlock, Block parentBlock, Geometry parentGeometry, AlienNode alienNode) {
         for (Block b : parentBlock.getConnectedLimbs()) {
-            Geometry g = createLimb(b.collisionShapeType, b.width, b.height, b.length, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getPosition()), b.mass);
+            Geometry g = createLimb(b.collisionShapeType, b.width, b.height, b.length, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getPosition()), b.mass,b.rotation);
             b.applyProperties(g);
 
             //printVector3f(b.getHingePosition());
@@ -61,7 +67,7 @@ public class AlienHelper {
         }
     }
 
-    public static Geometry createLimb(String meshShape, float width, float height, float length, Vector3f location, float mass) {
+    public static Geometry createLimb(String meshShape, float width, float height, float length, Vector3f location, float mass, Matrix3f rotation) {
 
         Mesh mesh;
         if (meshShape.equals("Cylinder")) {
@@ -73,6 +79,7 @@ public class AlienHelper {
         } else {
             mesh = new Box(width, height, length);
         }
+        mesh = rotateMesh(rotation, mesh);
         Geometry limb = new Geometry("Limb", mesh);
         RigidBodyControl r;
         r = new RigidBodyControl(CollisionShapeFactory.createDynamicMeshShape(limb), mass);
@@ -131,5 +138,22 @@ public class AlienHelper {
         alienNode.geometries.add(rootBlockGeometry);
         recursivelyAddBlocks(rootBlock, rootBlock, rootBlockGeometry, alienNode);
         return alienNode;
+    }
+    
+    public static Mesh rotateMesh(Matrix3f m, Mesh mesh){        
+        // Get the buffer from the mesh and put in array of vectors
+        VertexBuffer vb = mesh.getBuffer(Type.Position);
+        FloatBuffer vbData = (FloatBuffer)vb.getData();
+        int elements = vb.getNumElements();
+        Vector3f[] points;// = new Vector3f[elements];
+        points = BufferUtils.getVector3Array(vbData);
+        
+        for (int i = 0; i < elements; i++) {
+            BufferUtils.setInBuffer(m.mult(points[i]), vbData, i);
+        }
+        
+        //Update it:
+        vb.setUpdateNeeded();
+        return mesh;
     }
 }
