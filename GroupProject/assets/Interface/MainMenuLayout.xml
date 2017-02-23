@@ -56,24 +56,13 @@
                                  <control id="gravitySlider" valign = "center"name="horizontalSlider" initial = "0.0"  min = "-10.0" max = "10.0" stepSize = "0.1"/>
                               </panel>
                               
+                              <panel id = "restartPanel" align = "center" width = "100%" height = "15%" childLayout = "vertical" >
+                                
+                                 <control name ="button" label="Restart Alien" height = "60%" width = "100%"  id = "restartAlienButton" visibleToMouse="true">
+                                    <interact onClick="restartAlien()"/>
+                                 </control>
+                              </panel>
                               
-                              <!--
-                              <control name="button" label="Toggle Wire Mesh" width = "*"  id="wireMesh" align="center" valign="center" 
-                                            visibleToMouse="true" > 
-                                    <interact onClick="toggleWireMesh()"/>
-                              </control>
-                              <control name="button" label="Smooth Camera Toggle" width = "*" id="smoothCamera" align="center" valign="center" 
-                                            visibleToMouse="true" > 
-                                    <interact onClick="toggleSmoothness()"/>
-                              </control>
-                              <control name="button" label="Gravity Off"  width = "*" id="GravButton" align="center" valign="center" 
-                                            visibleToMouse="true" > 
-                                    <interact onClick="toggleGravOff()"/>
-                              </control>
-                              <control name="button" label="Gravity On" width = "*" id="GravButton" align="center" valign="center" 
-                                            visibleToMouse="true" > 
-                                    <interact onClick="toggleGravOn()"/>
-                              </control>-->
                          </panel>
                          <panel id = "return_options_panel" childLayout = "vertical" valign = "bottom" height = "8%" width = "100%">
                              <control name ="button" label="Go Back to Editor" height = "*" width = "*" id = "returnToEditor" visibleToMouse="true">
@@ -212,9 +201,15 @@
                                                                 <control id="hingeAxisButtons" name="radioButtonGroup"/>
                                                                 <control name="label" valign = "center" id = "hinge_axis_label" width = "100%" height = "25%" text="Hinge Axis:"/>
                                                                 
+                                                                <panel id = "AutoAxisPanel" height = "15%" childLayout = "horizontal" >
+                                                                    <control name="label" valign = "center" id = "AutoAxisLabel" width = "70%" text="Auto:"  />
+                                                                    <control id="AutoCheckBox" checked = "true" valign = "center" name="radioButton" group="hingeAxisButtons"/>
+                                                                </panel>
+                                                                
+                                                                
                                                                 <panel id = "XAxisPanel" height = "15%" childLayout = "horizontal" >
                                                                     <control name="label" valign = "center" id = "XAxisLabel" width = "70%" text="X:"  />
-                                                                    <control id="XCheckBox" checked = "true" valign = "center" name="radioButton" group="hingeAxisButtons" />
+                                                                    <control id="XCheckBox"  valign = "center" name="radioButton" group="hingeAxisButtons" />
                                                                 </panel>
                                                                 <panel id = "YAxisPanel" height = "15%" childLayout = "horizontal" >
                                                                     <control name="label" valign = "center" id = "YAxisLabel" width = "70%" text="Y:"  />
@@ -224,10 +219,7 @@
                                                                     <control name="label" valign = "center" id = "ZAxisLabel" width = "70%" text="Z:"  />
                                                                     <control id="ZCheckBox" valign = "center" name="radioButton" group="hingeAxisButtons"/>
                                                                 </panel>
-                                                                <panel id = "AutoAxisPanel" height = "15%" childLayout = "horizontal" >
-                                                                    <control name="label" valign = "center" id = "AutoAxisLabel" width = "70%" text="Auto:"  />
-                                                                    <control id="AutoCheckBox" valign = "center" name="radioButton" group="hingeAxisButtons"/>
-                                                                </panel>
+                                                                
                                                                 
                                                                 
                                                                 
