@@ -1,5 +1,7 @@
 package julietgroupproject;
 
+import java.io.Serializable;
+
 /**
  * Abstract representation of an Alien.
  * The class contains tree-structured blocks
@@ -7,7 +9,7 @@ package julietgroupproject;
  * 
  * @author George Andersen
  */
-public class Alien {
+public class Alien implements Serializable {
     public Block rootBlock;
     
     public Alien(Block rootBlock) {

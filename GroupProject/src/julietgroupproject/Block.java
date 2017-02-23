@@ -5,8 +5,9 @@ import com.jme3.math.Matrix3f;
 import java.util.LinkedList;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
+import java.io.Serializable;
 
-public class Block {
+public class Block implements Serializable {
 
     private Vector3f pos; // Position of limb relative to parent Block
     private Vector3f hingePos; // Position of hinge connecting this block and the parent, relative to parent
@@ -19,7 +20,7 @@ public class Block {
     public String collisionShapeType;
     public String hingeType;
     private LinkedList<Block> connectedLimbs = new LinkedList<Block>(); // List of Blocks that this is the parent of
-    private Geometry geo;
+    private transient Geometry geo;
     private Vector3f normal = new Vector3f(1,0,0);
     
 

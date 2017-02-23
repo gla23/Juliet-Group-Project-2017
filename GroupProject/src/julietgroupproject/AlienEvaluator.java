@@ -37,13 +37,14 @@ public class AlienEvaluator implements CalculateScore {
         return val;
     }
 
+    /**
+     * Construct an alien evaluator which will put simulation tasks onto
+     * _simTasks.
+     *
+     * @param _simTasks the thread-safe queue containing simulation tasks
+     */
     public AlienEvaluator(Queue<SimulationData> _simTasks) {
-        /**
-         * Construct an alien evaluator which will put simulation tasks onto
-         * _simTasks.
-         *
-         * @param _simTasks the thread-safe queue containing simulation tasks
-         */
+
         simTasks = _simTasks;
         simTime = 5.0;
     }

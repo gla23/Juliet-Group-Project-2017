@@ -56,6 +56,14 @@ import com.jme3.scene.shape.Sphere;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.DropDown;
 import de.lessvoid.nifty.controls.Slider;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import julietgroupproject.GUI.MainMenuController;
 
 public class UIAppState extends DrawingAppState implements ActionListener {
@@ -170,7 +178,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     public void createNewBody() {
         if (prevAlien == null) {
-            
+
             //Take the entries from text fields for limb size, do some error handling
             Slider widthField = nifty.getCurrentScreen().findNiftyControl("bodyWidthSlider", Slider.class);
             Slider heightField = nifty.getCurrentScreen().findNiftyControl("bodyHeightSlider", Slider.class);
@@ -197,7 +205,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
             //Instantiate the new alien
             Vector3f pos = new Vector3f(-10 + 20 * rng.nextFloat(), -10 + 20 * rng.nextFloat(), -10 + 20 * rng.nextFloat());
-            
+
             Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", bodyWeight);
             cuboid = new Alien(bodyBlock);
             prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
@@ -206,7 +214,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
 
     }
-    
+
     //To be run when right click on body, adds new limb with dimensions defined in text fields
     public void addLimb(Block block, Vector3f contactPt, Vector3f normal) {
 
@@ -273,13 +281,44 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         setupKeys(prevAlien);
     }
 
+    public boolean saveAlien(String filename) {
+        if (cuboid != null) {
+            File f = new File(filename);
+            try (ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(f))) {
+                o.writeObject(cuboid);
+                return true;
+            } catch (IOException ex) {
+                Logger.getLogger(UIAppState.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return false;
+    }
+
+    public boolean loadAlien(String filename) {
+        File f = new File(filename);
+        try (ObjectInputStream o = new ObjectInputStream(new FileInputStream(f))) {
+            Alien a = (Alien) o.readObject();
+            if (a != null) {
+                cuboid = a;
+                resetAlien();
+                prevAlien = instantiateAlien(cuboid, new Vector3f(0f, 5f, -10f));
+                setChaseCam(cuboid);
+                setupKeys(prevAlien);
+                return true;
+            }
+        } catch (IOException | ClassNotFoundException ex) {
+            Logger.getLogger(UIAppState.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
 
         // turn the wireframe off
         physics.setDebugEnabled(false);
-  
+
         // disable gravity initially
         toggleGravityOff();
 
@@ -296,7 +335,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         guiViewPort.addProcessor(niftyDisplay);
         nifty.fromXml("Interface/MainMenuLayout.xml", "begin", myMainMenuController);
         //nifty.setDebugOptionPanelColors(true); //un-comment this line to use DebugPanelColors and make sure Nifty is running correctly.
-        
+
         //flyCam.setDragToRotate(true); //detaches camera from mouse unless you click/drag.a
 
         flyCam.setEnabled(false);
