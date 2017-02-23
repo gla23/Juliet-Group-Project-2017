@@ -42,7 +42,7 @@
                               <panel id = "chaseCamPanel" height = "15%" childLayout = "horizontal" >
                                  <control name="label" valign = "center" id = "chaseCam_label" width = "50%" text="Smooth Camera:"  />
                                  <panel id = "chaseCamCheckPanel" valign = "center" width = "50%" childLayout = "vertical" >
-                                    <control id="chaseCamCheckBox" checked="true" align = "center"  name="checkbox" />
+                                    <control id="chaseCamCheckBox" checked="false" align = "center"  name="checkbox" />
                                  </panel>
                               </panel>
                               <panel id = "wireMeshPanel" height = "15%" childLayout = "horizontal" >

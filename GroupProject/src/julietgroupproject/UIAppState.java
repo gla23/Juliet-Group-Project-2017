@@ -83,7 +83,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private float horizontalAngle = 0;
     private float verticalAngle = 0;
     private float cameraZoom = 10;
-    private boolean smoothCam = true;
+    private boolean smoothCam = false;
     private String currentShape = "Box";
     private String currentHingeAxis ="A";
     Alien simpleAlien;
@@ -113,7 +113,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     
     public void setCurrentHingeAxis(String axis) {
         currentHingeAxis = axis;
-        System.out.println(axis);
     }
 
     public void restartAlien() {
