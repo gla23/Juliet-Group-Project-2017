@@ -6,8 +6,10 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.math.Vector3f;
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.controls.Button;
 import de.lessvoid.nifty.controls.DropDown;
+import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
 import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.controls.Tab;
 import de.lessvoid.nifty.controls.TabGroup;
@@ -87,6 +89,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 try {
                   this.sleep(150);
                   DropDown shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector_body", DropDown.class);
+                  
                   shapeSelect.removeItem("Cuboid");
                   shapeSelect.removeItem("Sphere");
                   shapeSelect.removeItem("Cylinder");
@@ -97,6 +100,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                   shapeSelect.addItem("Cylinder");
                   shapeSelect.addItem("Torus");
                   //shapeSelect.addItem("Option3");
+                  shapeSelect.selectItemByIndex(0);
                   TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
                 // tabs.addTab(addBody);
                   if (firstBody) {
@@ -146,12 +150,124 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
        //Window window = nifty.getCurrentScreen().findNiftyControl("editor_options_window", Window.class);
        
    }
-   /*
-   public void addLimb() {
-       app.addLimb();
+   
+   public void attachLimb() {
+       //TODO
        
        
-   }*/
+   }
+   
+   public void saveLimb() {
+       //TODO
+   }
+   
+   @NiftyEventSubscriber(id="shape_selector")
+   public void onDropDownLimbSelectionChanged(final String id, final DropDownSelectionChangedEvent<String> event) {
+       System.out.println(id);
+       Element getWidth = nifty.getCurrentScreen().findElementByName("limbWidthSlider");
+       Element getHeight = nifty.getCurrentScreen().findElementByName("limbHeightSlider");
+       Element getLength = nifty.getCurrentScreen().findElementByName("limbLengthSlider");
+       Element firstLabelE = nifty.getCurrentScreen().findElementByName("first_label");
+       Element secondLabelE = nifty.getCurrentScreen().findElementByName("second_label");
+       Element thirdLabelE = nifty.getCurrentScreen().findElementByName("third_label");
+       
+       Label firstLabel = nifty.getCurrentScreen().findNiftyControl("first_label", Label.class);
+       Label secondLabel = nifty.getCurrentScreen().findNiftyControl("second_label", Label.class);
+       Label thirdLabel = nifty.getCurrentScreen().findNiftyControl("third_label", Label.class);
+       if (event.getSelection().equals("Cylinder")) {
+            getWidth.show();
+            getHeight.hide();
+            getLength.show();
+            firstLabelE.show();
+            secondLabelE.hide();
+            thirdLabelE.show();
+            firstLabel.setText("Radius:");
+            thirdLabel.setText("Height:");
+       } else if (event.getSelection().equals("Sphere")) {
+            getWidth.show();
+            getHeight.hide();
+            getLength.hide();
+            firstLabelE.show();
+            secondLabelE.hide();
+            thirdLabelE.hide();
+            firstLabel.setText("Radius:");
+       } else if (event.getSelection().equals("Torus")) {
+            getWidth.show();
+            getHeight.hide();
+            getLength.show();
+            firstLabelE.show();
+            secondLabelE.hide();
+            thirdLabelE.show();
+            firstLabel.setText("Ring Thickness:");
+            thirdLabel.setText("Outer Radius:");
+       } else if (event.getSelection().equals("Cuboid")) {
+            getWidth.show();
+            getHeight.show();
+            getLength.show();
+            firstLabelE.show();
+            secondLabelE.show();
+            thirdLabelE.show();
+            firstLabel.setText("Width:");
+            secondLabel.setText("Height:");
+            thirdLabel.setText("Length:");
+       }
+       
+   }
+   
+   
+   @NiftyEventSubscriber(id="shape_selector_body")
+   public void onDropDownBodySelectionChanged(final String id, final DropDownSelectionChangedEvent<String> event) {
+       System.out.println(id);
+       Element getWidth = nifty.getCurrentScreen().findElementByName("bodyWidthSlider");
+       Element getHeight = nifty.getCurrentScreen().findElementByName("bodyHeightSlider");
+       Element getLength = nifty.getCurrentScreen().findElementByName("bodyLengthSlider");
+       Element firstLabelE = nifty.getCurrentScreen().findElementByName("first_body_label");
+       Element secondLabelE = nifty.getCurrentScreen().findElementByName("second_body_label");
+       Element thirdLabelE = nifty.getCurrentScreen().findElementByName("third_body_label");
+       
+       Label firstLabel = nifty.getCurrentScreen().findNiftyControl("first_body_label", Label.class);
+       Label secondLabel = nifty.getCurrentScreen().findNiftyControl("second_body_label", Label.class);
+       Label thirdLabel = nifty.getCurrentScreen().findNiftyControl("third_body_label", Label.class);
+       if (event.getSelection().equals("Cylinder")) {
+            getWidth.show();
+            getHeight.hide();
+            getLength.show();
+            firstLabelE.show();
+            secondLabelE.hide();
+            thirdLabelE.show();
+            firstLabel.setText("Radius:");
+            thirdLabel.setText("Height:");
+       } else if (event.getSelection().equals("Sphere")) {
+            getWidth.show();
+            getHeight.hide();
+            getLength.hide();
+            firstLabelE.show();
+            secondLabelE.hide();
+            thirdLabelE.hide();
+            firstLabel.setText("Radius:");
+       } else if (event.getSelection().equals("Torus")) {
+            getWidth.show();
+            getHeight.hide();
+            getLength.show();
+            firstLabelE.show();
+            secondLabelE.hide();
+            thirdLabelE.show();
+            firstLabel.setText("Ring Thickness:");
+            thirdLabel.setText("Outer Radius:");
+       } else if (event.getSelection().equals("Cuboid")) {
+            getWidth.show();
+            getHeight.show();
+            getLength.show();
+            firstLabelE.show();
+            secondLabelE.show();
+            thirdLabelE.show();
+            firstLabel.setText("Width:");
+            secondLabel.setText("Height:");
+            thirdLabel.setText("Length:");
+       }
+       
+   }
+   
     public void onStartScreen() {
         
                 
