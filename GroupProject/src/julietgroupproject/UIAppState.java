@@ -580,7 +580,20 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         //flyCam.setDragToRotate(true); //detaches camera from mouse unless you click/drag.a
 
         flyCam.setEnabled(false);
+ 
+        addKeyBindings();
+
+        ghostMaterial = new Material(assetManager, 
+            "Common/MatDefs/Misc/Unshaded.j3md");
+        //ghostMaterial.setTexture("ColorMap", 
+        //    assetManager.loadTexture("Textures/ColoredTex/Monkey.png"));
+        ghostMaterial.setColor("Color", new ColorRGBA(0.32f,0.85f,0.5f, 1f));
         
+        //ghostMaterial.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+
+    }
+ 
+    public void addKeyBindings() {
         //Add the key binding for the right click to add limb funtionality
         inputManager.addMapping("AddLimb", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         inputManager.addListener(this, "AddLimb");
@@ -592,15 +605,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         inputManager.addListener(this, "GoToEditor");
         inputManager.addMapping("Pulsate",new KeyTrigger(KeyInput.KEY_W));
         inputManager.addListener(this, "Pulsate");
-        
-        ghostMaterial = new Material(assetManager, 
-            "Common/MatDefs/Misc/Unshaded.j3md");
-        //ghostMaterial.setTexture("ColorMap", 
-        //    assetManager.loadTexture("Textures/ColoredTex/Monkey.png"));
-        ghostMaterial.setColor("Color", new ColorRGBA(0.32f,0.85f,0.5f, 1f));
-        
-        //ghostMaterial.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-
+    }
+    
+    public void removeKeyBindings() {
+        inputManager.deleteMapping("AddLimb");
+        inputManager.deleteMapping("ToggleMesh");
+        inputManager.deleteMapping("ToggleSmooth");
+        inputManager.deleteMapping("GoToEditor");
+        inputManager.deleteMapping("Pulsate");
     }
 
     public boolean beginTraining() {
