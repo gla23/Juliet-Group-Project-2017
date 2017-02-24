@@ -201,8 +201,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         chaseCam.setToggleRotationTrigger(new MouseButtonTrigger(MouseInput.BUTTON_LEFT), new KeyTrigger(KeyInput.KEY_P));
         chaseCam.setTrailingRotationInertia(0.1f);
         chaseCam.setUpVector(new Vector3f(0, 1, 0));
-        chaseCam.setZoomInTrigger(new KeyTrigger(KeyInput.KEY_LBRACKET));
-        chaseCam.setZoomOutTrigger(new KeyTrigger(KeyInput.KEY_RBRACKET));
+        chaseCam.setZoomInTrigger(new KeyTrigger(KeyInput.KEY_EQUALS));
+        chaseCam.setZoomOutTrigger(new KeyTrigger(KeyInput.KEY_MINUS));
         chaseCam.setZoomSensitivity(10);
         chaseCam.setInvertVerticalAxis(true);
         chaseCam.setMaxDistance(150);
