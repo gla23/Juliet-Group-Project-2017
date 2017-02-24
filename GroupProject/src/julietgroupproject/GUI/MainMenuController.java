@@ -451,6 +451,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         current = (String) shapeSelect.getSelection();
         if (current.equals("Cuboid")) {
             current = "Box";
+        }else if (current.equals("Ellipsoid")) {
+            current = "Sphere";
         }
         app.setCurrentShape(current);
 
