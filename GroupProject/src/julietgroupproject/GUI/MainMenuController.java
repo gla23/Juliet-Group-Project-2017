@@ -229,6 +229,10 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     }
 
+    public void gotoSaveScreen() {
+        nifty.gotoScreen("save_dialog");
+    }
+
     public void saveAlien() {
         //TODO
         if (app.saveAlien("alien.sav")) {
