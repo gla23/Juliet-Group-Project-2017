@@ -524,6 +524,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (alien != null) {
             alien.setName(name);
             File f = new File("aliens/" + alien.getName() + "/body.sav");
+            f.getParentFile().mkdirs();
             try (ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(f))) {
                 o.writeObject(alien);
                 return true;

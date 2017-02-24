@@ -209,7 +209,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         nifty.gotoScreen("simulation");
     }
 
-    public void loadAlien() {
+    public void gotoLoadScreen() {
         loadType = "alien";
         nifty.gotoScreen("load_dialog");
     }
@@ -243,13 +243,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     public void gotoSaveScreen() {
-        nifty.gotoScreen("save_dialog");
-    }
-
-    public void saveAlien() {
         this.saveType = "alien";
-        nifty.gotoScreen("save");
-        
+        nifty.gotoScreen("save_dialog");
     }
     
     public void confirmSave()

@@ -1,6 +1,7 @@
 package julietgroupproject;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -52,10 +53,14 @@ public class AlienTrainer extends Thread {
 
     private void save() {
         //TODO: can cause stack overflow as NEATPopulation's Serialize is not implemented properly
-
+        
         //serialize the population and write it to a file.
         try {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename));
+            File f = new File(filename);
+            
+            f.getParentFile().mkdirs();
+            
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(f));
 
             out.writeObject(pop);
 

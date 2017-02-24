@@ -14,7 +14,7 @@ public class Alien implements Serializable {
     public Block rootBlock;
     private String name;
     public int materialCode = 1;
-    private static Random rng;
+    private static Random rng = new Random();
     
     public Alien(Block rootBlock) {
         this.rootBlock = rootBlock;
