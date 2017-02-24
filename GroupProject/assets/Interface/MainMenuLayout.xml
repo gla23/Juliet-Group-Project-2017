@@ -23,7 +23,7 @@
                              <onActive name="fade" start ="#00" end = "ff" length = "2000"/>
                              <onActive name="changeFont" font = "Interface/Fonts/Begin.fnt"/>
                         </effect>
-                           <interact onClick="loadAlienButtonClick()"/>
+                           <interact onClick="gotoLoadScreen()"/>
                      </control>
                 </panel>
            
@@ -374,7 +374,7 @@
                                 <interact onClick="gotoSaveScreen()"/>
                             </control>
                             <control name ="button" label="Load Alien" height = "*" width = "*" id = "load_alien" visibleToMouse="true">
-                                <interact onClick="loadAlien()"/>
+                                <interact onClick="gotoLoadScreen()"/>
                             </control>
                             <control name ="button" label="Run New Simulation" height = "*" width = "*" id = "new_sim" visibleToMouse="true">
                                 <interact onClick="runNewSimulation()"/>
@@ -415,21 +415,4 @@
             
         </layer>
     </screen>
-    <screen id="loadAlien" controller="julietgroupproject.GUI.MainMenuController">
-        <layer id="foreground" childLayout="center">
-            
-            <panel id="load_panel"  height = "7%" width = "30%" childLayout="horizontal">
-                <control name="label" text="Choose your alien"  height = "*" width = "*" align="center" valign="center" 
-                /> 
-                       
-                <control name = "button" label = "Select" id = "show_editor" align = "right" width = "50%"
-                         visibleToMouse = "true" >
-                    <interact onClick="showEditor()"/>
-                </control>    
-                    
-            </panel>
-           
-        </layer>
-    </screen>
-    
 </nifty>

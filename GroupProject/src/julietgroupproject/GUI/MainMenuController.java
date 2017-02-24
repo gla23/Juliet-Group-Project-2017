@@ -195,11 +195,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         thread.start();
     }
 
-    public void loadAlienButtonClick() {
-        loadType = "alien";
-        nifty.gotoScreen("load_dialog");
-    }
-
     public void runPreviousSimulation() {
         //TODO
     }
@@ -251,7 +246,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     {
         if ("alien".equals(saveType))
         {
-            if (app.saveAlien(screen.findNiftyControl("saveTextField", TextField.class).getDisplayedText())) {
+            if (app.saveAlien(screen.findNiftyControl("saveTextField", TextField.class).getRealText())) {
             //TODO: inform user save was successful
             } else {
             //TODO: inform user save was unsuccessful
