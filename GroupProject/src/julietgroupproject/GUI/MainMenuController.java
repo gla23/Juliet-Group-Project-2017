@@ -192,10 +192,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         thread.start();
     }
 
-    public void loadAlienButtonClick() {
-        nifty.gotoScreen("loadAlien");
-    }
-
     public void runPreviousSimulation() {
         //TODO
     }
@@ -205,6 +201,10 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         nifty.gotoScreen("simulation");
     }
 
+    public void gotoLoadScreen() {
+        nifty.gotoScreen("load_dialog");
+    }
+    
     public void loadAlien() {
         //TODO
         if (app.loadAlien("alien.sav")) {
