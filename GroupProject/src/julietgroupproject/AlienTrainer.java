@@ -125,6 +125,8 @@ public class AlienTrainer extends Thread {
             for (SlaveSimulator slave : this.slaves) {
                 slave.kill();
             }
+            slaves.clear();
+            slaves = null;
         }
     }
 

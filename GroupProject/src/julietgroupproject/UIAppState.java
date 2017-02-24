@@ -311,7 +311,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             verticalAngle = chaseCam.getVerticalRotation();
             cameraZoom = chaseCam.getDistanceToTarget();
             chaseCam.setSmoothMotion(false);
-
         }
         //toggleSmoothness();
         chaseCam = new ChaseCamera(cam, shape.geometries.get(0), inputManager);
@@ -568,6 +567,18 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         //flyCam.setDragToRotate(true); //detaches camera from mouse unless you click/drag.a
 
         flyCam.setEnabled(false);
+        
+        //Add the key binding for the right click to add limb funtionality
+        inputManager.addMapping("AddLimb", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+        inputManager.addListener(this, "AddLimb");
+        inputManager.addMapping("ToggleMesh", new KeyTrigger(KeyInput.KEY_Q));
+        inputManager.addListener(this, "ToggleMesh");
+        inputManager.addMapping("ToggleSmooth",new KeyTrigger(KeyInput.KEY_S));
+        inputManager.addListener(this, "ToggleSmooth");
+        inputManager.addMapping("GoToEditor",new KeyTrigger(KeyInput.KEY_E));
+        inputManager.addListener(this, "GoToEditor");
+        inputManager.addMapping("Pulsate",new KeyTrigger(KeyInput.KEY_W));
+        inputManager.addListener(this, "Pulsate");
 
     }
 
@@ -585,7 +596,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             instantiateAlien(alien, Vector3f.ZERO);
         }
 
-        this.trainer = new AlienTrainer(0.5, "saved.pop",
+        this.trainer = new AlienTrainer(0.5, "wormTraining2.pop",
                 simulationQueue, currentAlienNode.joints.size() + 1,
                 currentAlienNode.joints.size());
 
@@ -709,28 +720,20 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public void setupKeys(AlienNode brain) {
+        
         // Creates keyboard bindings for the joints with keys in jointKeys, limited by umber of joints or keys specified in jointKeys
         int numberOfJoints = Math.min(brain.joints.size(), jointKeys.length / 2);
         for (int i = 0; i < numberOfJoints; i++) {
-            inputManager.addMapping("Alien joint " + ((Integer) i).toString() + " clockwise", new KeyTrigger(jointKeys[2 * i]));
-            inputManager.addMapping("Alien joint " + ((Integer) i).toString() + " anticlockwise", new KeyTrigger(jointKeys[2 * i + 1]));
-            inputManager.addListener(this, "Alien joint " + ((Integer) i).toString() + " clockwise");
-            inputManager.addListener(this, "Alien joint " + ((Integer) i).toString() + " anticlockwise");
+            
+            if (!inputManager.hasMapping("Alien joint " + ((Integer) i).toString() + " clockwise"))
+            {
+                inputManager.addMapping("Alien joint " + ((Integer) i).toString() + " clockwise", new KeyTrigger(jointKeys[2 * i]));
+                inputManager.addMapping("Alien joint " + ((Integer) i).toString() + " anticlockwise", new KeyTrigger(jointKeys[2 * i + 1]));
+                inputManager.addListener(this, "Alien joint " + ((Integer) i).toString() + " clockwise");
+                inputManager.addListener(this, "Alien joint " + ((Integer) i).toString() + " anticlockwise");
+            }
         }
         currentAlienNode = brain;
-
-        //Add the key binding for the right click to add limb funtionality
-        inputManager.addMapping("AddLimb", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-        inputManager.addListener(this, "AddLimb");
-        inputManager.addMapping("ToggleMesh", new KeyTrigger(KeyInput.KEY_Q));
-        inputManager.addListener(this, "ToggleMesh");
-        inputManager.addMapping("ToggleSmooth",new KeyTrigger(KeyInput.KEY_S));
-        inputManager.addListener(this, "ToggleSmooth");
-        inputManager.addMapping("GoToEditor",new KeyTrigger(KeyInput.KEY_E));
-        inputManager.addListener(this, "GoToEditor");
-        inputManager.addMapping("Pulsate",new KeyTrigger(KeyInput.KEY_W));
-        inputManager.addListener(this, "Pulsate");
-
     }
     
     /**
