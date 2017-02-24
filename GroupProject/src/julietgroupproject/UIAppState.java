@@ -96,6 +96,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private SimulationData currentSim;
     private float simTimeLimit;
     private String currentHingeAxis = "A";
+    private boolean attaching = false;
+    private Block ghostLimb;
+    
+    
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
@@ -160,8 +164,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void toggleSmoothness() {
         smoothCam = !smoothCam;
         chaseCam.setSmoothMotion(smoothCam);
-
-
     }
 
     public void toggleWireMesh() {
@@ -172,6 +174,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     //Method for easily printing out vectors for debugging
     public void printVector3f(Vector3f vec) {
         System.out.println(vec);
+    }
+    
+    public void setAttaching(boolean attaching) {
+        this.attaching = attaching;
+        
+        if (attaching) {
+            //ghostLimb = new Block();
+        }
     }
 
     public void setChaseCam(AlienNode shape) {
@@ -247,6 +257,22 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             setupKeys(this.currentAlienNode);
         }
 
+    }
+    
+    // Returns closest collision result after casting ray from cursor
+    private CollisionResult getCursorRaycastCollision() {        
+        //Generate the ray from position of click
+        CollisionResults results = new CollisionResults();
+        Vector2f click2d = inputManager.getCursorPosition();
+        Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
+        Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
+
+        // Aim the ray from the clicked spot forwards.
+        Ray ray = new Ray(click3d, dir);
+
+        //Check for collisions with body recursively
+        rootNode.collideWith(ray, results);
+        return results.getClosestCollision();
     }
 
     //To be run when right click on body, adds new limb with dimensions defined in text fields
@@ -511,52 +537,42 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
 
 
-            //When right mouse button clicked, fire ray to see if intersects with body
-            if ("AddLimb".equals(string) && !bln) {
-                //Generate the ray from position of click
-                CollisionResults results = new CollisionResults();
-                Vector2f click2d = inputManager.getCursorPosition();
-                Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
-                Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
-
-                // Aim the ray from the clicked spot forwards.
-                Ray ray = new Ray(click3d, dir);
-
-                //Check for collisions with body recursively
-                rootNode.collideWith(ray, results);
-                CollisionResult collision = results.getClosestCollision();
+        //When right mouse button clicked, fire ray to see if intersects with body
+        if ("AddLimb".equals(string) && !bln && attaching) {
+            CollisionResult collision = getCursorRaycastCollision();
 
 
-                //If collided then generate new limb at collision point
-                if (results.size() > 0) {
-                    Geometry geo = collision.getGeometry();
-                    Vector3f colpt = collision.getContactPoint();
-                    Vector3f pt = colpt.add(geo.getWorldTranslation().negate());
-                    Vector3f norm = collision.getContactNormal();
+            //If collided then generate new limb at collision point
+            if (collision != null) {
+                Geometry geo = collision.getGeometry();
+                Vector3f colpt = collision.getContactPoint();
+                Vector3f pt = colpt.add(geo.getWorldTranslation().negate());
+                Vector3f norm = collision.getContactNormal();
 
-                    //Find block assoicated with collision geometry
-                    Block block = null;
+                //Find block assoicated with collision geometry
+                Block block = null;
 
-                    LinkedList<Block> q = new LinkedList<>();
-                    q.push(alien.rootBlock);
+                LinkedList<Block> q = new LinkedList<>();
+                q.push(alien.rootBlock);
 
-                    while (!q.isEmpty()) {
-                        Block head = q.pop();
-                        if (geo == head.getGeometry()) {
-                            block = head;
-                            break;
-                        } else {
-                            for (Block child : head.getConnectedLimbs()) {
-                                q.push(child);
-                            }
+                while (!q.isEmpty()) {
+                    Block head = q.pop();
+                    if (geo == head.getGeometry()) {
+                        block = head;
+                        break;
+                    } else {
+                        for (Block child : head.getConnectedLimbs()) {
+                            q.push(child);
                         }
                     }
-
-                    if (block != null) {
-                        addLimb(block, pt, norm);
-                    }
+                }
+                
+                if (block != null) {
+                    setAttaching(false);
+                    addLimb(block, pt, norm);
                 }
             }
+        }
     }
 
     public void setupKeys(AlienNode brain) {
@@ -658,3 +674,4 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
     }
 }
+
