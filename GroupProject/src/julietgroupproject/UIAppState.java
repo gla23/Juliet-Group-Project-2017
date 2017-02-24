@@ -595,24 +595,44 @@ public class UIAppState extends DrawingAppState implements ActionListener {
  
     public void addKeyBindings() {
         //Add the key binding for the right click to add limb funtionality
-        inputManager.addMapping("AddLimb", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
-        inputManager.addListener(this, "AddLimb");
-        inputManager.addMapping("ToggleMesh", new KeyTrigger(KeyInput.KEY_Q));
-        inputManager.addListener(this, "ToggleMesh");
-        inputManager.addMapping("ToggleSmooth",new KeyTrigger(KeyInput.KEY_S));
-        inputManager.addListener(this, "ToggleSmooth");
-        inputManager.addMapping("GoToEditor",new KeyTrigger(KeyInput.KEY_E));
-        inputManager.addListener(this, "GoToEditor");
-        inputManager.addMapping("Pulsate",new KeyTrigger(KeyInput.KEY_W));
-        inputManager.addListener(this, "Pulsate");
+        if (!inputManager.hasMapping("AddLimb")) {
+            inputManager.addMapping("AddLimb", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+            inputManager.addListener(this, "AddLimb");
+        }
+        if (!inputManager.hasMapping("ToggleMesh")) {
+            inputManager.addMapping("ToggleMesh", new KeyTrigger(KeyInput.KEY_Q));
+            inputManager.addListener(this, "ToggleMesh");
+        }
+        if (!inputManager.hasMapping("ToggleSmooth")) {
+            inputManager.addMapping("ToggleSmooth",new KeyTrigger(KeyInput.KEY_S));
+            inputManager.addListener(this, "ToggleSmooth");
+        }
+        if (!inputManager.hasMapping("GoToEditor")) {
+            inputManager.addMapping("GoToEditor",new KeyTrigger(KeyInput.KEY_E));
+            inputManager.addListener(this, "GoToEditor");
+        }
+        if (!inputManager.hasMapping("Pulsate")) {
+            inputManager.addMapping("Pulsate",new KeyTrigger(KeyInput.KEY_W));
+            inputManager.addListener(this, "Pulsate");
+        }
     }
     
     public void removeKeyBindings() {
-        inputManager.deleteMapping("AddLimb");
-        inputManager.deleteMapping("ToggleMesh");
-        inputManager.deleteMapping("ToggleSmooth");
-        inputManager.deleteMapping("GoToEditor");
-        inputManager.deleteMapping("Pulsate");
+        if (inputManager.hasMapping("AddLimb")) {
+            inputManager.deleteMapping("AddLimb");
+        }
+        if (inputManager.hasMapping("ToggleMesh")) {
+            inputManager.deleteMapping("ToggleMesh");
+        }
+        if (inputManager.hasMapping("ToggleSmooth")) {
+            inputManager.deleteMapping("ToggleSmooth");
+        }
+        if (inputManager.hasMapping("GoToEditor")) {
+            inputManager.deleteMapping("GoToEditor");
+        }
+        if (inputManager.hasMapping("Pulsate")) {
+            inputManager.deleteMapping("Pulsate");
+        }
     }
 
     public boolean beginTraining() {

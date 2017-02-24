@@ -211,10 +211,9 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         nifty.gotoScreen("load_dialog");
     }
     
-    public void confirmLoad()
-    {
-        if ("alien".equals(loadType))
-        {
+    public void confirmLoad() {
+        app.removeKeyBindings();
+        if ("alien".equals(loadType)) {
             //TODO
             if (app.loadAlien(screen.findNiftyControl("loadTextField", TextField.class).getDisplayedText())) {
                 TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
@@ -245,8 +244,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         nifty.gotoScreen("save_dialog");
     }
     
-    public void confirmSave()
-    {
+    public void confirmSave() {
+        app.addKeyBindings();
         if ("alien".equals(saveType))
         {
             if (app.saveAlien(screen.findNiftyControl("saveTextField", TextField.class).getRealText())) {
