@@ -25,6 +25,7 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.AmbientLight;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Quaternion;
@@ -98,6 +99,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private String currentHingeAxis = "A";
     private boolean attaching = false;
     private Geometry ghostLimb;
+    private Material ghostMaterial;
     
     
     int[] jointKeys = { // Used for automatically giving limbs keys
@@ -298,7 +300,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     limb.rotation = rotation;
 
                     ghostLimb = AlienHelper.assembleBlock(limb, newPos.add(AlienHelper.getGeometryLocation(block.getGeometry())));
-                    ghostLimb.setMaterial(alienMaterial1);
+                    
+                    ghostLimb.setMaterial(ghostMaterial);
+                    
                     rootNode.attachChild(ghostLimb);
                 }
             }
@@ -306,14 +310,20 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public void setChaseCam(AlienNode shape) {
+        
         if (chaseCam != null) {
             horizontalAngle = chaseCam.getHorizontalRotation();
             verticalAngle = chaseCam.getVerticalRotation();
             cameraZoom = chaseCam.getDistanceToTarget();
             chaseCam.setSmoothMotion(false);
+            //remove warnings about adding duplicate mappings.
+            inputManager.deleteMapping("ChaseCamMoveLeft");
+            inputManager.deleteMapping("ChaseCamMoveRight");
+            inputManager.deleteMapping("ChaseCamToggleRotate");
         }
         //toggleSmoothness();
         chaseCam = new ChaseCamera(cam, shape.geometries.get(0), inputManager);
+        
         //toggleSmoothness();
         chaseCam.setSmoothMotion(smoothCam);
         if (smoothCam) {
@@ -336,6 +346,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         chaseCam.setZoomSensitivity(10);
         chaseCam.setInvertVerticalAxis(true);
         chaseCam.setMaxDistance(150);
+        
     }
 
     public void createNewBody() {
@@ -579,6 +590,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         inputManager.addListener(this, "GoToEditor");
         inputManager.addMapping("Pulsate",new KeyTrigger(KeyInput.KEY_W));
         inputManager.addListener(this, "Pulsate");
+        
+        ghostMaterial = new Material(assetManager, 
+            "Common/MatDefs/Misc/Unshaded.j3md");
+        //ghostMaterial.setTexture("ColorMap", 
+        //    assetManager.loadTexture("Textures/ColoredTex/Monkey.png"));
+        ghostMaterial.setColor("Color", new ColorRGBA(0.32f,0.85f,0.5f, 1f));
+        
+        //ghostMaterial.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
 
     }
 

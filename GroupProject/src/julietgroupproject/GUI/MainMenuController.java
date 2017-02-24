@@ -172,10 +172,15 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     shapeSelect.selectItemByIndex(0);
                     TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
                     // tabs.addTab(addBody);
-                    if (firstBody) {
-                        tabs.setSelectedTab(addLimb);
-                    } else {
-                        tabs.setSelectedTab(addBody);
+                    
+                    
+                    if (tabs != null && addLimb != null && addBody != null) //TODO null check required to disable exceptions, but these shouldn't be null!
+                    {
+                        if (firstBody) {
+                            tabs.setSelectedTab(addLimb);
+                        } else {
+                            tabs.setSelectedTab(addBody);
+                        }
                     }
 
                 } catch (InterruptedException e) {
