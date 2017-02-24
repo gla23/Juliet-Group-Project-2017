@@ -241,12 +241,19 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     public void attachLimb() {
-        //TODO
+        //TODO     
         Slider getWidth = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
         getWidth.setValue(5.0f);
         CheckBox getAuto = nifty.getCurrentScreen().findNiftyControl("AutoCheckBox", CheckBox.class);
         
-        getAuto.setChecked(!getAuto.isChecked());
+        boolean checked = !getAuto.isChecked();
+        
+        app.setAttaching(checked);
+        getAuto.setChecked(checked);
+    }
+    
+    public void setLimbCheckbox() {
+        
     }
 
     public void saveLimb() {
