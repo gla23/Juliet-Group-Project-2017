@@ -251,7 +251,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     //To be run when right click on body, adds new limb with dimensions defined in text fields
     public void addLimb(Block block, Vector3f contactPt, Vector3f normal) {
-
+        
         //Get rid of old alien on screen
         if (this.currentAlienNode != null) {
             removeAlien(this.currentAlienNode);
@@ -508,6 +508,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             if (!bln) {
                 myMainMenuController.pulsateToggle();
             }
+        }
 
 
             //When right mouse button clicked, fire ray to see if intersects with body
@@ -556,7 +557,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     }
                 }
             }
-        }
     }
 
     public void setupKeys(AlienNode brain) {
