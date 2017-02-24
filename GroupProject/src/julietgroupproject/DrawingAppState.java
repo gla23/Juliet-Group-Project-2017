@@ -41,19 +41,19 @@ public class DrawingAppState extends SimulatorAppState {
     protected AudioRenderer audioRenderer;
     protected RenderManager renderManager;
     //Textures
-    private Texture alienTexture1;
-    private Texture alienTexture2;
-    private Texture alienTexture3;
-    private Texture grassTexture;
-    private Texture skyTexture;
+    protected Texture alienTexture1;
+    protected Texture alienTexture2;
+    protected Texture alienTexture3;
+    protected Texture grassTexture;
+    protected Texture skyTexture;
     //Materials
-    private Material alienMaterial1;
-    private Material alienMaterial2;
-    private Material alienMaterial3;
-    private Material grassMaterial;
-    private Material skyMaterial;
+    protected Material alienMaterial1;
+    protected Material alienMaterial2;
+    protected Material alienMaterial3;
+    protected Material grassMaterial;
+    protected Material skyMaterial;
     
-    private Material[] materials;
+    protected Material[] materials;
     
 
     public DrawingAppState(Alien _alien, double _simSpeed) {
