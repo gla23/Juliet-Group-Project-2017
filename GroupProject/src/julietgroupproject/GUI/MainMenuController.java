@@ -7,6 +7,7 @@ import com.jme3.math.Vector3f;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
 import de.lessvoid.nifty.controls.Button;
+import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.controls.CheckBoxStateChangedEvent;
 import de.lessvoid.nifty.controls.DropDown;
@@ -38,6 +39,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     private boolean Z = false;
     private boolean auto = false;
     private volatile boolean initialising = false;
+    private String saveType = "";
+    private String loadType = "";
 
     public MainMenuController(UIAppState App) {
         this.app = App;
@@ -193,7 +196,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     public void loadAlienButtonClick() {
-        nifty.gotoScreen("loadAlien");
+        loadType = "alien";
+        nifty.gotoScreen("load_dialog");
     }
 
     public void runPreviousSimulation() {
@@ -206,36 +210,57 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     public void loadAlien() {
-        //TODO
-        if (app.loadAlien("alien.sav")) {
-            TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
-            addLimb = screen.findNiftyControl("add_limb_tab", Tab.class);
-            addBody = screen.findNiftyControl("add_body_tab", Tab.class);
-            tabs.setSelectedTab(addLimb);
-            DropDown shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector", DropDown.class);
-            shapeSelect.removeItem("Cuboid");
-            shapeSelect.removeItem("Ellipsoid");
-            shapeSelect.removeItem("Cylinder");
-            shapeSelect.removeItem("Torus");
-            //shapeSelect.removeItem("Option3");
-            shapeSelect.addItem("Cuboid");
-            shapeSelect.addItem("Ellipsoid");
-            shapeSelect.addItem("Cylinder");
-            shapeSelect.addItem("Torus");
-            //TODO: inform user load was successful
-        } else {
-            //TODO: inform user load was unsuccessful
+        loadType = "alien";
+        nifty.gotoScreen("load_dialog");
+    }
+    
+    public void confirmLoad()
+    {
+        if ("alien".equals(loadType))
+        {
+            //TODO
+            if (app.loadAlien(screen.findNiftyControl("loadTextField", TextField.class).getDisplayedText())) {
+                TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
+                addLimb = screen.findNiftyControl("add_limb_tab", Tab.class);
+                addBody = screen.findNiftyControl("add_body_tab", Tab.class);
+                tabs.setSelectedTab(addLimb);
+                DropDown shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector", DropDown.class);
+                shapeSelect.removeItem("Cuboid");
+                shapeSelect.removeItem("Ellipsoid");
+                shapeSelect.removeItem("Cylinder");
+                shapeSelect.removeItem("Torus");
+                //shapeSelect.removeItem("Option3");
+                shapeSelect.addItem("Cuboid");
+                shapeSelect.addItem("Ellipsoid");
+                shapeSelect.addItem("Cylinder");
+                shapeSelect.addItem("Torus");
+                //TODO: inform user load was successful
+            } else {
+                //TODO: inform user load was unsuccessful
+            }
         }
-
+        nifty.gotoScreen("start");
     }
 
     public void saveAlien() {
-        //TODO
-        if (app.saveAlien("alien.sav")) {
+        this.saveType = "alien";
+        nifty.gotoScreen("save");
+        
+    }
+    
+    public void confirmSave()
+    {
+        if ("alien".equals(saveType))
+        {
+            if (app.saveAlien(screen.findNiftyControl("saveTextField", TextField.class).getDisplayedText())) {
             //TODO: inform user save was successful
-        } else {
+            } else {
             //TODO: inform user save was unsuccessful
+            }
         }
+        
+        nifty.gotoScreen("start");
+        //TODO limbs
     }
 
     public void editorOptions() {
@@ -263,7 +288,9 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     public void saveLimb() {
-        //TODO
+     
+        this.saveType = "limb";
+        nifty.gotoScreen("save");
     }
     
     public void pulsateToggle() {
