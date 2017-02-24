@@ -192,11 +192,15 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
     }
     
-    public void updateGhostLimb() {
+    public void removeGhostLimb() {
         if (ghostLimb != null) {
             this.physics.getPhysicsSpace().removeAll(ghostLimb);
             ghostLimb.removeFromParent();
         }
+    }
+    
+    public void updateGhostLimb() {
+        removeGhostLimb();
         
         if (getAttaching()) {
             CollisionResult collision = getCursorRaycastCollision();
@@ -736,6 +740,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         //When right mouse button clicked, fire ray to see if intersects with body
         if ("AddLimb".equals(string) && !bln && attaching) {
+            
+            removeGhostLimb();
+            
             CollisionResult collision = getCursorRaycastCollision();
 
 
