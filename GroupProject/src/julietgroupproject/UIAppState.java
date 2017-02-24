@@ -88,7 +88,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private float cameraZoom = 10;
     private boolean smoothCam = false;
     private String currentShape = "Box";
-    private final int SIM_COUNT = 0;
+    private final int SIM_COUNT = 8;
     private List<SlaveSimulator> slaves = new ArrayList<>(SIM_COUNT);
     private Queue<SimulationData> simulationQueue = new ConcurrentLinkedQueue<>();
     private AlienTrainer trainer;
@@ -600,6 +600,17 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         return true;
     }
+    
+    public void endTraining()
+    {
+        this.trainer.terminateTraining(slaves);
+        
+        //slaves are cleaned up by trainer after current requests have been answered
+        
+        this.stopSimulation();
+        
+        editing = true;
+    }
 
     @Override
     public void onAction(String string, boolean bln, float tpf) {
@@ -776,11 +787,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             updateGhostLimb();
             
             // try to poll task from the queue
-            SimulationData s;
-            s = this.simulationQueue.peek();
-            if (s != null) {
-                System.out.println(Thread.currentThread().getId() + ": starting simulation!");
-                startSimulation(s);
+            if (!editing)
+            {
+                SimulationData s;
+                s = this.simulationQueue.peek();
+                if (s != null) {
+                    System.out.println(Thread.currentThread().getId() + ": starting simulation!");
+                    startSimulation(s);
+                }
             }
         }
     }
@@ -791,10 +805,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             sim.terminate();
         }
         if (this.trainer != null) {
-            this.trainer.terminateTraining();
-        }
-        for (SlaveSimulator slave : this.slaves) {
-            slave.kill();
+            this.trainer.terminateTraining(slaves);
         }
     }
 }

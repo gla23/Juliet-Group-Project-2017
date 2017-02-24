@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.List;
 import java.util.Queue;
 
 import org.encog.ml.ea.train.EvolutionaryAlgorithm;
@@ -27,7 +28,9 @@ public class AlienTrainer extends Thread {
     private String filename; //File to save/load population from.
     private int inputCount; //Number of inputs to the NN
     private int outputCount; //Number of outputs from the NN
-    private int popCount = 500; //population size to use
+    private final int popCount = 20; //population size to use
+    private volatile boolean terminating = false;
+    private volatile List<SlaveSimulator> slaves;
 
     private void load() {
         pop = null;
@@ -102,9 +105,6 @@ public class AlienTrainer extends Thread {
     @Override
     public void run() {
 
-        //checks if the user has provided input.
-        BufferedInputStream IO = new BufferedInputStream(System.in);
-
         try {
             do {
                 this.train.iteration(); //perform the next training iteration.#
@@ -112,16 +112,24 @@ public class AlienTrainer extends Thread {
                 //print statistics
                 System.out.println("Error: " + Format.formatDouble(this.train.getError(), 2)); //TODO: Error always returns 1
                 System.out.println("Iterations: " + Format.formatInteger(this.train.getIteration()));
-            } while (this.train.getError() > targetError);
+            } while (!terminating);
         } finally {
             this.train.finishTraining();
         }
 
         //write out current population state to file.
         this.save();
+        
+        if (slaves != null)
+        {
+            for (SlaveSimulator slave : this.slaves) {
+                slave.kill();
+            }
+        }
     }
 
-    public void terminateTraining() {
-        this.train.finishTraining();
+    public void terminateTraining(List<SlaveSimulator> _slaves) {
+        slaves = _slaves;
+        terminating = true;
     }
 }
