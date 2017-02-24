@@ -520,9 +520,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         setupKeys(this.currentAlienNode);
     }
 
-    public boolean saveAlien(String filename) {
+    public boolean saveAlien(String name) {
         if (alien != null) {
-            File f = new File(filename);
+            alien.setName(name);
+            File f = new File("aliens/" + alien.getName() + "/body.sav");
             try (ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(f))) {
                 o.writeObject(alien);
                 return true;
@@ -533,8 +534,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         return false;
     }
 
-    public boolean loadAlien(String filename) {
-        File f = new File(filename);
+    public boolean loadAlien(String name) {
+        File f = new File("aliens/" + name + "/body.sav");
         try (ObjectInputStream o = new ObjectInputStream(new FileInputStream(f))) {
             Alien a = (Alien) o.readObject();
             if (a != null) {
@@ -615,7 +616,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             instantiateAlien(alien, Vector3f.ZERO);
         }
 
-        this.trainer = new AlienTrainer(0.5, "wormTraining2.pop",
+        this.trainer = new AlienTrainer("aliens/" + alien.getName() + "/training.pop",
                 simulationQueue, currentAlienNode.joints.size() + 1,
                 currentAlienNode.joints.size());
 

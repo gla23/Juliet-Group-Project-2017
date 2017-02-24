@@ -1,6 +1,7 @@
 package julietgroupproject;
 
 import java.io.Serializable;
+import java.util.Random;
 
 /**
  * Abstract representation of an Alien.
@@ -11,11 +12,23 @@ import java.io.Serializable;
  */
 public class Alien implements Serializable {
     public Block rootBlock;
-    
+    private String name;
     public int materialCode = 1;
+    private static Random rng;
     
     public Alien(Block rootBlock) {
         this.rootBlock = rootBlock;
+        name = "alien" + Integer.toString(rng.nextInt());
+    }
+    
+    public String getName()
+    {
+        return name;
+    }
+    
+    public void setName(String _name)
+    {
+        name = _name;
     }
     
     public int getCode() {

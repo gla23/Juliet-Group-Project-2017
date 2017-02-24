@@ -24,7 +24,6 @@ public class AlienTrainer extends Thread {
 
     private NEATPopulation pop; //The population being trained
     private EvolutionaryAlgorithm train; //Manages training
-    private double targetError; //If error becomes lower than this, stop.
     private String filename; //File to save/load population from.
     private int inputCount; //Number of inputs to the NN
     private int outputCount; //Number of outputs from the NN
@@ -68,8 +67,7 @@ public class AlienTrainer extends Thread {
         }
     }
 
-    public AlienTrainer(double _targetError, String _filename, Queue<SimulationData> _simTasks, int _inputCount, int _outputCount) {
-        targetError = _targetError;
+    public AlienTrainer(String _filename, Queue<SimulationData> _simTasks, int _inputCount, int _outputCount) {
         filename = _filename;
 
         inputCount = _inputCount;
