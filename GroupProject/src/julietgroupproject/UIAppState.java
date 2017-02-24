@@ -638,6 +638,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 mesh.setChecked(!mesh.isChecked());
             }
         }
+        
         if ("ToggleSmooth".equals(string)) {
             if (!bln) {
                 CheckBox chasecam = nifty.getScreen("editor_options").findNiftyControl("chaseCamCheckBox", CheckBox.class);
