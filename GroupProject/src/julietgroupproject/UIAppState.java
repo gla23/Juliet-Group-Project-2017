@@ -96,6 +96,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private SimulationData currentSim;
     private float simTimeLimit;
     private String currentHingeAxis = "A";
+    private boolean attaching = false;
+    private Geometry ghostLimb;
+    
+    
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
@@ -160,8 +164,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void toggleSmoothness() {
         smoothCam = !smoothCam;
         chaseCam.setSmoothMotion(smoothCam);
-
-
     }
 
     public void toggleWireMesh() {
@@ -172,6 +174,135 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     //Method for easily printing out vectors for debugging
     public void printVector3f(Vector3f vec) {
         System.out.println(vec);
+    }
+    
+    public boolean getAttaching() {
+        return attaching;
+    }
+    
+    public void setAttaching(boolean attaching) {
+        this.attaching = attaching;
+        
+        if (attaching) {
+            
+        } else {
+            
+        }
+    }
+    
+    public void updateGhostLimb() {
+        if (ghostLimb != null) {
+            this.physics.getPhysicsSpace().removeAll(ghostLimb);
+            ghostLimb.removeFromParent();
+        }
+        
+        if (getAttaching()) {
+            CollisionResult collision = getCursorRaycastCollision();
+
+            //If collided then generate new limb at collision point
+            if (collision != null) {
+                Geometry geo = collision.getGeometry();
+                Vector3f colpt = collision.getContactPoint();
+                Vector3f contactPt = colpt.add(geo.getWorldTranslation().negate());
+                Vector3f normal = collision.getContactNormal();
+
+                //Find block assoicated with collision geometry
+                Block block = null;
+
+                LinkedList<Block> q = new LinkedList<>();
+                q.push(alien.rootBlock);
+
+                while (!q.isEmpty()) {
+                    Block head = q.pop();
+                    if (geo == head.getGeometry()) {
+                        block = head;
+                        break;
+                    } else {
+                        for (Block child : head.getConnectedLimbs()) {
+                            q.push(child);
+                        }
+                    }
+                }
+
+                if (block != null) {
+                    //Take the entries from the sliders for limb properties
+                    Slider widthField = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
+                    Slider heightField = nifty.getCurrentScreen().findNiftyControl("limbHeightSlider", Slider.class);
+                    Slider lengthField = nifty.getCurrentScreen().findNiftyControl("limbLengthSlider", Slider.class);
+                    Slider weightField = nifty.getCurrentScreen().findNiftyControl("limbWeightSlider", Slider.class);
+                    Slider frictionField = nifty.getCurrentScreen().findNiftyControl("limbFrictionSlider", Slider.class);
+                    Slider strengthField = nifty.getCurrentScreen().findNiftyControl("limbStrengthSlider", Slider.class);
+                    Slider seperationField = nifty.getCurrentScreen().findNiftyControl("limbSeperationSlider", Slider.class);
+                    CheckBox symmeticBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
+
+
+                    Slider rollSlider = nifty.getCurrentScreen().findNiftyControl("rollSlider", Slider.class);
+                    Slider yawSlider = nifty.getCurrentScreen().findNiftyControl("yawSlider", Slider.class);
+                    Slider pitchSlider = nifty.getCurrentScreen().findNiftyControl("pitchSlider", Slider.class);
+                    Slider jointPosSlider = nifty.getCurrentScreen().findNiftyControl("jointPosSlider", Slider.class);
+                    Slider jointRotSlider = nifty.getCurrentScreen().findNiftyControl("jointRotSlider", Slider.class);
+
+                    float limbWidth;
+                    float limbHeight;
+                    float limbLength;
+                    float weight;
+                    float friction;
+                    float strength;
+                    float limbSeperation;
+                    boolean symmetric;
+                    float roll;
+                    float yaw;
+                    float pitch;
+                    float jointPositionFraction;
+                    float jointStartRotation;
+                    // currentHingeAxis Will be either "X", "Y", "Z" or "A" for auto
+
+                    limbWidth = widthField.getValue();
+                    limbHeight = heightField.getValue();
+                    limbLength = lengthField.getValue();
+                    weight = weightField.getValue();
+                    friction = frictionField.getValue();
+                    strength = strengthField.getValue();
+                    limbSeperation = seperationField.getValue();
+                    symmetric = symmeticBox.isChecked();
+                    roll = rollSlider.getValue();
+                    yaw = yawSlider.getValue();
+                    pitch = pitchSlider.getValue();
+                    jointPositionFraction = jointPosSlider.getValue();
+                    jointStartRotation = jointRotSlider.getValue();
+
+
+                    //Get the current shape from the selector
+                    myMainMenuController.setCurrentLimbShape();
+                    
+
+                    //Find hinge and postion vectors given shape and click position
+                    //TODO fix this so that is gets the actual distance, and also make that distance correct when it is rotated
+                    Vector3f newHingePos = contactPt.add(normal.mult(-0.36f));
+                    Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeperation));
+
+                    String axisToUse = "ZAxis";
+                    if (currentHingeAxis.equals("A")) {
+                        if (Math.abs(normal.x) < Math.abs(normal.z)) {
+                            axisToUse = "XAxis";
+                        }
+                    } else {
+                        axisToUse = currentHingeAxis;
+                    }
+
+                    //Build the new limb
+                    Block limb = new Block(newPos, newHingePos, limbWidth, limbHeight, limbLength, currentShape, axisToUse, weight);
+                    Matrix3f rotation = new Matrix3f();
+                    rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
+
+                    limb.rotation = rotation;
+
+                    ghostLimb = AlienHelper.assembleBlock(limb, newPos.add(AlienHelper.getGeometryLocation(block.getGeometry())));
+                    ghostLimb.setMaterial(alienMaterial1);
+                    rootNode.attachChild(ghostLimb);
+                }
+            }
+        }
     }
 
     public void setChaseCam(AlienNode shape) {
@@ -247,6 +378,22 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             setupKeys(this.currentAlienNode);
         }
 
+    }
+    
+    // Returns closest collision result after casting ray from cursor
+    private CollisionResult getCursorRaycastCollision() {        
+        //Generate the ray from position of click
+        CollisionResults results = new CollisionResults();
+        Vector2f click2d = inputManager.getCursorPosition();
+        Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
+        Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
+
+        // Aim the ray from the clicked spot forwards.
+        Ray ray = new Ray(click3d, dir);
+
+        //Check for collisions with body recursively
+        rootNode.collideWith(ray, results);
+        return results.getClosestCollision();
     }
 
     //To be run when right click on body, adds new limb with dimensions defined in text fields
@@ -491,6 +638,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 mesh.setChecked(!mesh.isChecked());
             }
         }
+        
         if ("ToggleSmooth".equals(string)) {
             if (!bln) {
                 CheckBox chasecam = nifty.getScreen("editor_options").findNiftyControl("chaseCamCheckBox", CheckBox.class);
@@ -511,52 +659,42 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
 
 
-            //When right mouse button clicked, fire ray to see if intersects with body
-            if ("AddLimb".equals(string) && !bln) {
-                //Generate the ray from position of click
-                CollisionResults results = new CollisionResults();
-                Vector2f click2d = inputManager.getCursorPosition();
-                Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
-                Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalizeLocal();
-
-                // Aim the ray from the clicked spot forwards.
-                Ray ray = new Ray(click3d, dir);
-
-                //Check for collisions with body recursively
-                rootNode.collideWith(ray, results);
-                CollisionResult collision = results.getClosestCollision();
+        //When right mouse button clicked, fire ray to see if intersects with body
+        if ("AddLimb".equals(string) && !bln && attaching) {
+            CollisionResult collision = getCursorRaycastCollision();
 
 
-                //If collided then generate new limb at collision point
-                if (results.size() > 0) {
-                    Geometry geo = collision.getGeometry();
-                    Vector3f colpt = collision.getContactPoint();
-                    Vector3f pt = colpt.add(geo.getWorldTranslation().negate());
-                    Vector3f norm = collision.getContactNormal();
+            //If collided then generate new limb at collision point
+            if (collision != null) {
+                Geometry geo = collision.getGeometry();
+                Vector3f colpt = collision.getContactPoint();
+                Vector3f pt = colpt.add(geo.getWorldTranslation().negate());
+                Vector3f norm = collision.getContactNormal();
 
-                    //Find block assoicated with collision geometry
-                    Block block = null;
+                //Find block assoicated with collision geometry
+                Block block = null;
 
-                    LinkedList<Block> q = new LinkedList<>();
-                    q.push(alien.rootBlock);
+                LinkedList<Block> q = new LinkedList<>();
+                q.push(alien.rootBlock);
 
-                    while (!q.isEmpty()) {
-                        Block head = q.pop();
-                        if (geo == head.getGeometry()) {
-                            block = head;
-                            break;
-                        } else {
-                            for (Block child : head.getConnectedLimbs()) {
-                                q.push(child);
-                            }
+                while (!q.isEmpty()) {
+                    Block head = q.pop();
+                    if (geo == head.getGeometry()) {
+                        block = head;
+                        break;
+                    } else {
+                        for (Block child : head.getConnectedLimbs()) {
+                            q.push(child);
                         }
                     }
-
-                    if (block != null) {
-                        addLimb(block, pt, norm);
-                    }
+                }
+                
+                if (block != null) {
+                    setAttaching(false);
+                    addLimb(block, pt, norm);
                 }
             }
+        }
     }
 
     public void setupKeys(AlienNode brain) {
@@ -635,12 +773,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 stopSimulation();
             }
         } else {
+            updateGhostLimb();
+            
             // try to poll task from the queue
-                SimulationData s;
-                s = this.simulationQueue.peek();
-                if (s != null) {
-                    System.out.println(Thread.currentThread().getId() + ": starting simulation!");
-                    startSimulation(s);
+            SimulationData s;
+            s = this.simulationQueue.peek();
+            if (s != null) {
+                System.out.println(Thread.currentThread().getId() + ": starting simulation!");
+                startSimulation(s);
             }
         }
     }
