@@ -382,6 +382,9 @@
                             <control name ="button" label="Load Previous Simualtion" height = "*" width = "*" id = "prev_sim" visibleToMouse="true">
                                 <interact onClick="runPreviousSimulation()"/>
                             </control>
+                            <control name ="button" label="Toggle direction arrow" height = "*" width = "*" id = "toggle_arrow" visibleToMouse="true">
+                                <interact onClick="toggleArrow()"/>
+                            </control>
                             <control name ="button" label="Hide Editor" height = "*" width = "*" id = "hide_editor" visibleToMouse="true">
                                 <interact onClick="hideEditor()"/>
                             </control>

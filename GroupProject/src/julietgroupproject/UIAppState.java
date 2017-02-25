@@ -17,7 +17,6 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
-import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.debug.Arrow;
@@ -72,6 +71,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     
     private Geometry ghostLimb;
     private Material ghostMaterial;
+    
+    private Geometry arrowGeometry;
     
     
     int[] jointKeys = { // Used for automatically giving limbs keys
@@ -350,7 +351,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             instantiateAlien(alien, startLocation);
             setChaseCam(this.currentAlienNode);
             setupKeys(this.currentAlienNode);
-            createArrow();
         }
 
     }
@@ -358,14 +358,22 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private void createArrow() {
         Arrow directionArrow = new Arrow(new Vector3f(7, 0, 0));
         directionArrow.setLineWidth(5);
-        Geometry arrowGeometry = new Geometry("Arrow", directionArrow);
+        arrowGeometry = new Geometry("Arrow", directionArrow);
         Material arrowMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         arrowMaterial.setColor("Color", ColorRGBA.Blue);
         arrowGeometry.setMaterial(arrowMaterial);
         arrowGeometry.setLocalTranslation(0, -3.5f, 0);
-        simRoot.attachChild(arrowGeometry);
     }
-    
+
+    public void toggleArrow() {
+        if (arrowGeometry == null) createArrow();
+        if (simRoot.hasChild(arrowGeometry)) {
+            simRoot.detachChild(arrowGeometry);
+        } else {
+            simRoot.attachChild(arrowGeometry);
+        }
+    }
+
     // Returns closest collision result after casting ray from cursor
     private CollisionResult getCursorRaycastCollision() {        
         //Generate the ray from position of click
@@ -538,7 +546,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 instantiateAlien(alien, startLocation);
                 setChaseCam(this.currentAlienNode);
                 setupKeys(this.currentAlienNode);
-                createArrow();
                 return true;
             }
         } catch (IOException | ClassNotFoundException ex) {

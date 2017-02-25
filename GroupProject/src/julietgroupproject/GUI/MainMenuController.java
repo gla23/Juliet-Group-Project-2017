@@ -52,6 +52,10 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         app.createNewBody();
         addAlienSpecificOptions();
     }
+    
+    public void toggleArrow() {
+        app.toggleArrow();
+    }
 
     public void addAlienSpecificOptions() {
         firstBody = true;
