@@ -350,9 +350,9 @@
                                         </control>
                                     </panel>
                                     <panel id = "space_taker" height = "5%"/>
-                                    <control name ="button" label="Attach Limb" height = "5%" align = "center" width = "80%" id = "attach_limb_button" visibleToMouse="true">
+                                    <!--<control name ="button" label="Attach Limb" height = "5%" align = "center" width = "80%" id = "attach_limb_button" visibleToMouse="true">
                                         <interact onClick="attachLimb()"/>
-                                    </control>
+                                    </control>-->
                                 </panel>
                             </control>
                         </control>

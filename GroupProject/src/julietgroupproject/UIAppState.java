@@ -86,7 +86,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private ChaseCamera chaseCam;
     private float horizontalAngle = 0;
     private float verticalAngle = 0;
-    private float cameraZoom = 10;
+    private float cameraZoom = 25;
     private boolean smoothCam = false;
     private String currentShape = "Box";
     private final int SIM_COUNT = 8;
@@ -97,7 +97,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private SimulationData currentSim;
     private float simTimeLimit;
     private String currentHingeAxis = "A";
-    private boolean attaching = false;
+    
     private Geometry ghostLimb;
     private Material ghostMaterial;
     
@@ -178,19 +178,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         System.out.println(vec);
     }
     
-    public boolean getAttaching() {
-        return attaching;
-    }
     
-    public void setAttaching(boolean attaching) {
-        this.attaching = attaching;
-        
-        if (attaching) {
-            
-        } else {
-            
-        }
-    }
     
     public void removeGhostLimb() {
         if (ghostLimb != null) {
@@ -202,7 +190,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void updateGhostLimb() {
         removeGhostLimb();
         
-        if (getAttaching()) {
+        if (!checkRootNull()) {
             CollisionResult collision = getCursorRaycastCollision();
 
             //If collided then generate new limb at collision point
@@ -279,7 +267,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
 
                     //Get the current shape from the selector
-                    myMainMenuController.setCurrentLimbShape();
+                    //myMainMenuController.setCurrentLimbShape();
                     
 
                     //Find hinge and postion vectors given shape and click position
@@ -409,6 +397,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         rootNode.collideWith(ray, results);
         return results.getClosestCollision();
     }
+    
+    public boolean checkRootNull() {
+        return (currentAlienNode==null);
+    }
 
     //To be run when right click on body, adds new limb with dimensions defined in text fields
     public void addLimb(Block block, Vector3f contactPt, Vector3f normal) {
@@ -470,7 +462,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
 
         //Get the current shape from the selector
-        myMainMenuController.setCurrentLimbShape();
+        //myMainMenuController.setCurrentLimbShape();
         /*
 
         if (currentShape.equals("Box")) {
@@ -745,7 +737,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
 
         //When right mouse button clicked, fire ray to see if intersects with body
-        if ("AddLimb".equals(string) && !bln && attaching) {
+        if ("AddLimb".equals(string) && !bln && !checkRootNull()) {
             
             removeGhostLimb();
             
@@ -778,7 +770,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 }
                 
                 if (block != null) {
-                    setAttaching(false);
                     addLimb(block, pt, norm);
                 }
             }

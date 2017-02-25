@@ -271,14 +271,14 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     public void attachLimb() {
         //TODO     
-        Slider getWidth = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
-        getWidth.setValue(5.0f);
-        CheckBox getAuto = nifty.getCurrentScreen().findNiftyControl("AutoCheckBox", CheckBox.class);
+        /*Slider getWidth = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
+        getWidth.setValue(5.0f);*/
+        /*CheckBox getAuto = nifty.getCurrentScreen().findNiftyControl("AutoCheckBox", CheckBox.class);
 
         boolean checked = !getAuto.isChecked();
 
         app.setAttaching(checked);
-        getAuto.setChecked(checked);
+        getAuto.setChecked(checked);*/
     }
 
     public void setLimbCheckbox() {
@@ -383,13 +383,13 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     public void onXChange(final String id, final RadioButtonGroupStateChangedEvent event) {
         switch (event.getSelectedId()) {
             case "XCheckBox":
-                app.setCurrentHingeAxis("X");
+                app.setCurrentHingeAxis("XAxis");
                 break;
             case "YCheckBox":
-                app.setCurrentHingeAxis("Y");
+                app.setCurrentHingeAxis("YAxis");
                 break;
             case "ZCheckBox":
-                app.setCurrentHingeAxis("Z");
+                app.setCurrentHingeAxis("ZAxis");
                 break;
             case "AutoCheckBox":
                 app.setCurrentHingeAxis("A");
@@ -480,9 +480,9 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         app.toggleWireMesh();
     }
 
-    public void setCurrentLimbShape() {
-        DropDown shapeSelect = nifty.getCurrentScreen().findNiftyControl("shape_selector", DropDown.class);
-        String current = (String) shapeSelect.getSelection();
+    @NiftyEventSubscriber (id = "shape_selector")
+    public void setCurrentLimbShape(final String id, final DropDownSelectionChangedEvent<String> event) {
+        String current = event.getSelection();
         switch (current) {
             case "Cuboid":
                 current = "Box";
