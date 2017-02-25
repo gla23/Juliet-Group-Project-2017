@@ -193,7 +193,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     shapeSelect.addItem("Torus");
                     shapeSelect.selectItemByIndex(0);
                     TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
-
+                    addLimb = nifty.getScreen("start").findNiftyControl("add_limb_tab", Tab.class);
+                    addBody = nifty.getScreen("start").findNiftyControl("add_body_tab", Tab.class);
 
                     if (firstBody) {
                         tabs.setSelectedTab(addLimb);
