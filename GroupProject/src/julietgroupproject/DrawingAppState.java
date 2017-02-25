@@ -56,8 +56,8 @@ public class DrawingAppState extends SimulatorAppState {
     protected Material[] materials;
     
 
-    public DrawingAppState(Alien _alien, double _simSpeed) {
-        super(_alien, _simSpeed);
+    public DrawingAppState(Alien _alien, double _simSpeed, double _accuracy) {
+        super(_alien, _simSpeed, _accuracy);
     }
 
     @Override

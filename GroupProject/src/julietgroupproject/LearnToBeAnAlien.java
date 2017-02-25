@@ -18,6 +18,10 @@ import java.util.logging.Logger;
  * @author GeorgeLenovo
  */
 public class LearnToBeAnAlien extends SimpleApplication {
+    
+    public static final double SIM_SPEED = 1.0f;
+    public static final double SIM_ACCURACY = 1f/3000f;
+    
     public static void main(String[] args) {
         
         //Disable joint warnings
@@ -34,7 +38,7 @@ public class LearnToBeAnAlien extends SimpleApplication {
         setDisplayStatView(false);
         BulletAppState physics = new BulletAppState();
         this.stateManager.attach(physics);
-        UIAppState uiAppState = new UIAppState(null, 1.0);
+        UIAppState uiAppState = new UIAppState(null, SIM_SPEED, SIM_ACCURACY);
         this.stateManager.attach(uiAppState);
     }
 }

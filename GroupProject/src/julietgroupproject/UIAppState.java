@@ -54,6 +54,7 @@ import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.scene.shape.Sphere;
+import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.controls.DropDown;
@@ -90,6 +91,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private boolean smoothCam = false;
     private String currentShape = "Box";
     private final int SIM_COUNT = 8;
+    private static final int SLAVE_FRAMERATE = 300;
     private List<SlaveSimulator> slaves = new ArrayList<>(SIM_COUNT);
     private Queue<SimulationData> simulationQueue = new ConcurrentLinkedQueue<>();
     private AlienTrainer trainer;
@@ -110,8 +112,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         KeyInput.KEY_V, KeyInput.KEY_B,
         KeyInput.KEY_N, KeyInput.KEY_M};
 
-    public UIAppState(Alien _alien, double _simSpeed) {
-        super(_alien, _simSpeed);
+    public UIAppState(Alien _alien, double _simSpeed, double _accuracy) {
+        super(_alien, _simSpeed, _accuracy);
     }
     
     public void setTexture(int textno) {
@@ -658,8 +660,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 currentAlienNode.joints.size());
 
         while (this.slaves.size() < SIM_COUNT) {
-            SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(this.alien, this.simulationQueue, 1.0f));
+            SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(this.alien, this.simulationQueue, 1.0f, this.accuracy, 1f/60f));
             this.slaves.add(toAdd);
+            // speed up by 5 times, 300 = 60 * 5
+            AppSettings set = new AppSettings(false);
+            set.setFrameRate(SLAVE_FRAMERATE);
+            toAdd.setSettings(set);
             toAdd.start(JmeContext.Type.Headless);
         }
 
@@ -817,7 +823,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.simTimeLimit = (float) data.getSimTime();
         this.currentAlienNode = instantiateAlien(this.alien, this.startLocation);
         setChaseCam(currentAlienNode);
-        this.currentAlienNode.addControl(new AlienBrain(data.getToEvaluate()));
+        this.currentAlienNode.addControl(new AlienBrain(data.getToEvaluate(), physics.getPhysicsSpace().getAccuracy(), physics.getSpeed()));
         this.simInProgress = true;
     }
     

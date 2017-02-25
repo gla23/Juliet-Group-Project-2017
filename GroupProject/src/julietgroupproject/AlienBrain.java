@@ -31,27 +31,62 @@ public class AlienBrain extends AbstractControl {
     private static final float MAX_VELOCITY = 2f;
     private static final float MIN_VELOCITY = 0.1f;
     private static final float MAX_POWER = 1f;
-    private int tickCycle = 100;
+    
+    private final boolean isFixedTimestep;
+    public static final double DEFAULT_UPDATE_INTERVAL = 0.5;
+    private double updateInterval = DEFAULT_UPDATE_INTERVAL;
+    private final float timeStep;
+    private final float accuracy;
+    private float speed;
+    private int tickCycle;
     private int tick = 0;
 
-    public int getTickCycle() {
-        return tickCycle;
+    public void setUpdateInterval(double _updateInterval) {
+        this.updateInterval = _updateInterval;
     }
-
-    public void setTickCycle(int _tickCycle) {
-        this.tickCycle = _tickCycle;
+    public double getUpdateInterval() {
+        return this.updateInterval;
     }
 
     /**
      * Construct an AlienBrain for alien controlling.
      *
      * @param _nn the neural network that controls alien
+     * @param _accuracy the PhysicsSpace accuracy, i.e. length of
+     * each physics tick
+     * @param _speed the speed of simulation
      */
-    public AlienBrain(MLRegression _nn) {
+    public AlienBrain(MLRegression _nn, float _accuracy, float _speed, double _updateInterval) {
 
         this.nn = _nn;
+        this.accuracy = _accuracy;
+        this.isFixedTimestep = false;
+        this.speed = _speed;
+        this.timeStep = 0.0f;
+        this.updateInterval = _updateInterval;
+        this.tickCycle = (int) (this.updateInterval / (double)this.accuracy);
+    }
+    
+    public AlienBrain(MLRegression _nn, float _accuracy, float _speed) {
+
+        this(_nn,_accuracy,_speed,DEFAULT_UPDATE_INTERVAL);
+    }
+    
+    public AlienBrain(MLRegression _nn, float _accuracy, float _speed, float _timeStep, double _updateInterval) {
+
+        this.nn = _nn;
+        this.accuracy = _accuracy;
+        this.isFixedTimestep = true;
+        this.speed = _speed;
+        this.timeStep = _timeStep;
+        this.updateInterval = _updateInterval;
     }
 
+    public AlienBrain(MLRegression _nn, float _accuracy, float _speed, float _timeStep) {
+
+        this(_nn,_accuracy,_speed,_timeStep,DEFAULT_UPDATE_INTERVAL);
+    }
+    
     /**
      * Fetch physical information into nnInput.
      */
@@ -95,6 +130,7 @@ public class AlienBrain extends AbstractControl {
                 this.alien = (AlienNode) spatial;
             }
         }
+        this.tick = 0;
     }
 
     /**
@@ -111,10 +147,12 @@ public class AlienBrain extends AbstractControl {
             return;
         };
 
-        tick++;
-
+        if(this.isFixedTimestep) {
+            tpf = this.timeStep;
+        }
+        tick += (tpf * this.speed / this.accuracy);
         if (tick >= this.tickCycle) {
-            tick = 0;
+            tick -= this.tickCycle;
 
             updateInput();
             MLData in = new BasicMLData(this.nnInput);
@@ -127,6 +165,7 @@ public class AlienBrain extends AbstractControl {
                 j.getBodyB().activate();
                 float v = MAX_VELOCITY * (float) (2 * (nnOutput[i] - 0.5));
                 float p = MAX_POWER;
+                System.out.println("applying torque to limb " + i + " with v:" + v + " p:" + p);
                 if (Math.abs(v) < MIN_VELOCITY) {
                     // try to stop moving
                     j.enableMotor(true, 0f, 0f);

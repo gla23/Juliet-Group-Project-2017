@@ -50,9 +50,8 @@ public class SimulatorAppState extends AbstractAppState {
     protected Node simRoot;
     protected Node scene;
     // Physics Timing Fields
-    public static final int DEFAULT_UPDATE_CYCLE = 100;
-    protected int nnUpdateCycle;
     protected double simSpeed;
+    protected double accuracy;
     private float originalSpeed;
     // Flags
     protected volatile boolean toKill;
@@ -61,7 +60,6 @@ public class SimulatorAppState extends AbstractAppState {
     protected final Vector3f startLocation = Vector3f.ZERO;
     protected Geometry floorGeometry;
     public final Vector3f standardG;
-        
 
     /**
      * Constructs a minimal AppState for simulation which provides basic utility
@@ -71,10 +69,9 @@ public class SimulatorAppState extends AbstractAppState {
      * to simulate is specified manually during instantiation
      * @param _simSpeed the simulation speed, 1.0 should be default
      */
-    public SimulatorAppState(Alien _alien, double _simSpeed) {
+    public SimulatorAppState(Alien _alien, double _simSpeed, double _accuracy) {
         this.simSpeed = _simSpeed;
         this.alien = _alien;
-        this.nnUpdateCycle = (int) (DEFAULT_UPDATE_CYCLE / this.simSpeed);
         Vector3f temp = new Vector3f();
         Vector3f.UNIT_Y.mult(-9.81f, temp);
         standardG = temp;
@@ -102,9 +99,8 @@ public class SimulatorAppState extends AbstractAppState {
     }
 
     /**
-     * Calculate fitness for the current simulated alien.
-     * Current implementation returns the x-coordinate of
-     * the main body of alien.
+     * Calculate fitness for the current simulated alien. Current implementation
+     * returns the x-coordinate of the main body of alien.
      *
      * @return the fitness value for current simulation in double
      */
@@ -116,7 +112,7 @@ public class SimulatorAppState extends AbstractAppState {
             if (Double.isNaN(fitness)) {
                 System.err.println(pos);
                 throw new RuntimeException("bad fitness");
-            };
+            }
             return fitness;
         } else {
             throw new UnsupportedOperationException("No simulation running! Cannot compute fitness.");
@@ -128,7 +124,7 @@ public class SimulatorAppState extends AbstractAppState {
      */
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
-        
+
         this.app = (SimpleApplication) app; // can cast Application to something more specific
         this.rootNode = this.app.getRootNode();
         this.assetManager = this.app.getAssetManager();
@@ -139,13 +135,14 @@ public class SimulatorAppState extends AbstractAppState {
         this.physics = this.stateManager.getState(BulletAppState.class);
         this.originalSpeed = this.physics.getSpeed();
         this.physics.setSpeed((float) simSpeed);
+        this.physics.getPhysicsSpace().setAccuracy((float) accuracy);
+        this.physics.getPhysicsSpace().setMaxSubSteps(200);
         this.setToKill(false);
-        
+
         this.reset();
     }
-    
-    protected void resetGravity()
-    {
+
+    protected void resetGravity() {
         this.physics.getPhysicsSpace().setGravity(standardG);
     }
 
@@ -208,17 +205,17 @@ public class SimulatorAppState extends AbstractAppState {
         return simInProgress;
     }
 
+    /**
+     * Remove all geometries created by this AppState and perform appropriate
+     * clean up.
+     */
     @Override
     public void cleanup() {
-        /**
-         * Remove all geometries created by this AppState and perform
-         * appropriate clean up.
-         */
-        super.cleanup();
         this.physics.getPhysicsSpace().removeAll(simRoot);
         this.simRoot.removeFromParent();
         this.currentAlienNode = null;
         this.physics.setSpeed(originalSpeed);
+        super.cleanup();
     }
 
     @Override
