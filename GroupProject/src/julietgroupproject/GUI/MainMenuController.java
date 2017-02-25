@@ -201,8 +201,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     public void runNewSimulation() {
-        app.beginTraining();
-        nifty.gotoScreen("simulation");
+        if (app.beginTraining())
+            nifty.gotoScreen("simulation");
     }
 
     public void gotoLoadScreen() {
@@ -284,7 +284,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     public void saveLimb() {
-     
         this.saveType = "limb";
         nifty.gotoScreen("save");
     }

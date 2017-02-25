@@ -21,7 +21,6 @@ public class SimulationData {
     private double simTime;
     private double fitness;
     private boolean fitnessCalculated;
-    private boolean simTerminated;
     
     
     public SimulationData(MLRegression _toEvaluate, double _simTime)
@@ -40,21 +39,15 @@ public class SimulationData {
      */
     public synchronized double getFitness()
     {
-        while (!fitnessCalculated && !simTerminated)
+        while (!fitnessCalculated)
         {
             try {
                 this.wait();
-                System.out.println("Thread woken");
             } catch (InterruptedException ex) {
                 return Double.MIN_VALUE;
             }
         }
-        if (fitnessCalculated)
-            return fitness;
-        else
-        {
-            return Double.MIN_VALUE;
-        }
+        return fitness;
     }
     
     /**
@@ -66,15 +59,8 @@ public class SimulationData {
      */
     public synchronized void setFitness(double _fitness)
     {
-        System.out.println("Fitness set");
         fitness = _fitness;
         fitnessCalculated = true;
-        this.notifyAll();
-    }
-    
-    public synchronized void terminate()
-    {
-        simTerminated = true;
         this.notifyAll();
     }
     

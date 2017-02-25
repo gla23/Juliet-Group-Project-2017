@@ -118,7 +118,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         System.out.println("Setting texture to " + textno);
         removeAlien(currentAlienNode);
         alien.materialCode = textno;
-        instantiateAlien(alien, new Vector3f(0f, 5f, -10f));
+        instantiateAlien(alien, this.startLocation);
         setChaseCam(this.currentAlienNode);
         setupKeys(this.currentAlienNode);
     }
@@ -147,7 +147,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void restartAlien() {
         if (currentAlienNode != null) {
             removeAlien(currentAlienNode);
-            instantiateAlien(alien, new Vector3f(0f, 5f, -10f));
+            instantiateAlien(alien, startLocation);
             setChaseCam(currentAlienNode);
             setupKeys(currentAlienNode);
         }
@@ -387,7 +387,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             int texturecode = alien != null ? alien.materialCode : 1;
             alien = new Alien(bodyBlock);
             alien.materialCode = texturecode;
-            instantiateAlien(alien, new Vector3f(0f, 5f, -10f));
+            instantiateAlien(alien, startLocation);
             setChaseCam(this.currentAlienNode);
             setupKeys(this.currentAlienNode);
         }
@@ -519,7 +519,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         //Add new limb to alien and instantiate
         block.addLimb(limb);
-        instantiateAlien(alien, new Vector3f(0f, 5f, -10f));
+        instantiateAlien(alien, startLocation);
         setChaseCam(this.currentAlienNode);
         setupKeys(this.currentAlienNode);
     }
@@ -546,7 +546,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             if (a != null) {
                 alien = a;
                 resetAlien();
-                instantiateAlien(alien, new Vector3f(0f, 5f, -10f));
+                instantiateAlien(alien, startLocation);
                 setChaseCam(this.currentAlienNode);
                 setupKeys(this.currentAlienNode);
                 return true;
@@ -676,6 +676,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         //slaves are cleaned up by trainer after current requests have been answered
         
         this.stopSimulation();
+        
+        resetAlien();
+        
+        instantiateAlien(alien, startLocation);
+        setChaseCam(this.currentAlienNode);
+        setupKeys(this.currentAlienNode);
         
         editing = true;
     }
@@ -864,9 +870,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     @Override
     public void cleanup() {
-        for (SimulationData sim : this.simulationQueue) {
-            sim.terminate();
-        }
         if (this.trainer != null) {
             this.trainer.terminateTraining(slaves);
         }
