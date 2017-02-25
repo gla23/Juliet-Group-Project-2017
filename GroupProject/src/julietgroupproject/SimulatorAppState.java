@@ -40,8 +40,8 @@ public class SimulatorAppState extends AbstractAppState {
     protected Node simRoot;
     protected Node scene;
     // Physics Timing Fields
-    protected double simSpeed;
-    protected double accuracy;
+    protected final double simSpeed;
+    protected final double accuracy;
     private float originalSpeed;
     // Flags
     protected volatile boolean toKill;
@@ -61,6 +61,7 @@ public class SimulatorAppState extends AbstractAppState {
      */
     public SimulatorAppState(Alien _alien, double _simSpeed, double _accuracy) {
         this.simSpeed = _simSpeed;
+        this.accuracy = _accuracy;
         this.alien = _alien;
         Vector3f temp = new Vector3f();
         Vector3f.UNIT_Y.mult(-9.81f, temp);

@@ -27,7 +27,7 @@ public class AlienBrain extends AbstractControl {
     private double[] nnInput;
     private static final float MAX_VELOCITY = 2f;
     private static final float MIN_VELOCITY = 0.1f;
-    private static final float MAX_POWER = 1f;
+    private static final float MAX_POWER = 4f;
     
     private final boolean isFixedTimestep;
     public static final double DEFAULT_UPDATE_INTERVAL = 0.5;
@@ -95,7 +95,7 @@ public class AlienBrain extends AbstractControl {
             // rotation, positive and negative values
             // denote clockwise and anticlockwise rotations
             // (PS: I'm not sure about which is which though)
-            double in = ((double) this.alien.joints.get(i).getHingeAngle()) / (1.5 * Math.PI) + 0.5;
+            double in = ((double) this.alien.joints.get(i).getHingeAngle()) / (2.0 * Math.PI) + 0.5;
             if (in < 0.0) {
                 in = 0.0;
             }
@@ -162,7 +162,7 @@ public class AlienBrain extends AbstractControl {
                 j.getBodyB().activate();
                 float v = MAX_VELOCITY * (float) (2 * (nnOutput[i] - 0.5));
                 float p = MAX_POWER;
-                System.out.println("applying torque to limb " + i + " with v:" + v + " p:" + p);
+                //System.out.println("applying torque to limb " + i + " with v:" + v + " p:" + p);
                 if (Math.abs(v) < MIN_VELOCITY) {
                     // try to stop moving
                     j.enableMotor(true, 0f, 0f);

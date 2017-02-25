@@ -124,8 +124,15 @@ public class TestPhysics {
         List<SimulationData> lsd = new ArrayList<>();
         int count = 1;
         List<SlaveSimulator> list = new ArrayList<>();
+        {
+            // foregound simulator
+            SlaveSimulator s = new SlaveSimulator(new TrainingAppState(a, q, 1.0f, 1f/3000f));
+            s.start(JmeContext.Type.Headless);
+            list.add(s);
+        }
         for (int i = 0; i < count; ++i) {
-            SlaveSimulator s = new SlaveSimulator(new TrainingAppState(a, q, 1.0f, 1f/60f, 1f/60f));
+            // background simulators
+            SlaveSimulator s = new SlaveSimulator(new TrainingAppState(a, q, 1.0f, 1f/3000f, 1f/60f));
             /*SlaveSimulator s = new SlaveSimulator(new TrainingAppState(a, q, 1.0){
              @Override
              public void initialize(AppStateManager stateManager, Application app) {
@@ -136,7 +143,7 @@ public class TestPhysics {
              }
              });*/
             AppSettings set = new AppSettings(false);
-            set.setFrameRate(60);
+            set.setFrameRate(600);
             s.setSettings(set);
             s.start(JmeContext.Type.Headless);
             list.add(s);
@@ -166,11 +173,11 @@ public class TestPhysics {
         ((BasicNetwork) nn).addLayer(new BasicLayer(new ActivationSigmoid(), false, jCount));
         ((BasicNetwork) nn).getStructure().finalizeStructure();
 
-        int samplecount = 20;
+        int samplecount = 10;
         final double[] fitness = new double[samplecount];
         for (int i = 0; i < samplecount; i++) {
             //final SimulationData d = new SimulationData(null, 10.0);
-            final SimulationData d = new SimulationData(nn, 5.0);
+            final SimulationData d = new SimulationData(nn, 10.0);
             lsd.add(d);
             q.offer(d);
         }
