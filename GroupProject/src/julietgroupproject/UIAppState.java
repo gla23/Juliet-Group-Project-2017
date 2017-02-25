@@ -20,6 +20,7 @@ import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.debug.Arrow;
 import com.jme3.system.JmeContext;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.CheckBox;
@@ -349,8 +350,20 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             instantiateAlien(alien, startLocation);
             setChaseCam(this.currentAlienNode);
             setupKeys(this.currentAlienNode);
+            createArrow();
         }
 
+    }
+    
+    private void createArrow() {
+        Arrow directionArrow = new Arrow(new Vector3f(7, 0, 0));
+        directionArrow.setLineWidth(5);
+        Geometry arrowGeometry = new Geometry("Arrow", directionArrow);
+        Material arrowMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        arrowMaterial.setColor("Color", ColorRGBA.Blue);
+        arrowGeometry.setMaterial(arrowMaterial);
+        arrowGeometry.setLocalTranslation(0, -3.5f, 0);
+        simRoot.attachChild(arrowGeometry);
     }
     
     // Returns closest collision result after casting ray from cursor
@@ -525,6 +538,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 instantiateAlien(alien, startLocation);
                 setChaseCam(this.currentAlienNode);
                 setupKeys(this.currentAlienNode);
+                createArrow();
                 return true;
             }
         } catch (IOException | ClassNotFoundException ex) {
