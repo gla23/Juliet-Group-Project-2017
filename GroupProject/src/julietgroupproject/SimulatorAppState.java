@@ -12,21 +12,11 @@ import com.jme3.asset.AssetManager;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.input.InputManager;
-import com.jme3.light.AmbientLight;
-import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
-import com.jme3.texture.Texture;
-import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.encog.ml.MLRegression;
 
 /**
  * SimulatorAppState provides basic functionality of a alien simulator without

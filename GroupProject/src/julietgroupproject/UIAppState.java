@@ -1,63 +1,28 @@
 package julietgroupproject;
 
 import com.jme3.app.Application;
-import com.jme3.system.JmeContext;
-import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.asset.AssetManager;
-import com.jme3.bullet.BulletAppState;
-import com.jme3.bullet.PhysicsSpace;
-import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
-import com.jme3.bullet.collision.shapes.BoxCollisionShape;
-import com.jme3.bullet.control.RigidBodyControl;
-import com.jme3.bullet.joints.ConeJoint;
-import com.jme3.bullet.joints.HingeJoint;
-import com.jme3.bullet.joints.PhysicsJoint;
-import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.ChaseCamera;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
-import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
-import com.jme3.light.AmbientLight;
 import com.jme3.material.Material;
-import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Matrix3f;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.ViewPort;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Mesh;
-import com.jme3.scene.Node;
-import com.jme3.scene.shape.Box;
-import com.jme3.scene.shape.Cylinder;
-import com.jme3.scene.shape.Torus;
-import com.jme3.texture.Texture;
-import com.jme3.texture.Texture.WrapMode;
-import com.jme3.ui.Picture;
-import com.jme3.niftygui.NiftyJmeDisplay;
-import de.lessvoid.nifty.Nifty;
-import de.lessvoid.nifty.controls.TextField;
-import java.util.Random;
-import java.util.LinkedList;
-import org.encog.ml.MLRegression;
-import org.encog.ml.data.MLData;
-import org.encog.ml.data.basic.BasicMLData;
-import org.encog.neural.networks.BasicNetwork;
-import org.encog.neural.networks.layers.BasicLayer;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.system.AppSettings;
+import com.jme3.scene.Geometry;
+import com.jme3.system.JmeContext;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.CheckBox;
-import de.lessvoid.nifty.controls.DropDown;
 import de.lessvoid.nifty.controls.Slider;
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,7 +30,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -87,11 +56,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private ChaseCamera chaseCam;
     private float horizontalAngle = 0;
     private float verticalAngle = 0;
-    private float cameraZoom = 10;
+    private float cameraZoom = 25;
     private boolean smoothCam = false;
     private String currentShape = "Box";
     private final int SIM_COUNT = 8;
-    private static final int SLAVE_FRAMERATE = 300;
+    private static final int DEFAULT_FRAMERATE = 60;
     private List<SlaveSimulator> slaves = new ArrayList<>(SIM_COUNT);
     private Queue<SimulationData> simulationQueue = new ConcurrentLinkedQueue<>();
     private AlienTrainer trainer;
@@ -99,7 +68,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private SimulationData currentSim;
     private float simTimeLimit;
     private String currentHingeAxis = "A";
-    private boolean attaching = false;
+    
     private Geometry ghostLimb;
     private Material ghostMaterial;
     
@@ -180,19 +149,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         System.out.println(vec);
     }
     
-    public boolean getAttaching() {
-        return attaching;
-    }
     
-    public void setAttaching(boolean attaching) {
-        this.attaching = attaching;
-        
-        if (attaching) {
-            
-        } else {
-            
-        }
-    }
     
     public void removeGhostLimb() {
         if (ghostLimb != null) {
@@ -204,7 +161,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void updateGhostLimb() {
         removeGhostLimb();
         
-        if (getAttaching()) {
+        if (!checkRootNull()) {
             CollisionResult collision = getCursorRaycastCollision();
 
             //If collided then generate new limb at collision point
@@ -281,7 +238,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
 
                     //Get the current shape from the selector
-                    myMainMenuController.setCurrentLimbShape();
+                    //myMainMenuController.setCurrentLimbShape();
                     
 
                     //Find hinge and postion vectors given shape and click position
@@ -411,7 +368,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         rootNode.collideWith(ray, results);
         return results.getClosestCollision();
     }
-
+    
+    public boolean checkRootNull() {
+        return (currentAlienNode==null);
+    }
+   
     //To be run when right click on body, adds new limb with dimensions defined in text fields
     public void addLimb(Block block, Vector3f contactPt, Vector3f normal) {
         
@@ -472,7 +433,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
 
         //Get the current shape from the selector
-        myMainMenuController.setCurrentLimbShape();
+        //myMainMenuController.setCurrentLimbShape();
         /*
 
         if (currentShape.equals("Box")) {
@@ -533,6 +494,19 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             f.getParentFile().mkdirs();
             try (ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(f))) {
                 o.writeObject(alien);
+                
+                //invalidate the training file, it it exists, in case the number of joints was changed
+                //keep it but renamed to prevent data loss
+                for (File toRename : f.getParentFile().listFiles())
+                {
+                    if (toRename.getPath().contains("training.pop"))
+                    {
+                        DateFormat df = new SimpleDateFormat("yyMMddHHmmss");
+                        Date dateobj = new Date();
+                        File target = new File(toRename.getPath().substring(0,toRename.getPath().length() - 4) + df.format(dateobj) + ".pop");
+                        toRename.renameTo(target);
+                    }
+                }
                 return true;
             } catch (IOException ex) {
                 Logger.getLogger(UIAppState.class.getName()).log(Level.SEVERE, null, ex);
@@ -664,7 +638,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             this.slaves.add(toAdd);
             // speed up by 5 times, 300 = 60 * 5
             AppSettings set = new AppSettings(false);
-            set.setFrameRate(SLAVE_FRAMERATE);
+            set.setFrameRate(5 * DEFAULT_FRAMERATE);
             toAdd.setSettings(set);
             toAdd.start(JmeContext.Type.Headless);
         }
@@ -751,7 +725,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
 
         //When right mouse button clicked, fire ray to see if intersects with body
-        if ("AddLimb".equals(string) && !bln && attaching) {
+        if ("AddLimb".equals(string) && !bln && !checkRootNull()) {
             
             removeGhostLimb();
             
@@ -784,7 +758,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 }
                 
                 if (block != null) {
-                    setAttaching(false);
                     addLimb(block, pt, norm);
                 }
             }

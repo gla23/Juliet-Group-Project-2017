@@ -5,7 +5,6 @@
 package julietgroupproject;
 
 import com.jme3.app.Application;
-import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.debug.BulletDebugAppState;

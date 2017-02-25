@@ -3,22 +3,17 @@ package julietgroupproject.GUI;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.math.Vector3f;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
-import de.lessvoid.nifty.controls.Button;
-import de.lessvoid.nifty.controls.TextField;
-import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.controls.CheckBoxStateChangedEvent;
 import de.lessvoid.nifty.controls.DropDown;
 import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
 import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.controls.RadioButtonGroupStateChangedEvent;
-import de.lessvoid.nifty.controls.Slider;
 import de.lessvoid.nifty.controls.SliderChangedEvent;
 import de.lessvoid.nifty.controls.Tab;
 import de.lessvoid.nifty.controls.TabGroup;
-import de.lessvoid.nifty.controls.Window;
+import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.effects.EffectEventId;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.screen.Screen;
@@ -46,35 +41,59 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         this.app = App;
     }
 
+    @Override
     public void bind(Nifty nifty, Screen screen) {
         this.nifty = nifty;
         this.screen = screen;
     }
 
-
     public void newBody() {
         setCurrentBodyShape();
         app.createNewBody();
+        addAlienSpecificOptions();
+    }
+
+    public void addAlienSpecificOptions() {
         firstBody = true;
-        TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
-        screen = nifty.getCurrentScreen();
-        //TODO: factor out following code into a separate method
-        addLimb = screen.findNiftyControl("add_limb_tab", Tab.class);
-        addBody = screen.findNiftyControl("add_body_tab", Tab.class);
-        tabs.setSelectedTab(addLimb);
-        DropDown shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector", DropDown.class);
-        shapeSelect.removeItem("Cuboid");
-        shapeSelect.removeItem("Ellipsoid");
-        shapeSelect.removeItem("Cylinder");
-        shapeSelect.removeItem("Torus");
-        //shapeSelect.removeItem("Option3");
-        shapeSelect.addItem("Cuboid");
-        shapeSelect.addItem("Ellipsoid");
-        shapeSelect.addItem("Cylinder");
-        shapeSelect.addItem("Torus");
-        //shapeSelect.addItem("Option3");
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    //Shhhhhh..... there's nothing to see here
+                    boolean working = false;
+                    DropDown shapeSelect = null;
+                    TabGroup tabs = null;
+                    while (!working) {
+                        this.sleep(20);
+                        shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector", DropDown.class);
+                        try {
+                            shapeSelect.removeItem("");
+                            tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
+                            addLimb = nifty.getScreen("start").findNiftyControl("add_limb_tab", Tab.class);
+                            addBody = nifty.getScreen("start").findNiftyControl("add_body_tab", Tab.class);
+                            tabs.setSelectedTab(addLimb);
+                            working = true;
+                        } catch (NullPointerException e) {
+                        }
+                    }
 
+                    shapeSelect.removeItem("Cuboid");
+                    shapeSelect.removeItem("Ellipsoid");
+                    shapeSelect.removeItem("Cylinder");
+                    shapeSelect.removeItem("Torus");
+                    shapeSelect.addItem("Cuboid");
+                    shapeSelect.addItem("Ellipsoid");
+                    shapeSelect.addItem("Cylinder");
+                    shapeSelect.addItem("Torus");
+                    shapeSelect.selectItemByIndex(0);
+                    tabs.setSelectedTab(addLimb);
 
+                } catch (InterruptedException e) {
+                }
+
+            }
+        };
+        thread.start();
     }
 
     public void hideEditor() {
@@ -82,62 +101,61 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     }
 
-   public void showEditor(){
+    public void showEditor() {
         nifty.gotoScreen("start");
 
         addValues();
         app.addKeyBindings();
     }
-    
+
     public void stopSimulation() {
         this.app.endTraining();
-        
+
         nifty.gotoScreen("start");
         addValues();
     }
-    
+
     public void addOptionsValues() {
         Thread thread = new Thread() {
+            @Override
             public void run() {
                 try {
                     //Shhhhhh..... there's nothing to see here
                     boolean working = false;
                     DropDown textureBox = null;
-                    while(!working) {
+                    while (!working) {
                         this.sleep(20);
                         textureBox = nifty.getScreen("editor_options").findNiftyControl("textureDropDown", DropDown.class);
                         try {
                             textureBox.removeItem("");
                             working = true;
                         } catch (NullPointerException e) {
-                            
-                        } 
+                        }
                     }
-                    
+
                     initialising = true;
-                    
+
                     textureBox.removeItem("Alien1");
                     textureBox.removeItem("Alien2");
                     textureBox.removeItem("Alien3");
-        
+
                     textureBox.addItem("Alien1");
                     textureBox.addItem("Alien2");
                     textureBox.addItem("Alien3");
-                    
+
                     String tex = "Alien1";
                     int textNo = app.getTextureNo();
-                    if (textNo==0) {
+                    if (textNo == 0) {
                         tex = "Alien1";
-                    } else if(textNo==1) {
+                    } else if (textNo == 1) {
                         tex = "Alien2";
-                    } else if (textNo==2) {
+                    } else if (textNo == 2) {
                         tex = "Alien3";
                     }
                     textureBox.selectItem(tex);
-                    
+
                     initialising = false;
                 } catch (InterruptedException e) {
-                    
                 }
 
             }
@@ -147,48 +165,42 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     public void addValues() {
         Thread thread = new Thread() {
+            @Override
             public void run() {
                 try {
                     //Shhhhhh..... there's nothing to see here
                     boolean working = false;
                     DropDown shapeSelect = null;
-                    while(!working) {
+                    while (!working) {
                         this.sleep(20);
                         shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector_body", DropDown.class);
                         try {
                             shapeSelect.removeItem("");
                             working = true;
                         } catch (NullPointerException e) {
-                            
-                        } 
+                        }
                     }
-                    
+
                     shapeSelect.removeItem("Cuboid");
                     shapeSelect.removeItem("Ellipsoid");
                     shapeSelect.removeItem("Cylinder");
                     shapeSelect.removeItem("Torus");
-                    //shapeSelect.removeItem("Option3");
                     shapeSelect.addItem("Cuboid");
                     shapeSelect.addItem("Ellipsoid");
                     shapeSelect.addItem("Cylinder");
                     shapeSelect.addItem("Torus");
-                    //shapeSelect.addItem("Option3");
                     shapeSelect.selectItemByIndex(0);
                     TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
-                    // tabs.addTab(addBody);
-                    
-                    
-                    if (tabs != null && addLimb != null && addBody != null) //TODO null check required to disable exceptions, but these shouldn't be null!
-                    {
-                        if (firstBody) {
-                            tabs.setSelectedTab(addLimb);
-                        } else {
-                            tabs.setSelectedTab(addBody);
-                        }
+                    addLimb = nifty.getScreen("start").findNiftyControl("add_limb_tab", Tab.class);
+                    addBody = nifty.getScreen("start").findNiftyControl("add_body_tab", Tab.class);
+
+                    if (firstBody) {
+                        tabs.setSelectedTab(addLimb);
+                    } else {
+                        tabs.setSelectedTab(addBody);
                     }
 
                 } catch (InterruptedException e) {
-                    
                 }
 
             }
@@ -210,32 +222,22 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         app.removeKeyBindings();
         nifty.gotoScreen("load_dialog");
     }
-    
+
     public void confirmLoad() {
         app.addKeyBindings();
         if ("alien".equals(loadType)) {
             //TODO
-            if (app.loadAlien(screen.findNiftyControl("loadTextField", TextField.class).getRealText())) {
-                TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
-                addLimb = screen.findNiftyControl("add_limb_tab", Tab.class);
-                addBody = screen.findNiftyControl("add_body_tab", Tab.class);
-                tabs.setSelectedTab(addLimb);
-                DropDown shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector", DropDown.class);
-                shapeSelect.removeItem("Cuboid");
-                shapeSelect.removeItem("Ellipsoid");
-                shapeSelect.removeItem("Cylinder");
-                shapeSelect.removeItem("Torus");
-                //shapeSelect.removeItem("Option3");
-                shapeSelect.addItem("Cuboid");
-                shapeSelect.addItem("Ellipsoid");
-                shapeSelect.addItem("Cylinder");
-                shapeSelect.addItem("Torus");
+            if (app.loadAlien(nifty.getScreen("load_dialog").findNiftyControl("loadTextField", TextField.class).getRealText())) {
+                nifty.gotoScreen("start");
+                screen = nifty.getScreen("start");
+                firstBody = true;
+                addAlienSpecificOptions();
+                addValues();
                 //TODO: inform user load was successful
             } else {
                 //TODO: inform user load was unsuccessful
             }
         }
-        nifty.gotoScreen("start");
     }
 
     public void gotoSaveScreen() {
@@ -243,18 +245,17 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         app.removeKeyBindings();
         nifty.gotoScreen("save_dialog");
     }
-    
+
     public void confirmSave() {
         app.addKeyBindings();
-        if ("alien".equals(saveType))
-        {
+        if ("alien".equals(saveType)) {
             if (app.saveAlien(screen.findNiftyControl("saveTextField", TextField.class).getRealText())) {
-            //TODO: inform user save was successful
+                //TODO: inform user save was successful
             } else {
-            //TODO: inform user save was unsuccessful
+                //TODO: inform user save was unsuccessful
             }
         }
-        
+
         nifty.gotoScreen("start");
         //TODO limbs
     }
@@ -269,47 +270,45 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     public void attachLimb() {
         //TODO     
-        Slider getWidth = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
-        getWidth.setValue(5.0f);
-        CheckBox getAuto = nifty.getCurrentScreen().findNiftyControl("AutoCheckBox", CheckBox.class);
-        
+        /*Slider getWidth = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
+        getWidth.setValue(5.0f);*/
+        /*CheckBox getAuto = nifty.getCurrentScreen().findNiftyControl("AutoCheckBox", CheckBox.class);
+
         boolean checked = !getAuto.isChecked();
-        
+
         app.setAttaching(checked);
-        getAuto.setChecked(checked);
+        getAuto.setChecked(checked);*/
     }
-    
+
     public void setLimbCheckbox() {
-        
     }
 
     public void saveLimb() {
         this.saveType = "limb";
         nifty.gotoScreen("save");
     }
-    
+
     public void pulsateToggle() {
         nifty.getScreen("start").findElementByName("panel_background").startEffect(EffectEventId.onCustom);
     }
 
-    @NiftyEventSubscriber(id="textureDropDown")
+    @NiftyEventSubscriber(id = "textureDropDown")
     public void onDropDownTextureSelectionChanged(final String id, final DropDownSelectionChangedEvent<String> event) {
-        if (!initialising)
-        {
+        if (!initialising) {
             String selectedTex = event.getSelection();
             int textno = 1;
             if (selectedTex.equals("Alien1")) {
-                textno= 0;
+                textno = 0;
             } else if (selectedTex.equals("Alien2")) {
-                textno= 1;
+                textno = 1;
             } else if (selectedTex.equals("Alien3")) {
-                textno=2;
+                textno = 2;
             }
             app.setTexture(textno);
         }
     }
-    
-   @NiftyEventSubscriber(id="shape_selector")
+
+    @NiftyEventSubscriber(id = "shape_selector")
     public void onDropDownLimbSelectionChanged(final String id, final DropDownSelectionChangedEvent<String> event) {
         System.out.println(id);
         Element getWidth = nifty.getCurrentScreen().findElementByName("limbWidthSlider");
@@ -322,144 +321,157 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         Label firstLabel = nifty.getCurrentScreen().findNiftyControl("first_label", Label.class);
         Label secondLabel = nifty.getCurrentScreen().findNiftyControl("second_label", Label.class);
         Label thirdLabel = nifty.getCurrentScreen().findNiftyControl("third_label", Label.class);
-        if (event.getSelection().equals("Cylinder")) {
-            getWidth.show();
-            getHeight.hide();
-            getLength.show();
-            firstLabelE.show();
-            secondLabelE.hide();
-            thirdLabelE.show();
-            firstLabel.setText("Radius:");
-            thirdLabel.setText("Height:");
-        } else if (event.getSelection().equals("Ellipsoid")) {
-            getWidth.show();
-            getHeight.show();
-            getLength.show();
-            firstLabelE.show();
-            secondLabelE.show();
-            thirdLabelE.show();
-            firstLabel.setText("X-Radius:");
-            secondLabel.setText("Y-Radius");
-            thirdLabel.setText("Z-Radius");
-        } else if (event.getSelection().equals("Torus")) {
-            getWidth.show();
-            getHeight.hide();
-            getLength.show();
-            firstLabelE.show();
-            secondLabelE.hide();
-            thirdLabelE.show();
-            firstLabel.setText("Ring Thickness:");
-            thirdLabel.setText("Outer Radius:");
-        } else if (event.getSelection().equals("Cuboid")) {
-            getWidth.show();
-            getHeight.show();
-            getLength.show();
-            firstLabelE.show();
-            secondLabelE.show();
-            thirdLabelE.show();
-            firstLabel.setText("Width:");
-            secondLabel.setText("Height:");
-            thirdLabel.setText("Length:");
+        switch (event.getSelection()) {
+            case "Cylinder":
+                getWidth.show();
+                getHeight.hide();
+                getLength.show();
+                firstLabelE.show();
+                secondLabelE.hide();
+                thirdLabelE.show();
+                firstLabel.setText("Radius:");
+                thirdLabel.setText("Height:");
+                break;
+            case "Ellipsoid":
+                getWidth.show();
+                getHeight.show();
+                getLength.show();
+                firstLabelE.show();
+                secondLabelE.show();
+                thirdLabelE.show();
+                firstLabel.setText("X-Radius:");
+                secondLabel.setText("Y-Radius");
+                thirdLabel.setText("Z-Radius");
+                break;
+            case "Torus":
+                getWidth.show();
+                getHeight.hide();
+                getLength.show();
+                firstLabelE.show();
+                secondLabelE.hide();
+                thirdLabelE.show();
+                firstLabel.setText("Ring Thickness:");
+                thirdLabel.setText("Outer Radius:");
+                break;
+            case "Cuboid":
+                getWidth.show();
+                getHeight.show();
+                getLength.show();
+                firstLabelE.show();
+                secondLabelE.show();
+                thirdLabelE.show();
 
-        }
-
-    }
-   
-   @NiftyEventSubscriber(id="chaseCamCheckBox")
-   public void onChaseCamChange(final String id, final CheckBoxStateChangedEvent event) {
-       app.toggleSmoothness();
-   }
-   
-   public void restartAlien() {
-       app.restartAlien();
-   }
-   
-   
-   @NiftyEventSubscriber(id="hingeAxisButtons")
-   public void onXChange(final String id, final RadioButtonGroupStateChangedEvent  event) {
-       
-       if (event.getSelectedId().equals("XCheckBox")) {
-           app.setCurrentHingeAxis("X");
-       } else if (event.getSelectedId().equals("YCheckBox")) {
-           app.setCurrentHingeAxis("Y");
-       } else if (event.getSelectedId().equals("ZCheckBox")) {
-           app.setCurrentHingeAxis("Z");
-       } else if (event.getSelectedId().equals("AutoCheckBox")) {
-           app.setCurrentHingeAxis("A");
-       }
-       
-   }
-  
-   
-   @NiftyEventSubscriber(id="wireMeshCheckBox")
-   public void onWireMeshChange(final String id, final CheckBoxStateChangedEvent event) {
-       app.toggleWireMesh();
-   }
-   
-   @NiftyEventSubscriber(id="gravitySlider")
-   public void onGravityChange(final String id, final SliderChangedEvent event) {
-       app.setGravity(event.getValue());
-   }
-   
-   @NiftyEventSubscriber(id="shape_selector_body")
-   public void onDropDownBodySelectionChanged(final String id, final DropDownSelectionChangedEvent<String> event) {
-       System.out.println(id);
-       Element getWidth = nifty.getCurrentScreen().findElementByName("bodyWidthSlider");
-       Element getHeight = nifty.getCurrentScreen().findElementByName("bodyHeightSlider");
-       Element getLength = nifty.getCurrentScreen().findElementByName("bodyLengthSlider");
-       Element firstLabelE = nifty.getCurrentScreen().findElementByName("first_body_label");
-       Element secondLabelE = nifty.getCurrentScreen().findElementByName("second_body_label");
-       Element thirdLabelE = nifty.getCurrentScreen().findElementByName("third_body_label");
-       
-       Label firstLabel = nifty.getCurrentScreen().findNiftyControl("first_body_label", Label.class);
-       Label secondLabel = nifty.getCurrentScreen().findNiftyControl("second_body_label", Label.class);
-       Label thirdLabel = nifty.getCurrentScreen().findNiftyControl("third_body_label", Label.class);
-       if (event.getSelection().equals("Cylinder")) {
-
-            getWidth.show();
-            getHeight.hide();
-            getLength.show();
-            firstLabelE.show();
-            secondLabelE.hide();
-            thirdLabelE.show();
-            firstLabel.setText("Radius:");
-            thirdLabel.setText("Height:");
-        } else if (event.getSelection().equals("Ellipsoid")) {
-            getWidth.show();
-            getHeight.show();
-            getLength.show();
-            firstLabelE.show();
-            secondLabelE.show();
-            thirdLabelE.show();
-            firstLabel.setText("X-Radius:");
-            secondLabel.setText("Y-Radius");
-            thirdLabel.setText("Z-Radius");
-        } else if (event.getSelection().equals("Torus")) {
-            getWidth.show();
-            getHeight.hide();
-            getLength.show();
-            firstLabelE.show();
-            secondLabelE.hide();
-            thirdLabelE.show();
-            firstLabel.setText("Ring Thickness:");
-            thirdLabel.setText("Outer Radius:");
-        } else if (event.getSelection().equals("Cuboid")) {
-            getWidth.show();
-            getHeight.show();
-            getLength.show();
-            firstLabelE.show();
-            secondLabelE.show();
-            thirdLabelE.show();
-            firstLabel.setText("Width:");
-            secondLabel.setText("Height:");
-            thirdLabel.setText("Length:");
+                firstLabel.setText("Width:");
+                secondLabel.setText("Height:");
+                thirdLabel.setText("Length:");
+                break;
         }
 
     }
 
+    @NiftyEventSubscriber(id = "chaseCamCheckBox")
+    public void onChaseCamChange(final String id, final CheckBoxStateChangedEvent event) {
+        app.toggleSmoothness();
+    }
+
+    public void restartAlien() {
+        app.restartAlien();
+    }
+
+    @NiftyEventSubscriber(id = "hingeAxisButtons")
+    public void onXChange(final String id, final RadioButtonGroupStateChangedEvent event) {
+        switch (event.getSelectedId()) {
+            case "XCheckBox":
+                app.setCurrentHingeAxis("XAxis");
+                break;
+            case "YCheckBox":
+                app.setCurrentHingeAxis("YAxis");
+                break;
+            case "ZCheckBox":
+                app.setCurrentHingeAxis("ZAxis");
+                break;
+            case "AutoCheckBox":
+                app.setCurrentHingeAxis("A");
+                break;
+        }
+
+    }
+
+    @NiftyEventSubscriber(id = "wireMeshCheckBox")
+    public void onWireMeshChange(final String id, final CheckBoxStateChangedEvent event) {
+        app.toggleWireMesh();
+    }
+
+    @NiftyEventSubscriber(id = "gravitySlider")
+    public void onGravityChange(final String id, final SliderChangedEvent event) {
+        app.setGravity(event.getValue());
+    }
+
+    @NiftyEventSubscriber(id = "shape_selector_body")
+    public void onDropDownBodySelectionChanged(final String id, final DropDownSelectionChangedEvent<String> event) {
+        System.out.println(id);
+        Element getWidth = nifty.getCurrentScreen().findElementByName("bodyWidthSlider");
+        Element getHeight = nifty.getCurrentScreen().findElementByName("bodyHeightSlider");
+        Element getLength = nifty.getCurrentScreen().findElementByName("bodyLengthSlider");
+        Element firstLabelE = nifty.getCurrentScreen().findElementByName("first_body_label");
+        Element secondLabelE = nifty.getCurrentScreen().findElementByName("second_body_label");
+        Element thirdLabelE = nifty.getCurrentScreen().findElementByName("third_body_label");
+
+        Label firstLabel = nifty.getCurrentScreen().findNiftyControl("first_body_label", Label.class);
+        Label secondLabel = nifty.getCurrentScreen().findNiftyControl("second_body_label", Label.class);
+        Label thirdLabel = nifty.getCurrentScreen().findNiftyControl("third_body_label", Label.class);
+        switch (event.getSelection()) {
+            case "Cylinder":
+                getWidth.show();
+                getHeight.hide();
+                getLength.show();
+                firstLabelE.show();
+                secondLabelE.hide();
+                thirdLabelE.show();
+                firstLabel.setText("Radius:");
+                thirdLabel.setText("Height:");
+                break;
+            case "Ellipsoid":
+                getWidth.show();
+                getHeight.show();
+                getLength.show();
+                firstLabelE.show();
+                secondLabelE.show();
+                thirdLabelE.show();
+                firstLabel.setText("X-Radius:");
+                secondLabel.setText("Y-Radius");
+                thirdLabel.setText("Z-Radius");
+                break;
+            case "Torus":
+                getWidth.show();
+                getHeight.hide();
+                getLength.show();
+                firstLabelE.show();
+                secondLabelE.hide();
+                thirdLabelE.show();
+                firstLabel.setText("Ring Thickness:");
+                thirdLabel.setText("Outer Radius:");
+                break;
+            case "Cuboid":
+                getWidth.show();
+                getHeight.show();
+                getLength.show();
+                firstLabelE.show();
+                secondLabelE.show();
+                thirdLabelE.show();
+                firstLabel.setText("Width:");
+                secondLabel.setText("Height:");
+                thirdLabel.setText("Length:");
+                break;
+        }
+
+    }
+
+    @Override
     public void onStartScreen() {
     }
 
+    @Override
     public void onEndScreen() {
     }
 
@@ -467,14 +479,16 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         app.toggleWireMesh();
     }
 
-    public void setCurrentLimbShape() {
-        DropDown shapeSelect = nifty.getCurrentScreen().findNiftyControl("shape_selector", DropDown.class);
-        String current = "Box";
-        current = (String) shapeSelect.getSelection();
-        if (current.equals("Cuboid")) {
-            current = "Box";
-        } else if (current.equals("Ellipsoid")) {
-            current = "Sphere";
+    @NiftyEventSubscriber (id = "shape_selector")
+    public void setCurrentLimbShape(final String id, final DropDownSelectionChangedEvent<String> event) {
+        String current = event.getSelection();
+        switch (current) {
+            case "Cuboid":
+                current = "Box";
+                break;
+            case "Ellipsoid":
+                current = "Sphere";
+                break;
         }
         app.setCurrentShape(current);
 
@@ -482,12 +496,14 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     public void setCurrentBodyShape() {
         DropDown shapeSelect = nifty.getCurrentScreen().findNiftyControl("shape_selector_body", DropDown.class);
-        String current = "Box";
-        current = (String) shapeSelect.getSelection();
-        if (current.equals("Cuboid")) {
-            current = "Box";
-        }else if (current.equals("Ellipsoid")) {
-            current = "Sphere";
+        String current = (String) shapeSelect.getSelection();
+        switch (current) {
+            case "Cuboid":
+                current = "Box";
+                break;
+            case "Ellipsoid":
+                current = "Sphere";
+                break;
         }
         app.setCurrentShape(current);
 
