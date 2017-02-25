@@ -1,11 +1,10 @@
 package julietgroupproject;
 
-import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.math.Matrix3f;
-import java.util.LinkedList;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import java.io.Serializable;
+import java.util.LinkedList;
 
 public class Block implements Serializable {
 

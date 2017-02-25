@@ -5,12 +5,8 @@
 package julietgroupproject;
 
 import com.jme3.app.Application;
-import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.bullet.BulletAppState;
-import com.jme3.scene.Node;
 import java.util.Queue;
-import static julietgroupproject.SimulatorAppState.DEFAULT_UPDATE_CYCLE;
 
 /**
  * An AppState providing useful functionalities for alien training process.

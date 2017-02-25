@@ -6,10 +6,6 @@ package julietgroupproject;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
-import com.jme3.math.Matrix3f;
-import com.jme3.math.Vector3f;
-import com.jme3.system.JmeContext;
-import java.util.Queue;
 
 /**
  * A background simulator dedicated to training process.

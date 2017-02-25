@@ -5,10 +5,8 @@
 package julietgroupproject;
 
 import com.jme3.app.Application;
-import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.audio.AudioRenderer;
-import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.input.FlyByCamera;
 import com.jme3.light.AmbientLight;
@@ -20,13 +18,9 @@ import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
-import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
-import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
 import com.jme3.ui.Picture;
-import java.util.Queue;
-import org.encog.ml.MLRegression;
 
 /**
  * A SimulatorAppState with graphics support.
