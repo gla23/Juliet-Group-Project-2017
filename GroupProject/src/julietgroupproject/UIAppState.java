@@ -64,7 +64,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -523,6 +526,19 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             f.getParentFile().mkdirs();
             try (ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(f))) {
                 o.writeObject(alien);
+                
+                //invalidate the training file, it it exists, in case the number of joints was changed
+                //keep it but renamed to prevent data loss
+                for (File toRename : f.getParentFile().listFiles())
+                {
+                    if (toRename.getPath().contains("training.pop"))
+                    {
+                        DateFormat df = new SimpleDateFormat("yyMMddHHmmss");
+                        Date dateobj = new Date();
+                        File target = new File(toRename.getPath().substring(0,toRename.getPath().length() - 4) + df.format(dateobj) + ".pop");
+                        toRename.renameTo(target);
+                    }
+                }
                 return true;
             } catch (IOException ex) {
                 Logger.getLogger(UIAppState.class.getName()).log(Level.SEVERE, null, ex);
