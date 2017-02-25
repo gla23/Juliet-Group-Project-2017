@@ -212,10 +212,10 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
     
     public void confirmLoad() {
-        app.removeKeyBindings();
+        app.addKeyBindings();
         if ("alien".equals(loadType)) {
             //TODO
-            if (app.loadAlien(screen.findNiftyControl("loadTextField", TextField.class).getDisplayedText())) {
+            if (app.loadAlien(screen.findNiftyControl("loadTextField", TextField.class).getRealText())) {
                 TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
                 addLimb = screen.findNiftyControl("add_limb_tab", Tab.class);
                 addBody = screen.findNiftyControl("add_body_tab", Tab.class);
