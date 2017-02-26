@@ -221,6 +221,12 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             nifty.gotoScreen("simulation");
     }
 
+    private String sanitizeAlienName(String rawName) {
+        String sanitizedAlienName;
+        sanitizedAlienName = rawName.replaceAll("[^A-Za-z0-9 \\-_]", "");
+        return sanitizedAlienName;
+    }
+    
     public void gotoLoadScreen() {
         loadType = "alien";
         app.removeKeyBindings();
@@ -231,7 +237,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         app.addKeyBindings();
         if ("alien".equals(loadType)) {
             //TODO
-            if (app.loadAlien(nifty.getScreen("load_dialog").findNiftyControl("loadTextField", TextField.class).getRealText())) {
+            if (app.loadAlien(sanitizeAlienName(nifty.getScreen("load_dialog").findNiftyControl("loadTextField", TextField.class).getRealText()))) {
                 nifty.gotoScreen("start");
                 screen = nifty.getScreen("start");
                 firstBody = true;
@@ -253,7 +259,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     public void confirmSave() {
         app.addKeyBindings();
         if ("alien".equals(saveType)) {
-            if (app.saveAlien(screen.findNiftyControl("saveTextField", TextField.class).getRealText())) {
+            if (app.saveAlien(sanitizeAlienName(screen.findNiftyControl("saveTextField", TextField.class).getRealText()))) {
                 //TODO: inform user save was successful
             } else {
                 //TODO: inform user save was unsuccessful
