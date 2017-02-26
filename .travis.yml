@@ -1,2 +1,2 @@
 language: java
-script: ant -f GroupProject/build.xml
+script: ant -f GroupProject/build.xml test

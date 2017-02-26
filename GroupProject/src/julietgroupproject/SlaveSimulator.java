@@ -5,6 +5,7 @@
 package julietgroupproject;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.app.StatsAppState;
 import com.jme3.bullet.BulletAppState;
 
 /**
@@ -18,6 +19,7 @@ public class SlaveSimulator extends SimpleApplication {
     private SimulatorAppState simulatorAppState;
 
     public SlaveSimulator(SimulatorAppState state) {
+        super(new StatsAppState());
         simulatorAppState = state;
     }
     
@@ -27,6 +29,7 @@ public class SlaveSimulator extends SimpleApplication {
 
         stateManager.attach(bulletAppState);
         stateManager.attach(simulatorAppState);
+        //stateManager.detach();
     }
     
     /**

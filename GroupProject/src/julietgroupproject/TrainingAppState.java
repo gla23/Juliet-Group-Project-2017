@@ -6,9 +6,6 @@ package julietgroupproject;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.bullet.BulletAppState;
-import com.jme3.bullet.debug.BulletDebugAppState;
-import com.jme3.scene.Node;
 import java.util.Queue;
 
 /**
@@ -141,8 +138,7 @@ public class TrainingAppState extends SimulatorAppState {
         } else {
             // try to poll task from the queue
             if (toKill) {
-                System.out.println(Thread.currentThread().getId() + ": TrainingAppState detaching myself");
-                System.out.println("Detached:" + this.stateManager.detach(this));
+                this.stateManager.detach(this);
             } else {
                 SimulationData s;
                 if (isFirstSimulation) {

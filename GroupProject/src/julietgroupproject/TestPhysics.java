@@ -112,14 +112,14 @@ public class TestPhysics {
         Alien a = loadAlien("aliens/test3/body.sav");
         ConcurrentLinkedQueue<SimulationData> q = new ConcurrentLinkedQueue<>();
         List<SimulationData> lsd = new ArrayList<>();
-        int bgSimulatorCount = 1;
-        int fgSimulatorCount = 1;
-        int samplecount = 20;
+        int bgSimulatorCount = 4;
+        int fgSimulatorCount = 0;
+        int samplecount = 100;
         float accuracy = 1f / 60f;
         float bgSimTimeStep = 1f / 60f;
         final float defaultSpeed = 1.0f;
         final int defaultFramerate = 60;
-        int bgSpeedUpFactor = 2;
+        int bgSpeedUpFactor = 100;
         List<SlaveSimulator> list = new ArrayList<>();
         for (int i = 0; i < fgSimulatorCount; ++i) {
             // foreground simulators
@@ -165,7 +165,7 @@ public class TestPhysics {
             }
         };
         int jCount = countJoint(a);
-        System.out.println("no of joints " + jCount);
+        //System.out.println("no of joints " + jCount);
         ((BasicNetwork) nn).addLayer(new BasicLayer(null, true, jCount + 1));
         ((BasicNetwork) nn).addLayer(new BasicLayer(new ActivationSigmoid(), false, jCount));
         ((BasicNetwork) nn).getStructure().finalizeStructure();
@@ -182,8 +182,9 @@ public class TestPhysics {
             fitness[i] = lsd.get(i).getFitness();
         }
         System.out.println(Arrays.toString(fitness));
+        
         for (SlaveSimulator s : list) {
-            s.stop();
+            s.kill();
         }
     }
 }

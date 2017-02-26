@@ -71,15 +71,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private SimulationData currentSim;
     private float simTimeLimit;
     private String currentHingeAxis = "A";
-    
     private Geometry ghostLimb;
     private Geometry ghostLimb2;
     private Material ghostMaterial;
     private Material ghostMaterial2;
-    
     private Geometry arrowGeometry;
-    
-    
+    private int speedUpFactor = 1000;
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
@@ -91,11 +88,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public UIAppState(Alien _alien, double _simSpeed, double _accuracy) {
         super(_alien, _simSpeed, _accuracy);
     }
-    
+
     public UIAppState(Alien _alien, double _simSpeed, double _accuracy, double _fixedTimeStep) {
         super(_alien, _simSpeed, _accuracy, _fixedTimeStep);
     }
-    
+
     public void setTexture(int textno) {
         System.out.println("Setting texture to " + textno);
         removeAlien(currentAlienNode);
@@ -104,10 +101,22 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         setChaseCam(this.currentAlienNode);
         setupKeys(this.currentAlienNode);
     }
-    
+
     public int getTextureNo() {
         System.out.println(alien.getCode());
         return alien.getCode();
+    }
+
+    public int getSpeedUpFactor() {
+        return this.speedUpFactor;
+    }
+
+    public void setSpeedUpFactor(int _speedUpFactor) {
+        if (_speedUpFactor > 0) {
+            this.speedUpFactor = _speedUpFactor;
+        } else {
+            throw new IllegalArgumentException("speed up factor must be a positive integer.");
+        }
     }
 
     public void removeAlien(AlienNode alienNode) {
@@ -124,7 +133,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void setCurrentHingeAxis(String axis) {
         currentHingeAxis = axis;
     }
-
 
     public void restartAlien() {
         if (currentAlienNode != null) {
@@ -158,7 +166,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void printVector3f(Vector3f vec) {
         System.out.println(vec);
     }
-    
+
     public Geometry addGhostLimb(Block block, Vector3f contactPt, Vector3f normal) {
         //Take the entries from the sliders for limb properties
         Slider widthField = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
@@ -248,24 +256,23 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
 
         rootNode.attachChild(gl);
-        
+
         return gl;
     }
-    
-    
+
     public void removeGhostLimb(Geometry gl) {
         if (gl != null) {
             this.physics.getPhysicsSpace().removeAll(gl);
             gl.removeFromParent();
         }
     }
-    
+
     public void updateGhostLimb() {
         removeGhostLimb(ghostLimb);
         removeGhostLimb(ghostLimb2);
 
         if (alien != null && alien.rootBlock != null) {
-        
+
             CollisionResult collision = getCursorRaycastCollision();
 
             //If collided then generate new limb at collision point
@@ -297,9 +304,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     ghostLimb = addGhostLimb(block, pt, norm);
 
                     CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
-                    boolean symmetric = symmetricBox.isChecked();                 
+                    boolean symmetric = symmetricBox.isChecked();
 
-                    if (symmetric && block.collisionShapeType.equals("Box")) {                        
+                    if (symmetric && block.collisionShapeType.equals("Box")) {
                         ghostLimb2 = addGhostLimb(block, pt.subtract(pt.project(collision.getContactNormal().negate()).mult(2.0f)), norm.negate());
                     }
                 }
@@ -309,7 +316,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public void setChaseCam(AlienNode shape) {
-        
+
         if (chaseCam != null) {
             horizontalAngle = chaseCam.getHorizontalRotation();
             verticalAngle = chaseCam.getVerticalRotation();
@@ -322,7 +329,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
         //toggleSmoothness();
         chaseCam = new ChaseCamera(cam, shape.geometries.get(0), inputManager);
-        
+
         //toggleSmoothness();
         chaseCam.setSmoothMotion(smoothCam);
         if (smoothCam) {
@@ -345,7 +352,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         chaseCam.setZoomSensitivity(10);
         chaseCam.setInvertVerticalAxis(true);
         chaseCam.setMaxDistance(150);
-        
+
     }
 
     public void createNewBody() {
@@ -388,7 +395,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
 
     }
-    
+
     private void createArrow() {
         Arrow directionArrow = new Arrow(new Vector3f(7, 0, 0));
         directionArrow.setLineWidth(5);
@@ -400,7 +407,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public void toggleArrow() {
-        if (arrowGeometry == null) createArrow();
+        if (arrowGeometry == null) {
+            createArrow();
+        }
         if (simRoot.hasChild(arrowGeometry)) {
             simRoot.detachChild(arrowGeometry);
         } else {
@@ -409,7 +418,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     // Returns closest collision result after casting ray from cursor
-    private CollisionResult getCursorRaycastCollision() {        
+    private CollisionResult getCursorRaycastCollision() {
         //Generate the ray from position of click
         CollisionResults results = new CollisionResults();
         Vector2f click2d = inputManager.getCursorPosition();
@@ -423,14 +432,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         rootNode.collideWith(ray, results);
         return results.getClosestCollision();
     }
-    
+
     public boolean checkRootNull() {
-        return (currentAlienNode==null);
+        return (currentAlienNode == null);
     }
-   
+
     //To be run when right click on body, adds new limb with dimensions defined in text fields
     public void addLimb(Block block, Vector3f contactPt, Vector3f normal) {
-        
+
         //Get rid of old alien on screen
         if (this.currentAlienNode != null) {
             removeAlien(this.currentAlienNode);
@@ -447,15 +456,15 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Slider seperationField = nifty.getCurrentScreen().findNiftyControl("limbSeperationSlider", Slider.class);
         CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
 
-        
+
         Slider rollSlider = nifty.getCurrentScreen().findNiftyControl("rollSlider", Slider.class);
         Slider yawSlider = nifty.getCurrentScreen().findNiftyControl("yawSlider", Slider.class);
         Slider pitchSlider = nifty.getCurrentScreen().findNiftyControl("pitchSlider", Slider.class);
         Slider jointPosSlider = nifty.getCurrentScreen().findNiftyControl("jointPosSlider", Slider.class);
         Slider jointRotSlider = nifty.getCurrentScreen().findNiftyControl("jointRotSlider", Slider.class);
-        
-        
-        
+
+
+
 
         float limbWidth;
         float limbHeight;
@@ -491,25 +500,25 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         //myMainMenuController.setCurrentLimbShape();
         /*
 
-        if (currentShape.equals("Box")) {
-            // Rotate the x y z for making boxes rotate to the normal
-            Vector3f whlVec = new Vector3f(limbWidth, limbHeight, limbLength);
-            Matrix3f rotator = new Matrix3f();
-            rotator.fromStartEndVectors(normal, new Vector3f(1, 0, 0));
-            whlVec = rotator.mult(whlVec);
-            limbWidth = Math.abs(whlVec.x);
-            limbHeight = Math.abs(whlVec.y);
-            limbLength = Math.abs(whlVec.z);
+         if (currentShape.equals("Box")) {
+         // Rotate the x y z for making boxes rotate to the normal
+         Vector3f whlVec = new Vector3f(limbWidth, limbHeight, limbLength);
+         Matrix3f rotator = new Matrix3f();
+         rotator.fromStartEndVectors(normal, new Vector3f(1, 0, 0));
+         whlVec = rotator.mult(whlVec);
+         limbWidth = Math.abs(whlVec.x);
+         limbHeight = Math.abs(whlVec.y);
+         limbLength = Math.abs(whlVec.z);
 
-        } else if (currentShape.equals("Sphere")) {
-            //TODO things for attahcing sphere
-        } else if (currentShape.equals("Torus")) {
-            //TODO things for attahcing torus
-        } else if (currentShape.equals("Cylinder")) {
-            //TODO things for attahcing cylinder
-        }
-        */
-        
+         } else if (currentShape.equals("Sphere")) {
+         //TODO things for attahcing sphere
+         } else if (currentShape.equals("Torus")) {
+         //TODO things for attahcing torus
+         } else if (currentShape.equals("Cylinder")) {
+         //TODO things for attahcing cylinder
+         }
+         */
+
 
         //Find hinge and postion vectors given shape and click position
         //TODO fix this so that is gets the actual distance, and also make that distance correct when it is rotated
@@ -537,7 +546,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         //Add new limb to alien and instantiate
         block.addLimb(limb);
-        
+
         instantiateAlien(alien, startLocation);
         setChaseCam(this.currentAlienNode);
         setupKeys(this.currentAlienNode);
@@ -550,16 +559,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             f.getParentFile().mkdirs();
             try (ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(f))) {
                 o.writeObject(alien);
-                
+
                 //invalidate the training file, it it exists, in case the number of joints was changed
                 //keep it but renamed to prevent data loss
-                for (File toRename : f.getParentFile().listFiles())
-                {
-                    if (toRename.getPath().contains("training.pop"))
-                    {
+                for (File toRename : f.getParentFile().listFiles()) {
+                    if (toRename.getPath().contains("training.pop")) {
                         DateFormat df = new SimpleDateFormat("yyMMddHHmmss");
                         Date dateobj = new Date();
-                        File target = new File(toRename.getPath().substring(0,toRename.getPath().length() - 4) + df.format(dateobj) + ".pop");
+                        File target = new File(toRename.getPath().substring(0, toRename.getPath().length() - 4) + df.format(dateobj) + ".pop");
                         toRename.renameTo(target);
                     }
                 }
@@ -616,22 +623,22 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         //flyCam.setDragToRotate(true); //detaches camera from mouse unless you click/drag.a
 
         flyCam.setEnabled(false);
- 
+
         addKeyBindings();
 
-        ghostMaterial = new Material(assetManager, 
-            "Common/MatDefs/Misc/Unshaded.j3md");
+        ghostMaterial = new Material(assetManager,
+                "Common/MatDefs/Misc/Unshaded.j3md");
         //ghostMaterial.setTexture("ColorMap", 
         //    assetManager.loadTexture("Textures/ColoredTex/Monkey.png"));
-        ghostMaterial.setColor("Color", new ColorRGBA(0.32f,0.85f,0.5f, 1f));
-        
+        ghostMaterial.setColor("Color", new ColorRGBA(0.32f, 0.85f, 0.5f, 1f));
+
         //ghostMaterial.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-        
-        ghostMaterial2 = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
-        ghostMaterial2.setColor("Color", new ColorRGBA(0.85f,0.32f,0.32f, 1f));
+
+        ghostMaterial2 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        ghostMaterial2.setColor("Color", new ColorRGBA(0.85f, 0.32f, 0.32f, 1f));
 
     }
- 
+
     public void addKeyBindings() {
         //Add the key binding for the right click to add limb funtionality
         if (!inputManager.hasMapping("AddLimb")) {
@@ -643,19 +650,19 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             inputManager.addListener(this, "ToggleMesh");
         }
         if (!inputManager.hasMapping("ToggleSmooth")) {
-            inputManager.addMapping("ToggleSmooth",new KeyTrigger(KeyInput.KEY_S));
+            inputManager.addMapping("ToggleSmooth", new KeyTrigger(KeyInput.KEY_S));
             inputManager.addListener(this, "ToggleSmooth");
         }
         if (!inputManager.hasMapping("GoToEditor")) {
-            inputManager.addMapping("GoToEditor",new KeyTrigger(KeyInput.KEY_E));
+            inputManager.addMapping("GoToEditor", new KeyTrigger(KeyInput.KEY_E));
             inputManager.addListener(this, "GoToEditor");
         }
         if (!inputManager.hasMapping("Pulsate")) {
-            inputManager.addMapping("Pulsate",new KeyTrigger(KeyInput.KEY_W));
+            inputManager.addMapping("Pulsate", new KeyTrigger(KeyInput.KEY_W));
             inputManager.addListener(this, "Pulsate");
         }
     }
-    
+
     public void removeKeyBindings() {
         if (inputManager.hasMapping("AddLimb")) {
             inputManager.deleteMapping("AddLimb");
@@ -680,10 +687,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
 
         editing = false;
-        
+
         this.physics.setEnabled(false);
         resetGravity();
-        
+
         if (currentAlienNode == null) {
             instantiateAlien(alien, Vector3f.ZERO);
         }
@@ -693,11 +700,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 currentAlienNode.joints.size());
 
         while (this.slaves.size() < SIM_COUNT) {
-            SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(this.alien, this.simulationQueue, 1.0f, this.accuracy, 1f/60f));
+            SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(this.alien, this.simulationQueue, 1.0f, this.accuracy, 1f / 60f));
             this.slaves.add(toAdd);
             // speed up by 5 times, 300 = 60 * 5
             AppSettings set = new AppSettings(false);
-            set.setFrameRate(5 * DEFAULT_FRAMERATE);
+            set.setFrameRate(this.getSpeedUpFactor() * DEFAULT_FRAMERATE);
             toAdd.setSettings(set);
             toAdd.start(JmeContext.Type.Headless);
         }
@@ -707,21 +714,20 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         return true;
     }
-    
-    public void endTraining()
-    {
+
+    public void endTraining() {
         this.trainer.terminateTraining(slaves);
-        
+
         //slaves are cleaned up by trainer after current requests have been answered
-        
+
         this.stopSimulation();
-        
+
         resetAlien();
-        
+
         instantiateAlien(alien, startLocation);
         setChaseCam(this.currentAlienNode);
         setupKeys(this.currentAlienNode);
-        
+
         editing = true;
     }
 
@@ -762,20 +768,20 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 mesh.setChecked(!mesh.isChecked());
             }
         }
-        
+
         if ("ToggleSmooth".equals(string)) {
             if (!bln) {
                 CheckBox chasecam = nifty.getScreen("editor_options").findNiftyControl("chaseCamCheckBox", CheckBox.class);
                 chasecam.setChecked(!chasecam.isChecked());
             }
         }
-        
+
         if ("GoToEditor".equals(string)) {
             if (!bln) {
                 myMainMenuController.editorOptions();
             }
         }
-        
+
         if ("Pulsate".equals(string)) {
             if (!bln) {
                 myMainMenuController.pulsateToggle();
@@ -785,10 +791,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         //When right mouse button clicked, fire ray to see if intersects with body
         if ("AddLimb".equals(string) && !bln && !checkRootNull()) {
-            
+
             removeGhostLimb(ghostLimb);
             removeGhostLimb(ghostLimb2);
-            
+
             CollisionResult collision = getCursorRaycastCollision();
 
 
@@ -816,14 +822,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                         }
                     }
                 }
-                
+
                 if (block != null) {
                     addLimb(block, pt, norm);
-                    
+
                     CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
-                    boolean symmetric = symmetricBox.isChecked();                 
-                    
-                    if (symmetric && block.collisionShapeType.equals("Box")) {                        
+                    boolean symmetric = symmetricBox.isChecked();
+
+                    if (symmetric && block.collisionShapeType.equals("Box")) {
                         addLimb(block, pt.subtract(pt.project(collision.getContactNormal().negate()).mult(2.0f)), norm.negate());
                     }
                 }
@@ -832,13 +838,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public void setupKeys(AlienNode brain) {
-        
+
         // Creates keyboard bindings for the joints with keys in jointKeys, limited by umber of joints or keys specified in jointKeys
         int numberOfJoints = Math.min(brain.joints.size(), jointKeys.length / 2);
         for (int i = 0; i < numberOfJoints; i++) {
-            
-            if (!inputManager.hasMapping("Alien joint " + ((Integer) i).toString() + " clockwise"))
-            {
+
+            if (!inputManager.hasMapping("Alien joint " + ((Integer) i).toString() + " clockwise")) {
                 inputManager.addMapping("Alien joint " + ((Integer) i).toString() + " clockwise", new KeyTrigger(jointKeys[2 * i]));
                 inputManager.addMapping("Alien joint " + ((Integer) i).toString() + " anticlockwise", new KeyTrigger(jointKeys[2 * i + 1]));
                 inputManager.addListener(this, "Alien joint " + ((Integer) i).toString() + " clockwise");
@@ -847,7 +852,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
         currentAlienNode = brain;
     }
-    
+
     /**
      * Start a new simulation. This method should not be called externally by
      * another thread.
@@ -863,7 +868,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.simTimeLimit = (float) data.getSimTime();
         this.currentAlienNode = instantiateAlien(this.alien, this.startLocation);
         setChaseCam(currentAlienNode);
-        MLRegression nn = (MLRegression)ObjectCloner.deepCopy(data.getToEvaluate());
+        MLRegression nn = (MLRegression) ObjectCloner.deepCopy(data.getToEvaluate());
         if (this.isFixedTimeStep) {
             this.currentAlienNode.addControl(new AlienBrain(nn, physics.getPhysicsSpace().getAccuracy(), physics.getSpeed(), this.fixedTimeStep));
         } else {
@@ -871,8 +876,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
         this.simInProgress = true;
     }
-    
-     /**
+
+    /**
      * Stop simulation and set fitness value.
      */
     protected void stopSimulation() {
@@ -887,7 +892,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         // don't need this in front end
         //this.physics.setEnabled(false);
     }
-    
+
     @Override
     public void reset() {
         super.reset();
@@ -895,7 +900,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.simInProgress = false;
         this.simTimeLimit = 0.0f;
     }
-    
+
     @Override
     public void update(float tpf) {
         if (simInProgress) {
@@ -906,10 +911,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             }
         } else {
             updateGhostLimb();
-            
+
             // try to poll task from the queue
-            if (!editing)
-            {
+            if (!editing) {
                 SimulationData s;
                 s = this.simulationQueue.peek();
                 if (s != null) {
