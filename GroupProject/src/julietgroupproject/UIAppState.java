@@ -807,12 +807,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
                     boolean symmetric = symmetricBox.isChecked();                 
                     
-                    if (symmetric && block.collisionShapeType.equals("Box")) {
-                        // find point on opposite side
-
-                        //geo.
-                        
-                        addLimb(block, new Vector3f(), norm.negate());
+                    if (symmetric && block.collisionShapeType.equals("Box")) {                        
+                        addLimb(block, pt.subtract(pt.project(collision.getContactNormal().negate()).mult(2.0f)), norm.negate());
                     }
                 }
             }
