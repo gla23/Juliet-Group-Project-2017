@@ -58,28 +58,18 @@ public class TestPhysics {
 
         public NoBrainSimulatorAppState(Alien _alien, Queue<SimulationData> q, double _simSpeed) {
 
-            super(_alien, q, _simSpeed);
+            super(_alien, q, _simSpeed, 1f / 3000f);
 
         }
 
         @Override
         public void initialize(AppStateManager stateManager, Application app) {
             super.initialize(stateManager, app);
-            stateManager.detach(physics);
+            /*stateManager.detach(physics);
             physics = new BulletAppState() {
                 public void update(float tpf) {
-                    if (debugEnabled && debugAppState == null && pSpace != null) {
-                        debugAppState = new BulletDebugAppState(pSpace);
-                        stateManager.attach(debugAppState);
-                    } else if (!debugEnabled && debugAppState != null) {
-                        stateManager.detach(debugAppState);
-                        debugAppState = null;
-                    }
-                    if (!active) {
-                        return;
-                    }
-                    pSpace.distributeEvents();
-                    this.tpf = 1f/60f;
+                    super.update(tpf);
+                    this.tpf = 1f / 60f;
                 }
             };
             physics.setSpeed((float) this.simSpeed);
@@ -89,18 +79,18 @@ public class TestPhysics {
             pSpace.setAccuracy(1f / 300f);
             pSpace.setMaxSubSteps(200000);
         }
-        /*
-         @Override
-         public void startSimulation(SimulationData data) {
-         // turn physics back on
-         this.physics.setEnabled(true);
-         this.reset();
-         this.currentSim = data;
-         this.simTimeLimit = (float) data.getSimTime();
-         this.currentAlienNode = instantiateAlien(this.alien, this.startLocation);
-         this.currentAlienNode.addControl(new AlienBrain(data.getToEvaluate(), physics.getPhysicsSpace().getAccuracy()));
-         this.simInProgress = true;
-         }
+
+        @Override
+        public void startSimulation(SimulationData data) {
+            // turn physics back on
+            this.physics.setEnabled(true);
+            this.reset();
+            this.currentSim = data;
+            this.simTimeLimit = (float) data.getSimTime();
+            this.currentAlienNode = instantiateAlien(this.alien, this.startLocation);
+            //this.currentAlienNode.addControl(new AlienBrain(data.getToEvaluate(), physics.getPhysicsSpace().getAccuracy()));
+            this.simInProgress = true;
+        }
     }
 */
     public static Alien loadAlien(String filename) {
@@ -122,28 +112,35 @@ public class TestPhysics {
         Alien a = loadAlien("aliens/test3/body.sav");
         ConcurrentLinkedQueue<SimulationData> q = new ConcurrentLinkedQueue<>();
         List<SimulationData> lsd = new ArrayList<>();
-        int count = 1;
+        int bgSimulatorCount = 1;
+        int fgSimulatorCount = 1;
+        int samplecount = 20;
+        float accuracy = 1f / 60f;
+        float bgSimTimeStep = 1f / 60f;
+        final float defaultSpeed = 1.0f;
+        final int defaultFramerate = 60;
+        int bgSpeedUpFactor = 2;
         List<SlaveSimulator> list = new ArrayList<>();
-        {
-            // foregound simulator
-            SlaveSimulator s = new SlaveSimulator(new TrainingAppState(a, q, 1.0f, 1f/3000f));
+        for (int i = 0; i < fgSimulatorCount; ++i) {
+            // foreground simulators
+            SlaveSimulator s = new SlaveSimulator(new TrainingAppState(a, q, defaultSpeed, accuracy));
             s.start(JmeContext.Type.Headless);
             list.add(s);
         }
-        for (int i = 0; i < count; ++i) {
+        for (int i = 0; i < bgSimulatorCount; ++i) {
             // background simulators
-            SlaveSimulator s = new SlaveSimulator(new TrainingAppState(a, q, 1.0f, 1f/3000f, 1f/60f));
-            /*SlaveSimulator s = new SlaveSimulator(new TrainingAppState(a, q, 1.0){
-             @Override
-             public void initialize(AppStateManager stateManager, Application app) {
-             super.initialize(stateManager,app);
-             PhysicsSpace pSpace = this.physics.getPhysicsSpace();
-             pSpace.setAccuracy(1f/600f);
-             pSpace.setMaxSubSteps(2000);
-             }
-             });*/
+            SlaveSimulator s = new SlaveSimulator(new TrainingAppState(a, q, defaultSpeed, accuracy, bgSimTimeStep));
+            /*SlaveSimulator s = new SlaveSimulator(new NoBrainSimulatorAppState(a, q, 1.0) {
+                @Override
+                public void initialize(AppStateManager stateManager, Application app) {
+                    super.initialize(stateManager, app);
+                    PhysicsSpace pSpace = this.physics.getPhysicsSpace();
+                    pSpace.setAccuracy(1f / 600f);
+                    pSpace.setMaxSubSteps(2000);
+                }
+            });*/
             AppSettings set = new AppSettings(false);
-            set.setFrameRate(600);
+            set.setFrameRate(defaultFramerate * bgSpeedUpFactor);
             s.setSettings(set);
             s.start(JmeContext.Type.Headless);
             list.add(s);
@@ -173,7 +170,7 @@ public class TestPhysics {
         ((BasicNetwork) nn).addLayer(new BasicLayer(new ActivationSigmoid(), false, jCount));
         ((BasicNetwork) nn).getStructure().finalizeStructure();
 
-        int samplecount = 10;
+
         final double[] fitness = new double[samplecount];
         for (int i = 0; i < samplecount; i++) {
             //final SimulationData d = new SimulationData(null, 10.0);

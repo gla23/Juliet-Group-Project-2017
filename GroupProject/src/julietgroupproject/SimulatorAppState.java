@@ -43,9 +43,11 @@ public class SimulatorAppState extends AbstractAppState {
     protected final double simSpeed;
     protected final double accuracy;
     private float originalSpeed;
+    protected final float fixedTimeStep;
     // Flags
     protected volatile boolean toKill;
     protected boolean simInProgress;
+    protected boolean isFixedTimeStep;
     // World related
     protected final Vector3f startLocation = Vector3f.ZERO;
     protected Geometry floorGeometry;
@@ -66,6 +68,19 @@ public class SimulatorAppState extends AbstractAppState {
         Vector3f temp = new Vector3f();
         Vector3f.UNIT_Y.mult(-9.81f, temp);
         standardG = temp;
+        this.isFixedTimeStep = false;
+        this.fixedTimeStep = 0.0f;
+    }
+    
+    public SimulatorAppState(Alien _alien, double _simSpeed, double _accuracy, double _fixedTimeStep) {
+        this.simSpeed = _simSpeed;
+        this.accuracy = _accuracy;
+        this.alien = _alien;
+        Vector3f temp = new Vector3f();
+        Vector3f.UNIT_Y.mult(-9.81f, temp);
+        standardG = temp;
+        this.isFixedTimeStep = true;
+        this.fixedTimeStep = (float)_fixedTimeStep;
     }
 
     /**
@@ -125,9 +140,16 @@ public class SimulatorAppState extends AbstractAppState {
         this.viewPort = this.app.getViewPort();
         this.physics = this.stateManager.getState(BulletAppState.class);
         this.originalSpeed = this.physics.getSpeed();
+        
+        if (this.isFixedTimeStep) {
+            this.stateManager.detach(this.physics);
+            physics = new FixedTimeStepBulletAppState(this.fixedTimeStep);
+            this.stateManager.attach(this.physics);
+        }
+        
         this.physics.setSpeed((float) simSpeed);
         this.physics.getPhysicsSpace().setAccuracy((float) accuracy);
-        this.physics.getPhysicsSpace().setMaxSubSteps(200);
+        this.physics.getPhysicsSpace().setMaxSubSteps(4 * (int)((1.0/60.0)/this.accuracy));
         this.setToKill(false);
 
         this.reset();
@@ -202,11 +224,11 @@ public class SimulatorAppState extends AbstractAppState {
      */
     @Override
     public void cleanup() {
+        super.cleanup();
         this.physics.getPhysicsSpace().removeAll(simRoot);
         this.simRoot.removeFromParent();
         this.currentAlienNode = null;
         this.physics.setSpeed(originalSpeed);
-        super.cleanup();
     }
 
     @Override

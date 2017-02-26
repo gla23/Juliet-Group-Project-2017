@@ -19,7 +19,8 @@ import java.util.logging.Logger;
 public class LearnToBeAnAlien extends SimpleApplication {
     
     public static final double SIM_SPEED = 1.0f;
-    public static final double SIM_ACCURACY = 1f/3000f;
+    public static final double SIM_ACCURACY = 1f/60f;
+    public static final double FIXED_TIME_STEP = 1.0/60.0;
     
     public static void main(String[] args) {
         
@@ -37,7 +38,7 @@ public class LearnToBeAnAlien extends SimpleApplication {
         setDisplayStatView(false);
         BulletAppState physics = new BulletAppState();
         this.stateManager.attach(physics);
-        UIAppState uiAppState = new UIAppState(null, SIM_SPEED, SIM_ACCURACY);
+        UIAppState uiAppState = new UIAppState(null, SIM_SPEED, SIM_ACCURACY, FIXED_TIME_STEP);
         this.stateManager.attach(uiAppState);
     }
 }

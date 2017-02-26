@@ -53,6 +53,10 @@ public class DrawingAppState extends SimulatorAppState {
     public DrawingAppState(Alien _alien, double _simSpeed, double _accuracy) {
         super(_alien, _simSpeed, _accuracy);
     }
+    
+    public DrawingAppState(Alien _alien, double _simSpeed, double _accuracy, double _fixedTimeStep) {
+        super(_alien, _simSpeed, _accuracy, _fixedTimeStep);
+    }
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {

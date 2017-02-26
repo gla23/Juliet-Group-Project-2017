@@ -22,8 +22,6 @@ public class TrainingAppState extends SimulatorAppState {
     protected Queue<SimulationData> queue;
     protected SimulationData currentSim;
     protected float simTimeLimit;
-    protected boolean fixedTimeStep;
-    protected final float timeStep;
     // workaround weird bug of first simulation
     protected boolean isFirstSimulation = true;
 
@@ -34,23 +32,28 @@ public class TrainingAppState extends SimulatorAppState {
      *
      * @param _alien The alien to be tested.
      * @param q The SimulationData queue. Must be thread-safe.
-     * @param _simSpeed Simulation speed. Default is 1.0.
+     * @param _simSpeed Simulation speed. Default should be 1.0.
+     * @param _accuracy Simulation accuracy. 
      */
     public TrainingAppState(Alien _alien, Queue<SimulationData> q, double _simSpeed, double _accuracy) {
 
         super(_alien, _simSpeed, _accuracy);
         this.queue = q;
-        this.timeStep = 0.0f;
-        this.fixedTimeStep = false;
+        this.isFixedTimeStep = false;
     }
     
-    
+    /**
+     * 
+     * @param _alien
+     * @param q
+     * @param _simSpeed
+     * @param _accuracy
+     * @param _fixedTimeStep 
+     */
     public TrainingAppState(Alien _alien, Queue<SimulationData> q, double _simSpeed, double _accuracy, double _fixedTimeStep) {
 
-        super(_alien, _simSpeed, _accuracy);
+        super(_alien, _simSpeed, _accuracy, _fixedTimeStep);
         this.queue = q;
-        this.timeStep = (float)_fixedTimeStep;
-        this.fixedTimeStep = true;
     }
 
     /**
@@ -68,8 +71,8 @@ public class TrainingAppState extends SimulatorAppState {
         this.simTimeLimit = (float) data.getSimTime();
         this.currentAlienNode = instantiateAlien(this.alien, this.startLocation);
         AlienBrain brain;
-        if (fixedTimeStep) {
-            brain = new AlienBrain(data.getToEvaluate(), this.physics.getPhysicsSpace().getAccuracy(), this.physics.getSpeed(), this.timeStep);
+        if (isFixedTimeStep) {
+            brain = new AlienBrain(data.getToEvaluate(), this.physics.getPhysicsSpace().getAccuracy(), this.physics.getSpeed(), this.fixedTimeStep);
         } else {
             brain = new AlienBrain(data.getToEvaluate(), this.physics.getPhysicsSpace().getAccuracy(), this.physics.getSpeed());
         }
@@ -98,33 +101,7 @@ public class TrainingAppState extends SimulatorAppState {
      */
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
-        super.initialize(stateManager, app);
-        if (this.fixedTimeStep) {
-            this.stateManager.detach(this.physics);
-            physics = new BulletAppState() {
-                @Override
-                public void update(float tpf) {
-                    if (debugEnabled && debugAppState == null && pSpace != null) {
-                        debugAppState = new BulletDebugAppState(pSpace);
-                        stateManager.attach(debugAppState);
-                    } else if (!debugEnabled && debugAppState != null) {
-                        stateManager.detach(debugAppState);
-                        debugAppState = null;
-                    }
-                    if (!active) {
-                        return;
-                    }
-                    pSpace.distributeEvents();
-                    this.tpf = timeStep;
-                }
-            };
-            this.physics.setSpeed((float)this.simSpeed);
-            this.stateManager.attach(this.physics);
-            this.physics.getPhysicsSpace().setAccuracy((float)this.accuracy);
-            this.physics.getPhysicsSpace().setMaxSubSteps(200);
-        }
-        
-        
+        super.initialize(stateManager, app);        
         this.reset();
         resetGravity();
         // turn physics off to save CPU time
@@ -153,8 +130,8 @@ public class TrainingAppState extends SimulatorAppState {
     @Override
     public void update(float tpf) {
         if (simInProgress) {
-            if (this.fixedTimeStep) {
-                tpf = this.timeStep;
+            if (this.isFixedTimeStep) {
+                tpf = this.fixedTimeStep;
             }
             simTimeLimit -= tpf * physics.getSpeed();
             if (simTimeLimit < 0f) {

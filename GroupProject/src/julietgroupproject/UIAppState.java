@@ -41,6 +41,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import julietgroupproject.GUI.MainMenuController;
+import org.encog.ml.MLRegression;
+import org.encog.util.obj.ObjectCloner;
 
 public class UIAppState extends DrawingAppState implements ActionListener {
 
@@ -85,6 +87,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     public UIAppState(Alien _alien, double _simSpeed, double _accuracy) {
         super(_alien, _simSpeed, _accuracy);
+    }
+    
+    public UIAppState(Alien _alien, double _simSpeed, double _accuracy, double _fixedTimeStep) {
+        super(_alien, _simSpeed, _accuracy, _fixedTimeStep);
     }
     
     public void setTexture(int textno) {
@@ -817,7 +823,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.simTimeLimit = (float) data.getSimTime();
         this.currentAlienNode = instantiateAlien(this.alien, this.startLocation);
         setChaseCam(currentAlienNode);
-        this.currentAlienNode.addControl(new AlienBrain(data.getToEvaluate(), physics.getPhysicsSpace().getAccuracy(), physics.getSpeed()));
+        MLRegression nn = (MLRegression)ObjectCloner.deepCopy(data.getToEvaluate());
+        if (this.isFixedTimeStep) {
+            this.currentAlienNode.addControl(new AlienBrain(nn, physics.getPhysicsSpace().getAccuracy(), physics.getSpeed(), this.fixedTimeStep));
+        } else {
+            this.currentAlienNode.addControl(new AlienBrain(nn, physics.getPhysicsSpace().getAccuracy(), physics.getSpeed()));
+        }
         this.simInProgress = true;
     }
     
@@ -829,11 +840,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.simInProgress = false;
         if (this.currentSim != null) {
             double fitness = this.calcFitness();
-            this.currentSim.setFitness(fitness);
+            //this.currentSim.setFitness(fitness);
             System.out.println("Stopping simulation! " + this.currentSim.toString());
         }
         // turn physics off to save CPU time
-        this.physics.setEnabled(false);
+        // don't need this in front end
+        //this.physics.setEnabled(false);
     }
     
     @Override
@@ -873,5 +885,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (this.trainer != null) {
             this.trainer.terminateTraining(slaves);
         }
+        super.cleanup();
     }
 }
