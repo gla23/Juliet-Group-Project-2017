@@ -2,6 +2,7 @@ package julietgroupproject;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.bullet.control.GhostControl;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.input.ChaseCamera;
@@ -73,6 +74,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     
     private Geometry ghostLimb;
     private Material ghostMaterial;
+    private Material ghostMaterial2;
     
     private Geometry arrowGeometry;
     
@@ -135,7 +137,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void setGravity(float newGrav) {
         physics.getPhysicsSpace().setGravity(new Vector3f(0, -newGrav, 0));
         restartAlien();
-
     }
 
     public void resetAlien() {
@@ -206,7 +207,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     Slider frictionField = nifty.getCurrentScreen().findNiftyControl("limbFrictionSlider", Slider.class);
                     Slider strengthField = nifty.getCurrentScreen().findNiftyControl("limbStrengthSlider", Slider.class);
                     Slider seperationField = nifty.getCurrentScreen().findNiftyControl("limbSeperationSlider", Slider.class);
-                    CheckBox symmeticBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
+                    CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
 
 
                     Slider rollSlider = nifty.getCurrentScreen().findNiftyControl("rollSlider", Slider.class);
@@ -237,7 +238,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     friction = frictionField.getValue();
                     strength = strengthField.getValue();
                     limbSeperation = seperationField.getValue();
-                    symmetric = symmeticBox.isChecked();
+                    symmetric = symmetricBox.isChecked();
                     roll = rollSlider.getValue();
                     yaw = yawSlider.getValue();
                     pitch = pitchSlider.getValue();
@@ -272,8 +273,20 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
                     ghostLimb = AlienHelper.assembleBlock(limb, newPos.add(AlienHelper.getGeometryLocation(block.getGeometry())));
                     
-                    ghostLimb.setMaterial(ghostMaterial);
+                    // check for collision
                     
+                    //GhostControl ghostControl = new GhostControl();
+                    //ghostLimb.addControl(ghostControl);
+                    
+                    //physics.getPhysicsSpace().addAll(ghostLimb);
+                    
+                    if (true) { // (ghostControl.getOverlappingCount() > 0) {
+                        ghostLimb.setMaterial(ghostMaterial);
+                    } else {
+                        ghostLimb.setMaterial(ghostMaterial2);
+                    }
+                    
+                   
                     rootNode.attachChild(ghostLimb);
                 }
             }
@@ -417,7 +430,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Slider frictionField = nifty.getCurrentScreen().findNiftyControl("limbFrictionSlider", Slider.class);
         Slider strengthField = nifty.getCurrentScreen().findNiftyControl("limbStrengthSlider", Slider.class);
         Slider seperationField = nifty.getCurrentScreen().findNiftyControl("limbSeperationSlider", Slider.class);
-        CheckBox symmeticBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
+        CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
 
         
         Slider rollSlider = nifty.getCurrentScreen().findNiftyControl("rollSlider", Slider.class);
@@ -451,7 +464,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         friction = frictionField.getValue();
         strength = strengthField.getValue();
         limbSeperation = seperationField.getValue();
-        symmetric = symmeticBox.isChecked();
+        symmetric = symmetricBox.isChecked();
         roll = rollSlider.getValue();
         yaw = yawSlider.getValue();
         pitch = pitchSlider.getValue();
@@ -509,6 +522,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         //Add new limb to alien and instantiate
         block.addLimb(limb);
+        
         instantiateAlien(alien, startLocation);
         setChaseCam(this.currentAlienNode);
         setupKeys(this.currentAlienNode);
@@ -597,6 +611,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         ghostMaterial.setColor("Color", new ColorRGBA(0.32f,0.85f,0.5f, 1f));
         
         //ghostMaterial.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+        
+        ghostMaterial2 = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
+        ghostMaterial2.setColor("Color", new ColorRGBA(0.85f,0.32f,0.32f, 1f));
 
     }
  
@@ -786,6 +803,17 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 
                 if (block != null) {
                     addLimb(block, pt, norm);
+                    
+                    CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
+                    boolean symmetric = symmetricBox.isChecked();                 
+                    
+                    if (symmetric && block.collisionShapeType.equals("Box")) {
+                        // find point on opposite side
+
+                        //geo.
+                        
+                        addLimb(block, new Vector3f(), norm.negate());
+                    }
                 }
             }
         }
