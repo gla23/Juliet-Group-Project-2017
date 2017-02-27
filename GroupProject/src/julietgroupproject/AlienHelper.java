@@ -68,11 +68,11 @@ public class AlienHelper {
 
         Mesh mesh;
         if (meshShape.equals("Cylinder")) {
-            mesh = new Cylinder(40, 40, width, length, true);
+            mesh = new Cylinder(40, 40, height, 2*width, true);
         } else if (meshShape.equals("Torus")) {
-            mesh = new Torus(40, 40, width, length);
+            mesh = new Torus(40, 40, height, width-height);
         } else if (meshShape.equals("Sphere")) {
-            mesh = new Sphere(40, 40, width);
+            mesh = new Sphere(40, 40, 1f);
         } else {
             mesh = new Box(width, height, length);
         }

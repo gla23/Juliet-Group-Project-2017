@@ -13,7 +13,7 @@ import java.util.Random;
 public class Alien implements Serializable {
     public Block rootBlock;
     private String name;
-    public int materialCode = 1;
+    public int materialCode = 3;
     private static Random rng = new Random();
     
     public Alien(Block rootBlock) {

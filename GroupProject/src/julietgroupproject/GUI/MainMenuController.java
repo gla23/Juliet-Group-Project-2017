@@ -10,14 +10,29 @@ import de.lessvoid.nifty.controls.DropDown;
 import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
 import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.controls.RadioButtonGroupStateChangedEvent;
+
+
 import de.lessvoid.nifty.controls.SliderChangedEvent;
 import de.lessvoid.nifty.controls.Tab;
 import de.lessvoid.nifty.controls.TabGroup;
 import de.lessvoid.nifty.controls.TextField;
+
+import de.lessvoid.nifty.controls.ScrollPanel;
+import de.lessvoid.nifty.controls.Slider;
+import de.lessvoid.nifty.controls.SliderChangedEvent;
+import de.lessvoid.nifty.controls.Tab;
+import de.lessvoid.nifty.controls.TabGroup;
+import de.lessvoid.nifty.controls.button.builder.ButtonBuilder;
+
 import de.lessvoid.nifty.effects.EffectEventId;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
+import java.awt.Panel;
+
+import java.util.ArrayList;
+
+import java.util.Arrays;
 import julietgroupproject.UIAppState;
 
 public class MainMenuController extends AbstractAppState implements ScreenController {
@@ -36,6 +51,11 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     private volatile boolean initialising = false;
     private String saveType = "";
     private String loadType = "";
+
+    private String[] aliens;
+    private String currentlySelectedLoadAlien = "";
+    private ArrayList<String> alreadyAddedAliens = new ArrayList<String>();
+
 
     public MainMenuController(UIAppState App) {
         this.app = App;
@@ -118,6 +138,75 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         nifty.gotoScreen("start");
         addValues();
     }
+    
+    public void addLoadValues(final String[] aliens) {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    //Shhhhhh..... there's nothing to see here
+                    boolean working = false;
+                    DropDown loadScrollE = null;
+                    while (!working) {
+                        this.sleep(20);
+                            loadScrollE = nifty.getCurrentScreen().findNiftyControl("alien_selector", DropDown.class);
+                            
+                        try {
+                            loadScrollE.removeItem("");
+                            working = true;
+                        } catch (NullPointerException e) {
+                        }
+                    }
+
+                    initialising = true;
+                    //loadScrollE.setHeight(200);
+                    System.out.println("Aliens " + Arrays.toString(aliens));
+                    System.out.println("Already Added: "  + alreadyAddedAliens.toString());
+                    for (int i =0; i<aliens.length; i++) {
+                        if (!alreadyAddedAliens.contains(aliens[i])) {
+                            System.out.println(i);
+                            loadScrollE.addItem(aliens[i]);
+                            //addLoadButton(loadScrollE, aliens[i]);
+                            
+                        }
+                        alreadyAddedAliens.add(aliens[i]);
+                    }
+                    
+
+                    initialising = false;
+                } catch (InterruptedException e) {
+                } catch (NullPointerException e2) {
+                    System.out.println("HERE2");
+                }
+
+            }
+        };
+        thread.start();
+    }
+    
+
+    public void addLoadButton(Element scroll, final String alien) {
+        System.out.println(alien);
+        scroll.add(new ButtonBuilder(alien+"LoadBut", alien){{
+
+            //childLayoutCenter();
+            valignTop();
+            paddingTop("0px");
+            paddingBottom("0px");
+            marginTop("0px");
+            marginBottom("0px");
+            width("100%");
+
+            //height("30px");
+            //visibleToMouse(true);
+            interactOnClick("handleControlOnClick(" + alien + ")");
+            }}.build(nifty, nifty.getCurrentScreen(), scroll));
+    }
+    
+    public void handleControlOnClick(String alienID) {
+        confirmLoad(alienID);
+        System.out.println(alienID);
+    }
 
     public void addOptionsValues() {
         Thread thread = new Thread() {
@@ -142,10 +231,12 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     textureBox.removeItem("Alien1");
                     textureBox.removeItem("Alien2");
                     textureBox.removeItem("Alien3");
+                    textureBox.removeItem("Alien4");
 
                     textureBox.addItem("Alien1");
                     textureBox.addItem("Alien2");
                     textureBox.addItem("Alien3");
+                    textureBox.addItem("Alien4");
 
                     String tex = "Alien1";
                     int textNo = app.getTextureNo();
@@ -155,6 +246,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                         tex = "Alien2";
                     } else if (textNo == 2) {
                         tex = "Alien3";
+                    } else if (textNo == 3) {
+                        tex = "Alien4";
                     }
                     textureBox.selectItem(tex);
 
@@ -175,11 +268,16 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     //Shhhhhh..... there's nothing to see here
                     boolean working = false;
                     DropDown shapeSelect = null;
+                    TabGroup tabs = null;
                     while (!working) {
                         this.sleep(20);
                         shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector_body", DropDown.class);
+                        tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
+                        addLimb = nifty.getScreen("start").findNiftyControl("add_limb_tab", Tab.class);
+                        addBody = nifty.getScreen("start").findNiftyControl("add_body_tab", Tab.class);
                         try {
                             shapeSelect.removeItem("");
+                            tabs.getSelectedTabIndex();
                             working = true;
                         } catch (NullPointerException e) {
                         }
@@ -194,9 +292,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     shapeSelect.addItem("Cylinder");
                     shapeSelect.addItem("Torus");
                     shapeSelect.selectItemByIndex(0);
-                    TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
-                    addLimb = nifty.getScreen("start").findNiftyControl("add_limb_tab", Tab.class);
-                    addBody = nifty.getScreen("start").findNiftyControl("add_body_tab", Tab.class);
 
                     if (firstBody) {
                         tabs.setSelectedTab(addLimb);
@@ -212,11 +307,15 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         thread.start();
     }
 
-    public void runPreviousSimulation() {
-        //TODO
+    public void resetTraining() {
+        if (app.resetTraining()) {
+            nifty.gotoScreen("training_reset_success");
+        } else {
+            nifty.gotoScreen("training_reset_fail");
+        }
     }
 
-    public void runNewSimulation() {
+    public void startTraining() {
         if (app.beginTraining())
             nifty.gotoScreen("simulation");
     }
@@ -231,21 +330,59 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         loadType = "alien";
         app.removeKeyBindings();
         nifty.gotoScreen("load_dialog");
+
+       //String[] aliens = app.getLoadableAliens();
+        //aliens = new String[]{"first","second","third"};
+        addLoadValues(aliens);
+        //ScrollPanel loadScroll = nifty.getCurrentScreen().findNiftyControl("loadScrollBar", ScrollPanel.class);
+       /* Element loadScrollE = nifty.getCurrentScreen().findElementByName("loadScrollbar");
+                
+
+        loadScrollE.add(new ButtonBuilder("firstBut", aliens[0]){{
+        childLayoutCenter();
+        visibleToMouse(true);
+        interactOnClick("handleControlOnClick(" + "testAlien" + ")");
+        }}.build(nifty, nifty.getCurrentScreen(), loadScrollE));
+        
+        */
+        
+        
+        System.out.println(Arrays.toString(aliens));
+    }
+    
+    @NiftyEventSubscriber (id = "alien_selector")
+    public void setCurrentLoadAlien(final String id, final DropDownSelectionChangedEvent<String> event) {
+        currentlySelectedLoadAlien = event.getSelection();
     }
 
     public void confirmLoad() {
         app.addKeyBindings();
         if ("alien".equals(loadType)) {
             //TODO
-            if (app.loadAlien(sanitizeAlienName(nifty.getScreen("load_dialog").findNiftyControl("loadTextField", TextField.class).getRealText()))) {
+            if (app.loadAlien(sanitizeAlienName(currentlySelectedLoadAlien))) {
+                nifty.gotoScreen("start");
+                screen = nifty.getScreen("start");
+                firstBody = true;
+                addAlienSpecificOptions();
+                //addValues();
+            } else {
+                nifty.gotoScreen("load_fail");
+            }
+        }
+    }
+    
+    public void confirmLoad(String givenAlien) {
+        app.addKeyBindings();
+        if ("alien".equals(loadType)) {
+            //TODO
+            if (app.loadAlien(sanitizeAlienName(givenAlien))) {
                 nifty.gotoScreen("start");
                 screen = nifty.getScreen("start");
                 firstBody = true;
                 addAlienSpecificOptions();
                 addValues();
-                //TODO: inform user load was successful
             } else {
-                //TODO: inform user load was unsuccessful
+                nifty.gotoScreen("load_fail");
             }
         }
     }
@@ -259,14 +396,20 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     public void confirmSave() {
         app.addKeyBindings();
         if ("alien".equals(saveType)) {
-            if (app.saveAlien(sanitizeAlienName(screen.findNiftyControl("saveTextField", TextField.class).getRealText()))) {
+
+            String name = screen.findNiftyControl("saveTextField", TextField.class).getRealText();
+            if (app.saveAlien(sanitizeAlienName(name))) {
+                ArrayList<String> aliensTemp = new ArrayList<String>(Arrays.asList(aliens));
+                aliensTemp.add(name);
+                
+                aliensTemp.toArray(aliens);
+                nifty.gotoScreen("save_success");
                 //TODO: inform user save was successful
+
             } else {
-                //TODO: inform user save was unsuccessful
+                nifty.gotoScreen("save_fail");
             }
         }
-
-        nifty.gotoScreen("start");
         //TODO limbs
     }
 
@@ -306,13 +449,15 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     public void onDropDownTextureSelectionChanged(final String id, final DropDownSelectionChangedEvent<String> event) {
         if (!initialising) {
             String selectedTex = event.getSelection();
-            int textno = 1;
+            int textno = 3;
             if (selectedTex.equals("Alien1")) {
                 textno = 0;
             } else if (selectedTex.equals("Alien2")) {
                 textno = 1;
             } else if (selectedTex.equals("Alien3")) {
                 textno = 2;
+            } else if (selectedTex.equals("Alien4")) {
+                textno = 3;
             }
             app.setTexture(textno);
         }
@@ -479,6 +624,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     @Override
     public void onStartScreen() {
+        aliens = app.getLoadableAliens();
     }
 
     @Override

@@ -35,6 +35,20 @@ public class Block implements Serializable {
         this.mass = mass;
     }
     
+    // shitty copy - don't use
+    public Block(Block copy) {
+        this.pos = copy.pos;
+        this.hingePos = copy.hingePos;
+        this.width = copy.width;
+        this.height = copy.height;
+        this.length = copy.length;
+        this.collisionShapeType = copy.collisionShapeType;
+        this.hingeType = copy.hingeType;
+        this.mass = copy.mass;
+        this.normal = copy.normal;
+        this.rotation = copy.rotation;
+    }
+    
     public void applyProperties(Geometry g){
         // This function is used when the block is instantiated, used to make the properties of the geometry the same as the block.
         // As we add more properties for the blocks, this functions should be edited to apply them when the block is created
@@ -95,8 +109,6 @@ public class Block implements Serializable {
     public void setWidth(float width) {
         this.width = width;
     }
-    
-
 
     public void setMass(float mass) {
         this.mass = mass;
@@ -135,6 +147,24 @@ public class Block implements Serializable {
         }
         
         return false;
+    }
+    
+    public static Block getParent(Block block, Block ancestor) {
+        
+        LinkedList<Block> children = ancestor.connectedLimbs;
+        
+        if (children.contains(block)) {
+            return ancestor;
+        } else {
+            for (Block child : children) {
+                Block parent = getParent(block, child);
+                if (parent != null) {
+                    return parent;
+                }
+            }
+        }
+        
+        return null;
     }
 
 }
