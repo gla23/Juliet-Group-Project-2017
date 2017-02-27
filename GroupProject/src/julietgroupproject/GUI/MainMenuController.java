@@ -142,10 +142,12 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     textureBox.removeItem("Alien1");
                     textureBox.removeItem("Alien2");
                     textureBox.removeItem("Alien3");
+                    textureBox.removeItem("Alien4");
 
                     textureBox.addItem("Alien1");
                     textureBox.addItem("Alien2");
                     textureBox.addItem("Alien3");
+                    textureBox.addItem("Alien4");
 
                     String tex = "Alien1";
                     int textNo = app.getTextureNo();
@@ -155,6 +157,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                         tex = "Alien2";
                     } else if (textNo == 2) {
                         tex = "Alien3";
+                    } else if (textNo == 3) {
+                        tex = "Alien4";
                     }
                     textureBox.selectItem(tex);
 
@@ -306,13 +310,15 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     public void onDropDownTextureSelectionChanged(final String id, final DropDownSelectionChangedEvent<String> event) {
         if (!initialising) {
             String selectedTex = event.getSelection();
-            int textno = 1;
+            int textno = 3;
             if (selectedTex.equals("Alien1")) {
                 textno = 0;
             } else if (selectedTex.equals("Alien2")) {
                 textno = 1;
             } else if (selectedTex.equals("Alien3")) {
                 textno = 2;
+            } else if (selectedTex.equals("Alien4")) {
+                textno = 3;
             }
             app.setTexture(textno);
         }

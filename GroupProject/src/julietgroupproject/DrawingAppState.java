@@ -38,12 +38,14 @@ public class DrawingAppState extends SimulatorAppState {
     protected Texture alienTexture1;
     protected Texture alienTexture2;
     protected Texture alienTexture3;
+    protected Texture alienTexture4;
     protected Texture grassTexture;
     protected Texture skyTexture;
     //Materials
     protected Material alienMaterial1;
     protected Material alienMaterial2;
     protected Material alienMaterial3;
+    protected Material alienMaterial4;
     protected Material grassMaterial;
     protected Material skyMaterial;
     
@@ -131,12 +133,18 @@ public class DrawingAppState extends SimulatorAppState {
         alienTexture2.setWrap(Texture.WrapMode.Repeat);
         alienMaterial2 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         alienMaterial2.setTexture("ColorMap", alienTexture2);
+        
         alienTexture3 = assetManager.loadTexture("Textures/alien3.jpg");
         alienTexture3.setWrap(Texture.WrapMode.Repeat);
         alienMaterial3 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         alienMaterial3.setTexture("ColorMap", alienTexture3);
         
-        materials = new Material[]{alienMaterial1,alienMaterial2,alienMaterial3};
+        alienTexture4 = assetManager.loadTexture("Textures/alien4.jpg");
+        alienTexture4.setWrap(Texture.WrapMode.Repeat);
+        alienMaterial4 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        alienMaterial4.setTexture("ColorMap", alienTexture4);
+
+        materials = new Material[]{alienMaterial1,alienMaterial2,alienMaterial3,alienMaterial4};
     }
 
     /**
