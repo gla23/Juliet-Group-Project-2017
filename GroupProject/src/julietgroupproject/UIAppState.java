@@ -9,6 +9,7 @@ import com.jme3.input.ChaseCamera;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
@@ -28,6 +29,7 @@ import de.lessvoid.nifty.controls.Slider;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -76,7 +78,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private Material ghostMaterial;
     private Material ghostMaterial2;
     private Geometry arrowGeometry;
-    private int speedUpFactor = 5000;
+    private int speedUpFactor = 1000;
+    private boolean shiftDown = false;
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
@@ -166,6 +169,23 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void printVector3f(Vector3f vec) {
         System.out.println(vec);
     }
+    
+    public Geometry makeGhostLimb(Block block) {
+        
+        Block copy = new Block(block);
+        
+        copy.width += 0.02;
+        copy.length += 0.02;
+        copy.height += 0.02;
+             
+        copy.setPosition(copy.getPosition().add(new Vector3f(-0.01f, -0.01f, -0.01f)));
+              
+        Geometry gl = AlienHelper.assembleBlock(copy, block.getGeometry().getWorldTranslation());
+
+        rootNode.attachChild(gl);
+            
+        return gl;
+    }
 
     public Geometry addGhostLimb(Block block, Vector3f contactPt, Vector3f normal) {
         
@@ -232,25 +252,48 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 }
 
                 if (block != null) {
-                    ghostLimb = addGhostLimb(block, pt, norm);
+                    if (!shiftDown) {
+                        ghostLimb = addGhostLimb(block, pt, norm);
 
-                    CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
-                    boolean symmetric = symmetricBox.isChecked();
+                        CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
+                        boolean symmetric = symmetricBox.isChecked();
 
-                    if (symmetric) {
-                        switch(block.collisionShapeType)
-                        {
-                            case "Box":
-                                ghostLimb2 = addGhostLimb(block, pt.subtract(pt.project(collision.getContactNormal()).mult(2.0f)), norm.negate());
-                                break;
-                            default:
-                                ghostLimb2 = addGhostLimb(block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)),norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)));
-                                break;
-                                
+                        if (symmetric) {
+                            switch(block.collisionShapeType)
+                            {
+                                case "Box":
+                                    ghostLimb2 = addGhostLimb(block, pt.subtract(pt.project(collision.getContactNormal()).mult(2.0f)), norm.negate());
+                                    break;
+                                default:
+                                    ghostLimb2 = addGhostLimb(block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)),norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)));
+                                    break;
+
+                            }
                         }
+                    } else {
+                        ghostLimb = makeGhostLimb(block);
+                        ghostLimb.setMaterial(ghostMaterial2);
                     }
                 }
             }
+        } else {
+            /*
+            Slider widthField = nifty.getCurrentScreen().findNiftyControl("bodyWidthSlider", Slider.class);
+            Slider heightField = nifty.getCurrentScreen().findNiftyControl("bodyHeightSlider", Slider.class);
+            Slider lengthField = nifty.getCurrentScreen().findNiftyControl("bodyLengthSlider", Slider.class);
+
+            float bodyWidth = widthField.getValue();
+            float bodyHeight = heightField.getValue();
+            float bodyLength = lengthField.getValue();
+
+            Vector3f pos = Vector3f.ZERO;
+            Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", 0);
+        
+            Geometry gl = AlienHelper.assembleBlock(bodyBlock, pos);
+
+            gl.setMaterial(ghostMaterial);
+            rootNode.attachChild(gl);
+            */
         }
 
     }
@@ -375,6 +418,17 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     public boolean checkRootNull() {
         return (currentAlienNode == null);
+    }
+    
+    public void removeLimb(Block block) {
+        if (block != null) {
+            if (block == alien.rootBlock) {
+                resetAlien();
+            } else {
+                alien.rootBlock.removeDescendantBlock(block);
+                restartAlien();
+            }
+        }
     }
 
     // Used to get the block that is currently being specified by the options.
@@ -514,6 +568,39 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
         return false;
     }
+    
+
+
+    public boolean resetTraining() {
+        if (alien != null) {
+            String name = alien.getName();
+            // File with old name
+            File file = new File("aliens/" + name + "/training.pop");
+            if (file.exists()) {
+                // File with new name
+                DateFormat df = new SimpleDateFormat("yyMMddHHmmss");
+                File file2 = new File("aliens/" + name + "/training" + df.format(new Date()) + ".pop");
+                // Rename file 
+                return file.renameTo(file2);
+            }
+            return false;
+        }
+        return false;
+    }
+    
+
+
+    public String[] getLoadableAliens() {
+        File file = new File("aliens");
+        String[] directories = file.list(new FilenameFilter() {
+        @Override
+        public boolean accept(File current, String name) {
+        return new File(current, name).isDirectory();
+        }
+        });
+        return directories;
+    }
+
 
     public boolean loadAlien(String name) {
         File f = new File("aliens/" + name + "/body.sav");
@@ -598,6 +685,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             inputManager.addMapping("Pulsate", new KeyTrigger(KeyInput.KEY_W));
             inputManager.addListener(this, "Pulsate");
         }
+        if(!inputManager.hasMapping("Shift")) {
+            inputManager.addMapping("Shift", new KeyTrigger(KeyInput.KEY_LSHIFT));
+            inputManager.addListener(this, "Shift");
+        }
     }
 
     public void removeKeyBindings() {
@@ -615,6 +706,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
         if (inputManager.hasMapping("Pulsate")) {
             inputManager.deleteMapping("Pulsate");
+        }
+        if(!inputManager.hasMapping("Shift")) {
+            inputManager.deleteMapping("Shift");
         }
     }
 
@@ -640,10 +734,17 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(this.alien, this.simulationQueue, 1.0f, this.accuracy, 1f / 60f));
             this.slaves.add(toAdd);
             // speed up by 5 times, 300 = 60 * 5
+            /*
             AppSettings set = new AppSettings(false);
             set.setFrameRate(this.getSpeedUpFactor() * DEFAULT_FRAMERATE);
             toAdd.setSettings(set);
             toAdd.start(JmeContext.Type.Headless);
+            */
+            toAdd.setShowSettings(false);
+            AppSettings sett = new AppSettings(false);
+            sett.setCustomRenderer(FastNullContext.class);
+            toAdd.setSettings(sett);
+            toAdd.start();
         }
 
         this.trainer.start();
@@ -669,7 +770,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         
         setGravity(0.0f);
     }
-
+    
     @Override
     public void onAction(String string, boolean bln, float tpf) {
 
@@ -726,6 +827,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 myMainMenuController.pulsateToggle();
             }
         }
+        
+        if ("Shift".equals(string)) {
+            shiftDown = bln;
+        }
 
 
         //When right mouse button clicked, fire ray to see if intersects with body
@@ -763,26 +868,35 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 }
 
                 if (block != null) {
-                    addLimb(block, pt, norm);
+                    
+                    if (!shiftDown) { // add limb
 
-                    CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
-                    boolean symmetric = symmetricBox.isChecked();
+                        addLimb(block, pt, norm);
 
-                    if (symmetric) {
-                        switch(block.collisionShapeType)
-                        {
-                        case "Box":
-                            addLimb(block, pt.subtract(pt.project(collision.getContactNormal()).mult(2.0f)), norm.negate());
-                            break;
-                        default:
-                            addLimb(block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)),norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)));
-                            break;
+                        CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
+                        boolean symmetric = symmetricBox.isChecked();
+
+                        if (symmetric) {
+                            switch(block.collisionShapeType)
+                            {
+                            case "Box":
+                                addLimb(block, pt.subtract(pt.project(collision.getContactNormal()).mult(2.0f)), norm.negate());
+                                break;
+                            default:
+                                addLimb(block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)),norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)));
+                                break;
+                            }
                         }
+                    } else { // delete limb
+                        
+                        removeLimb(block);
+                        
                     }
                 }
             }
         }
     }
+    
 
     public void setupKeys(AlienNode brain) {
 

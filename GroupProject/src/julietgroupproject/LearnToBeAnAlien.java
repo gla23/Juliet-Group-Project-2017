@@ -7,6 +7,7 @@ package julietgroupproject;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.PhysicsSpace;
+import com.jme3.system.AppSettings;
 import java.util.logging.Logger;
 
 /**
@@ -27,8 +28,10 @@ public class LearnToBeAnAlien extends SimpleApplication {
         //Disable joint warnings
         Logger physicslogger = Logger.getLogger(PhysicsSpace.class.getName());
         physicslogger.setUseParentHandlers(false);
-        
+        // keep the default renderer
         LearnToBeAnAlien app = new LearnToBeAnAlien();
+        AppSettings set = new AppSettings(true);
+        app.setSettings(set);
         app.start();
     }
 

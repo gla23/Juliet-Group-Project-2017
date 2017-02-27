@@ -1,5 +1,6 @@
 package julietgroupproject;
 
+import com.jme3.bullet.PhysicsSpace;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -32,6 +33,20 @@ public class Block implements Serializable {
         this.collisionShapeType = collisionShapeType;
         this.hingeType = hingeType;
         this.mass = mass;
+    }
+    
+    // shitty copy - don't use
+    public Block(Block copy) {
+        this.pos = copy.pos;
+        this.hingePos = copy.hingePos;
+        this.width = copy.width;
+        this.height = copy.height;
+        this.length = copy.length;
+        this.collisionShapeType = copy.collisionShapeType;
+        this.hingeType = copy.hingeType;
+        this.mass = copy.mass;
+        this.normal = copy.normal;
+        this.rotation = copy.rotation;
     }
     
     public void applyProperties(Geometry g){
@@ -94,8 +109,6 @@ public class Block implements Serializable {
     public void setWidth(float width) {
         this.width = width;
     }
-    
-
 
     public void setMass(float mass) {
         this.mass = mass;
@@ -120,4 +133,38 @@ public class Block implements Serializable {
     public void addLimb(Block limb) {
         connectedLimbs.add(limb);
     }
+    
+    public boolean removeDescendantBlock(Block descendant) {
+        
+        if (connectedLimbs.remove(descendant)) {
+            return true;
+        } else {
+            for (Block child : connectedLimbs) {
+                if(child.removeDescendantBlock(descendant)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    public static Block getParent(Block block, Block ancestor) {
+        
+        LinkedList<Block> children = ancestor.connectedLimbs;
+        
+        if (children.contains(block)) {
+            return ancestor;
+        } else {
+            for (Block child : children) {
+                Block parent = getParent(block, child);
+                if (parent != null) {
+                    return parent;
+                }
+            }
+        }
+        
+        return null;
+    }
+
 }

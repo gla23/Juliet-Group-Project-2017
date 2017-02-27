@@ -126,7 +126,7 @@ public class TestPhysics {
         for (int i = 0; i < fastSimulatorCount; ++i) {
             SlaveSimulator sim = new SlaveSimulator(new TrainingAppState(a, q, defaultSpeed, accuracy, bgSimTimeStep));
             sim.setShowSettings(false);
-            AppSettings sett = new AppSettings(true);
+            AppSettings sett = new AppSettings(false);
             sett.setCustomRenderer(FastNullContext.class);
             sim.setSettings(sett);
             sim.start();
