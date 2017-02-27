@@ -1,5 +1,6 @@
 package julietgroupproject;
 
+import com.jme3.bullet.PhysicsSpace;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -120,4 +121,20 @@ public class Block implements Serializable {
     public void addLimb(Block limb) {
         connectedLimbs.add(limb);
     }
+    
+    public boolean removeDescendantBlock(Block descendant) {
+        
+        if (connectedLimbs.remove(descendant)) {
+            return true;
+        } else {
+            for (Block child : connectedLimbs) {
+                if(child.removeDescendantBlock(descendant)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+
 }

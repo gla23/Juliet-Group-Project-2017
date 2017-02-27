@@ -9,6 +9,7 @@ import com.jme3.input.ChaseCamera;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
@@ -76,7 +77,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private Material ghostMaterial;
     private Material ghostMaterial2;
     private Geometry arrowGeometry;
-    private int speedUpFactor = 5000;
+    private int speedUpFactor = 1000;
+    private boolean shiftDown = false;
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
@@ -445,6 +447,17 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public boolean checkRootNull() {
         return (currentAlienNode == null);
     }
+    
+    public void removeLimb(Block block) {
+        if (block != null) {
+            if (block == alien.rootBlock) {
+                resetAlien();
+            } else {
+                alien.rootBlock.removeDescendantBlock(block);
+                restartAlien();
+            }
+        }
+    }
 
     //To be run when right click on body, adds new limb with dimensions defined in text fields
     public void addLimb(Block block, Vector3f contactPt, Vector3f normal) {
@@ -670,6 +683,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             inputManager.addMapping("Pulsate", new KeyTrigger(KeyInput.KEY_W));
             inputManager.addListener(this, "Pulsate");
         }
+        if(!inputManager.hasMapping("Shift")) {
+            inputManager.addMapping("Shift", new KeyTrigger(KeyInput.KEY_LSHIFT));
+            inputManager.addListener(this, "Shift");
+        }
     }
 
     public void removeKeyBindings() {
@@ -687,6 +704,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
         if (inputManager.hasMapping("Pulsate")) {
             inputManager.deleteMapping("Pulsate");
+        }
+        if(!inputManager.hasMapping("Shift")) {
+            inputManager.deleteMapping("Shift");
         }
     }
 
@@ -741,7 +761,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         
         setGravity(0.0f);
     }
-
+    
     @Override
     public void onAction(String string, boolean bln, float tpf) {
 
@@ -798,6 +818,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 myMainMenuController.pulsateToggle();
             }
         }
+        
+        if ("Shift".equals(string)) {
+            shiftDown = bln;
+        }
 
 
         //When right mouse button clicked, fire ray to see if intersects with body
@@ -835,26 +859,35 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 }
 
                 if (block != null) {
-                    addLimb(block, pt, norm);
+                    
+                    if (!shiftDown) { // add limb
 
-                    CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
-                    boolean symmetric = symmetricBox.isChecked();
+                        addLimb(block, pt, norm);
 
-                    if (symmetric) {
-                        switch(block.collisionShapeType)
-                        {
-                        case "Box":
-                            addLimb(block, pt.subtract(pt.project(collision.getContactNormal()).mult(2.0f)), norm.negate());
-                            break;
-                        default:
-                            addLimb(block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)),norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)));
-                            break;
+                        CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
+                        boolean symmetric = symmetricBox.isChecked();
+
+                        if (symmetric) {
+                            switch(block.collisionShapeType)
+                            {
+                            case "Box":
+                                addLimb(block, pt.subtract(pt.project(collision.getContactNormal()).mult(2.0f)), norm.negate());
+                                break;
+                            default:
+                                addLimb(block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)),norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)));
+                                break;
+                            }
                         }
+                    } else { // delete limb
+                        
+                        removeLimb(block);
+                        
                     }
                 }
             }
         }
     }
+    
 
     public void setupKeys(AlienNode brain) {
 
