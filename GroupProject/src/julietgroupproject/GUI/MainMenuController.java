@@ -10,14 +10,25 @@ import de.lessvoid.nifty.controls.DropDown;
 import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
 import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.controls.RadioButtonGroupStateChangedEvent;
+
 import de.lessvoid.nifty.controls.SliderChangedEvent;
 import de.lessvoid.nifty.controls.Tab;
 import de.lessvoid.nifty.controls.TabGroup;
 import de.lessvoid.nifty.controls.TextField;
+
+import de.lessvoid.nifty.controls.ScrollPanel;
+import de.lessvoid.nifty.controls.Slider;
+import de.lessvoid.nifty.controls.SliderChangedEvent;
+import de.lessvoid.nifty.controls.Tab;
+import de.lessvoid.nifty.controls.TabGroup;
+import de.lessvoid.nifty.controls.button.builder.ButtonBuilder;
+
 import de.lessvoid.nifty.effects.EffectEventId;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
+import java.awt.Panel;
+import java.util.Arrays;
 import julietgroupproject.UIAppState;
 
 public class MainMenuController extends AbstractAppState implements ScreenController {
@@ -36,6 +47,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     private volatile boolean initialising = false;
     private String saveType = "";
     private String loadType = "";
+    private int addedAliens = 0;
 
     public MainMenuController(UIAppState App) {
         this.app = App;
@@ -117,6 +129,60 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
         nifty.gotoScreen("start");
         addValues();
+    }
+    
+    public void addLoadValues(final String[] aliens) {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    //Shhhhhh..... there's nothing to see here
+                    boolean working = false;
+                    Element loadScrollE = null;
+                    while (!working) {
+                        this.sleep(20);
+                            loadScrollE = nifty.getCurrentScreen().findElementByName("loadScrollPanel");
+                            
+                        try {
+                            loadScrollE.getClass();
+                            working = true;
+                        } catch (NullPointerException e) {
+                        }
+                    }
+
+                    initialising = true;
+                    //loadScrollE.setHeight(200);
+                    for (int i =addedAliens; i<aliens.length; i++) {
+                        addLoadButton(loadScrollE, aliens[i]);
+                    }
+                    
+
+                    initialising = false;
+                } catch (InterruptedException e) {
+                } catch (NullPointerException e2) {
+                    System.out.println("HERE2");
+                }
+
+            }
+        };
+        thread.start();
+    }
+    
+    public void addLoadButton(Element scroll, String alien) {
+        System.out.println(alien);
+        scroll.add(new ButtonBuilder("loadBut", alien){{
+            //childLayoutCenter();
+            valignTop();
+            paddingTop("0px");
+            paddingBottom("0px");
+            marginTop("0px");
+            marginBottom("0px");
+            width("100%");
+            height("30px");
+            //visibleToMouse(true);
+            //interactOnClick("handleControlOnClick(" + "testAlien" + ")");
+            }}.build(nifty, nifty.getCurrentScreen(), scroll));
+        addedAliens++;
     }
 
     public void addOptionsValues() {
@@ -239,6 +305,23 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         loadType = "alien";
         app.removeKeyBindings();
         nifty.gotoScreen("load_dialog");
+        String[] aliens = app.getLoadableAliens();
+        
+        addLoadValues(aliens);
+        //ScrollPanel loadScroll = nifty.getCurrentScreen().findNiftyControl("loadScrollBar", ScrollPanel.class);
+       /* Element loadScrollE = nifty.getCurrentScreen().findElementByName("loadScrollbar");
+                
+
+        loadScrollE.add(new ButtonBuilder("firstBut", aliens[0]){{
+        childLayoutCenter();
+        visibleToMouse(true);
+        interactOnClick("handleControlOnClick(" + "testAlien" + ")");
+        }}.build(nifty, nifty.getCurrentScreen(), loadScrollE));
+        
+        */
+        
+        
+        System.out.println(Arrays.toString(aliens));
     }
 
     public void confirmLoad() {

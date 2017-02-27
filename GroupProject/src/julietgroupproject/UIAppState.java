@@ -29,6 +29,7 @@ import de.lessvoid.nifty.controls.Slider;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -640,6 +641,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         return false;
     }
     
+
     public boolean resetTraining() {
         if (alien != null) {
             String name = alien.getName();
@@ -657,6 +659,19 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         return false;
     }
     
+
+    public String[] getLoadableAliens() {
+        File file = new File("aliens");
+        String[] directories = file.list(new FilenameFilter() {
+        @Override
+        public boolean accept(File current, String name) {
+        return new File(current, name).isDirectory();
+        }
+        });
+        return directories;
+    }
+
+
     public boolean loadAlien(String name) {
         File f = new File("aliens/" + name + "/body.sav");
         try (ObjectInputStream o = new ObjectInputStream(new FileInputStream(f))) {

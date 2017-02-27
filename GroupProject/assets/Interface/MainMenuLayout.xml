@@ -121,16 +121,29 @@
                     <effect>
                              <onActive name="fade" start ="#00" end = "ff" length = "1500"/>
                     </effect>
-                     <control id="load_window" name="window" closeable= "false" height = "165px" title="Load Alien" width="400px" y = "300px" x="400px" >
+
+                     <control id="load_window" name="window" closeable= "false" height = "500px" title="Load Alien" width="400px" y = "300px" x="400px" >
                          <panel height = "100%" width = "100%" childLayout = "vertical" >
-                            <panel id = "load_input_panel" height = "35%" childLayout = "horizontal" >
-                               <control name="label" valign = "center" id = "load_label" width = "35%" text="Alien name:"  />
-                               <control valign = "center" width = "65%" id="loadTextField" name="textfield" />
-                            </panel>
-                           <panel id = "load_input_panel_info" height = "25%" childLayout = "horizontal" >
-                               <control name="label" valign = "center" id = "load_info_label" width = "100%" text="Alphanumeric characters, dashes, spaces and underscores only."  />
-                            </panel>
-                            <panel id = "return_load_panel" childLayout = "vertical"  height = "40%" width = "100%">
+                                 <panel id = "load_input_panel" height = "10%" childLayout = "horizontal" >
+                                    <control name="label" valign = "center" id = "load_label" width = "35%" text="File name:"  />
+                                    <control valign = "center" width = "65%" id="loadTextField" name="textfield" />
+                                 </panel>
+                                 <panel id = "load_options" width = "100%" height = "70%" childLayout = "vertical" >
+                                     <control id="loadScrollbar" style="autoscroll"  name="scrollPanel" horizontal="false" height="100%"> 
+                                        <panel id ="loadScrollPanel" backgroundColor = "#dddddddd"  width = "100%" childLayout = "vertical">
+                                            <!--<control id = "loadScrollTestPanel" name = "panel" height = "100%" width = "100%" childLayout = "vertical" >
+                                                
+                                            </control>-->
+                                            
+                                        </panel>
+                                                    
+                                                    
+                                                    
+                                     </control>
+                                     
+                            
+                                 </panel>
+                            <panel id = "return_load_panel" childLayout = "vertical"  height = "25%" width = "100%">
                                 <control name ="button" label="Load alien"  width = "*" id = "confirmLoad" visibleToMouse="true">
                                    <interact onClick="confirmLoad()"/>
                                 </control>
