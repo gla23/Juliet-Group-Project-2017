@@ -339,8 +339,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstLabelE.show();
                 secondLabelE.hide();
                 thirdLabelE.show();
-                firstLabel.setText("Radius:");
-                thirdLabel.setText("Height:");
+                firstLabel.setText("Height:");
+                thirdLabel.setText("Radius:");
                 break;
             case "Ellipsoid":
                 getWidth.show();
@@ -360,8 +360,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstLabelE.show();
                 secondLabelE.hide();
                 thirdLabelE.show();
-                firstLabel.setText("Ring Thickness:");
-                thirdLabel.setText("Outer Radius:");
+                firstLabel.setText("Outer Radius:");
+                thirdLabel.setText("Ring Thickness:");
                 break;
             case "Cuboid":
                 getWidth.show();
@@ -438,8 +438,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstLabelE.show();
                 secondLabelE.hide();
                 thirdLabelE.show();
-                firstLabel.setText("Radius:");
-                thirdLabel.setText("Height:");
+                firstLabel.setText("Height:");
+                thirdLabel.setText("Radius:");
                 break;
             case "Ellipsoid":
                 getWidth.show();
@@ -459,8 +459,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstLabelE.show();
                 secondLabelE.hide();
                 thirdLabelE.show();
-                firstLabel.setText("Ring Thickness:");
-                thirdLabel.setText("Outer Radius:");
+                firstLabel.setText("Outer Radius:");
+                thirdLabel.setText("Ring Thickness:");
                 break;
             case "Cuboid":
                 getWidth.show();

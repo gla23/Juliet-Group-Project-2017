@@ -168,79 +168,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public Geometry addGhostLimb(Block block, Vector3f contactPt, Vector3f normal) {
-        //Take the entries from the sliders for limb properties
-        Slider widthField = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
-        Slider heightField = nifty.getCurrentScreen().findNiftyControl("limbHeightSlider", Slider.class);
-        Slider lengthField = nifty.getCurrentScreen().findNiftyControl("limbLengthSlider", Slider.class);
-        Slider weightField = nifty.getCurrentScreen().findNiftyControl("limbWeightSlider", Slider.class);
-        Slider frictionField = nifty.getCurrentScreen().findNiftyControl("limbFrictionSlider", Slider.class);
-        Slider strengthField = nifty.getCurrentScreen().findNiftyControl("limbStrengthSlider", Slider.class);
-        Slider seperationField = nifty.getCurrentScreen().findNiftyControl("limbSeperationSlider", Slider.class);
-        CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
+        
+        Block limb = createLimb(block, contactPt, normal);
 
-
-        Slider rollSlider = nifty.getCurrentScreen().findNiftyControl("rollSlider", Slider.class);
-        Slider yawSlider = nifty.getCurrentScreen().findNiftyControl("yawSlider", Slider.class);
-        Slider pitchSlider = nifty.getCurrentScreen().findNiftyControl("pitchSlider", Slider.class);
-        Slider jointPosSlider = nifty.getCurrentScreen().findNiftyControl("jointPosSlider", Slider.class);
-        Slider jointRotSlider = nifty.getCurrentScreen().findNiftyControl("jointRotSlider", Slider.class);
-
-        float limbWidth;
-        float limbHeight;
-        float limbLength;
-        float weight;
-        float friction;
-        float strength;
-        float limbSeperation;
-        boolean symmetric;
-        float roll;
-        float yaw;
-        float pitch;
-        float jointPositionFraction;
-        float jointStartRotation;
-        // currentHingeAxis Will be either "X", "Y", "Z" or "A" for auto
-
-        limbWidth = widthField.getValue();
-        limbHeight = heightField.getValue();
-        limbLength = lengthField.getValue();
-        weight = weightField.getValue();
-        friction = frictionField.getValue();
-        strength = strengthField.getValue();
-        limbSeperation = seperationField.getValue();
-        symmetric = symmetricBox.isChecked();
-        roll = rollSlider.getValue();
-        yaw = yawSlider.getValue();
-        pitch = pitchSlider.getValue();
-        jointPositionFraction = jointPosSlider.getValue();
-        jointStartRotation = jointRotSlider.getValue();
-
-
-        //Get the current shape from the selector
-        //myMainMenuController.setCurrentLimbShape();
-
-
-        //Find hinge and postion vectors given shape and click position
-        //TODO fix this so that is gets the actual distance, and also make that distance correct when it is rotated
-        Vector3f newHingePos = contactPt.add(normal.mult(-0.36f));
-        Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeperation));
-
-        String axisToUse = "ZAxis";
-        if (currentHingeAxis.equals("A")) {
-            if (Math.abs(normal.x) < Math.abs(normal.z)) {
-                axisToUse = "XAxis";
-            }
-        } else {
-            axisToUse = currentHingeAxis;
-        }
-
-        //Build the new limb
-        Block limb = new Block(newPos, newHingePos, limbWidth, limbHeight, limbLength, currentShape, axisToUse, weight);
-        Matrix3f rotation = new Matrix3f();
-        rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
-
-        limb.rotation = rotation;
-
-        Geometry gl = AlienHelper.assembleBlock(limb, newPos.add(AlienHelper.getGeometryLocation(block.getGeometry())));
+        Geometry gl = AlienHelper.assembleBlock(limb, limb.getPosition().add(AlienHelper.getGeometryLocation(block.getGeometry())));
 
         // check for collision
 
@@ -446,15 +377,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         return (currentAlienNode == null);
     }
 
-    //To be run when right click on body, adds new limb with dimensions defined in text fields
-    public void addLimb(Block block, Vector3f contactPt, Vector3f normal) {
-
-        //Get rid of old alien on screen
-        if (this.currentAlienNode != null) {
-            removeAlien(this.currentAlienNode);
-        }
-
-
+    // Used to get the block that is currently being specified by the options.
+    // Used by add limb and add ghost limb so the ghost limb ghosts the same block that is going to be created
+    public Block createLimb(Block block, Vector3f contactPt, Vector3f normal){
         //Take the entries from the sliders for limb properties
         Slider widthField = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
         Slider heightField = nifty.getCurrentScreen().findNiftyControl("limbHeightSlider", Slider.class);
@@ -505,35 +430,19 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         jointStartRotation = jointRotSlider.getValue();
 
 
-        //Get the current shape from the selector
-        //myMainMenuController.setCurrentLimbShape();
-        /*
-
-         if (currentShape.equals("Box")) {
-         // Rotate the x y z for making boxes rotate to the normal
-         Vector3f whlVec = new Vector3f(limbWidth, limbHeight, limbLength);
-         Matrix3f rotator = new Matrix3f();
-         rotator.fromStartEndVectors(normal, new Vector3f(1, 0, 0));
-         whlVec = rotator.mult(whlVec);
-         limbWidth = Math.abs(whlVec.x);
-         limbHeight = Math.abs(whlVec.y);
-         limbLength = Math.abs(whlVec.z);
-
-         } else if (currentShape.equals("Sphere")) {
-         //TODO things for attahcing sphere
-         } else if (currentShape.equals("Torus")) {
-         //TODO things for attahcing torus
-         } else if (currentShape.equals("Cylinder")) {
-         //TODO things for attahcing cylinder
-         }
-         */
-
-
         //Find hinge and postion vectors given shape and click position
         //TODO fix this so that is gets the actual distance, and also make that distance correct when it is rotated
-        Vector3f newHingePos = contactPt.add(normal.mult(-0.36f));
-        Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeperation));
-
+        Vector3f newHingePos;
+        Vector3f newPos;
+         if (currentShape.equals("Cylinder")) {
+             newHingePos = contactPt.add(normal.mult(0.1f));
+             newPos = contactPt.add(normal.mult(limbWidth + limbSeperation));
+         } else {
+             newHingePos = contactPt.add(normal.mult(0.1f));
+             newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeperation));
+         } 
+         
+        // Work out which hinge axis would make sense for auto hinge axis
         String axisToUse = "ZAxis";
         if (currentHingeAxis.equals("A")) {
             if (Math.abs(normal.x) < Math.abs(normal.z)) {
@@ -546,12 +455,31 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         //Build the new limb
         Block limb = new Block(newPos, newHingePos, limbWidth, limbHeight, limbLength, currentShape, axisToUse, weight);
         Matrix3f rotation = new Matrix3f();
-        rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
-
+        
+        if (currentShape.equals("Cylinder")){
+            rotation.fromStartEndVectors(new Vector3f(0, 0, 1), normal);
+        } else {
+            rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
+        }
+        
         limb.rotation = rotation;
 
         // Stores the normal the limb was created at in the limb for future use
         limb.setNormal(normal);
+        
+        return limb;
+    }
+    
+    //To be run when right click on body, adds new limb with dimensions defined in text fields
+    public void addLimb(Block block, Vector3f contactPt, Vector3f normal) {
+
+        //Get rid of old alien on screen
+        if (this.currentAlienNode != null) {
+            removeAlien(this.currentAlienNode);
+        }
+
+        Block limb = createLimb(block,contactPt,normal);
+        
 
         //Add new limb to alien and instantiate
         block.addLimb(limb);
@@ -560,7 +488,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         setChaseCam(this.currentAlienNode);
         setupKeys(this.currentAlienNode);
     }
-
+    
     public boolean saveAlien(String name) {
         if (alien != null) {
             alien.setName(name);
