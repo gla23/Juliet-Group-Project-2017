@@ -642,6 +642,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
     
 
+
     public boolean resetTraining() {
         if (alien != null) {
             String name = alien.getName();
@@ -659,6 +660,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         return false;
     }
     
+
 
     public String[] getLoadableAliens() {
         File file = new File("aliens");

@@ -11,6 +11,7 @@ import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
 import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.controls.RadioButtonGroupStateChangedEvent;
 
+
 import de.lessvoid.nifty.controls.SliderChangedEvent;
 import de.lessvoid.nifty.controls.Tab;
 import de.lessvoid.nifty.controls.TabGroup;
@@ -28,6 +29,9 @@ import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
 import java.awt.Panel;
+
+import java.util.ArrayList;
+
 import java.util.Arrays;
 import julietgroupproject.UIAppState;
 
@@ -47,7 +51,9 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     private volatile boolean initialising = false;
     private String saveType = "";
     private String loadType = "";
-    private int addedAliens = 0;
+
+    private String[] aliens;
+
 
     public MainMenuController(UIAppState App) {
         this.app = App;
@@ -152,7 +158,9 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
                     initialising = true;
                     //loadScrollE.setHeight(200);
-                    for (int i =addedAliens; i<aliens.length; i++) {
+
+                    for (int i =0; i<aliens.length; i++) {
+
                         addLoadButton(loadScrollE, aliens[i]);
                     }
                     
@@ -168,9 +176,11 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         thread.start();
     }
     
-    public void addLoadButton(Element scroll, String alien) {
+
+    public void addLoadButton(Element scroll, final String alien) {
         System.out.println(alien);
-        scroll.add(new ButtonBuilder("loadBut", alien){{
+        scroll.add(new ButtonBuilder(alien+"LoadBut", alien){{
+
             //childLayoutCenter();
             valignTop();
             paddingTop("0px");
@@ -178,11 +188,16 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             marginTop("0px");
             marginBottom("0px");
             width("100%");
-            height("30px");
+
+            //height("30px");
             //visibleToMouse(true);
-            //interactOnClick("handleControlOnClick(" + "testAlien" + ")");
+            interactOnClick("handleControlOnClick(" + alien + ")");
             }}.build(nifty, nifty.getCurrentScreen(), scroll));
-        addedAliens++;
+    }
+    
+    public void handleControlOnClick(String alienID) {
+        confirmLoad(alienID);
+        System.out.println(alienID);
     }
 
     public void addOptionsValues() {
@@ -305,8 +320,9 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         loadType = "alien";
         app.removeKeyBindings();
         nifty.gotoScreen("load_dialog");
-        String[] aliens = app.getLoadableAliens();
-        
+
+       //String[] aliens = app.getLoadableAliens();
+        //aliens = new String[]{"first","second","third"};
         addLoadValues(aliens);
         //ScrollPanel loadScroll = nifty.getCurrentScreen().findNiftyControl("loadScrollBar", ScrollPanel.class);
        /* Element loadScrollE = nifty.getCurrentScreen().findElementByName("loadScrollbar");
@@ -339,6 +355,23 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             }
         }
     }
+    
+    public void confirmLoad(String givenAlien) {
+        app.addKeyBindings();
+        if ("alien".equals(loadType)) {
+            //TODO
+            if (app.loadAlien(sanitizeAlienName(givenAlien))) {
+                nifty.gotoScreen("start");
+                screen = nifty.getScreen("start");
+                firstBody = true;
+                addAlienSpecificOptions();
+                addValues();
+                //TODO: inform user load was successful
+            } else {
+                //TODO: inform user load was unsuccessful
+            }
+        }
+    }
 
     public void gotoSaveScreen() {
         this.saveType = "alien";
@@ -349,8 +382,16 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     public void confirmSave() {
         app.addKeyBindings();
         if ("alien".equals(saveType)) {
-            if (app.saveAlien(sanitizeAlienName(screen.findNiftyControl("saveTextField", TextField.class).getRealText()))) {
+
+            String name = screen.findNiftyControl("saveTextField", TextField.class).getRealText();
+            if (app.saveAlien(sanitizeAlienName(name))) {
+                ArrayList<String> aliensTemp = new ArrayList<String>(Arrays.asList(aliens));
+                aliensTemp.add(name);
+                
+                aliensTemp.toArray(aliens);
                 nifty.gotoScreen("save_success");
+                //TODO: inform user save was successful
+
             } else {
                 nifty.gotoScreen("save_fail");
             }
@@ -569,6 +610,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     @Override
     public void onStartScreen() {
+        aliens = app.getLoadableAliens();
     }
 
     @Override
