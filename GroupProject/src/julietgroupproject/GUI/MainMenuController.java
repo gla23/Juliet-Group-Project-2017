@@ -216,11 +216,15 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         thread.start();
     }
 
-    public void runPreviousSimulation() {
-        //TODO
+    public void resetTraining() {
+        if (app.resetTraining()) {
+            nifty.gotoScreen("training_reset_success");
+        } else {
+            nifty.gotoScreen("training_reset_fail");
+        }
     }
 
-    public void runNewSimulation() {
+    public void startTraining() {
         if (app.beginTraining())
             nifty.gotoScreen("simulation");
     }
@@ -247,9 +251,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstBody = true;
                 addAlienSpecificOptions();
                 addValues();
-                //TODO: inform user load was successful
             } else {
-                //TODO: inform user load was unsuccessful
+                nifty.gotoScreen("load_fail");
             }
         }
     }
@@ -264,13 +267,11 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         app.addKeyBindings();
         if ("alien".equals(saveType)) {
             if (app.saveAlien(sanitizeAlienName(screen.findNiftyControl("saveTextField", TextField.class).getRealText()))) {
-                //TODO: inform user save was successful
+                nifty.gotoScreen("save_success");
             } else {
-                //TODO: inform user save was unsuccessful
+                nifty.gotoScreen("save_fail");
             }
         }
-
-        nifty.gotoScreen("start");
         //TODO limbs
     }
 

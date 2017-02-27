@@ -144,9 +144,120 @@
                     
                 </panel>
         </layer>
-    </screen>    
+    </screen>   
+
+    <screen id="save_success" controller="julietgroupproject.GUI.MainMenuController">
+     <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
+            <panel id="save_success_panel" childLayout="horizontal">
+                <effect>
+                         <onActive name="fade" start ="#00" end = "ff" length = "1500"/>
+                </effect>
+                 <control id="save_success_window" name="window" closeable= "false" height = "100px" title="Successfully saved" width="400px" y = "300px" x="400px" >
+                     <panel height = "100%" width = "100%" childLayout = "vertical" >
+                       <panel id = "save_success_panel_info" height = "50%" childLayout = "horizontal" >
+                           <control name="label" valign = "center" id = "load_info_label" width = "100%" text="Save was successful"  />
+                        </panel>
+                        <panel id = "return_save_success_panel" childLayout = "center"  valign = "center" height = "50%" width = "100%">
+                            <control name ="button" label="OK"  width = "33%" id = "returnToEditor" visibleToMouse="true">
+                               <interact onClick="showEditor()"/>
+                            </control>
+                        </panel>     
+                     </panel>
+                </control>
+            </panel>
+        </layer>
+    </screen>     
             
-    
+    <screen id="save_fail" controller="julietgroupproject.GUI.MainMenuController">
+     <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
+            <panel id="save_fail_panel" childLayout="horizontal">
+                <effect>
+                         <onActive name="fade" start ="#00" end = "ff" length = "1500"/>
+                </effect>
+                 <control id="save_fail_window" name="window" closeable= "false" height = "100px" title="Save failed" width="400px" y = "300px" x="400px" >
+                     <panel height = "100%" width = "100%" childLayout = "vertical" >
+                       <panel id = "save_fail_panel_info" height = "50%" childLayout = "horizontal" >
+                           <control name="label" valign = "center" id = "load_info_label" width = "100%" text="Unable to save file"  />
+                        </panel>
+                        <panel id = "return_save_fail_panel" childLayout = "center"  valign = "center" height = "50%" width = "100%">
+                            <control name ="button" label="OK"  width = "33%" id = "returnToEditor" visibleToMouse="true">
+                               <interact onClick="showEditor()"/>
+                            </control>
+                        </panel>     
+                     </panel>
+                </control>
+            </panel>
+        </layer>
+    </screen>    
+
+    <screen id="load_fail" controller="julietgroupproject.GUI.MainMenuController">
+     <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
+            <panel id="load_fail_panel" childLayout="horizontal">
+                <effect>
+                         <onActive name="fade" start ="#00" end = "ff" length = "1500"/>
+                </effect>
+                 <control id="load_fail_window" name="window" closeable= "false" height = "135px" title="Load failed" width="400px" y = "300px" x="400px" >
+                     <panel height = "100%" width = "100%" childLayout = "vertical" >
+                       <panel id = "load_fail_panel_info" height = "75%" childLayout = "vertical" >
+                           <control name="label" valign = "center" id = "load_info_label" width = "100%" text="Unable to load file."  />
+                           <control name="label" valign = "center" id = "load_info_label_2" width = "100%" text="Ensure the alien name is correct and don't use the file extension."  />
+                        </panel>
+                        <panel id = "return_load_fail_panel" childLayout = "center"  valign = "center" height = "25%" width = "100%">
+                            <control name ="button" label="OK"  width = "33%" id = "returnToEditor" visibleToMouse="true">
+                               <interact onClick="showEditor()"/>
+                            </control>
+                        </panel>    
+                     </panel>
+                </control>
+            </panel>
+        </layer>
+    </screen>     
+        
+    <screen id="training_reset_fail" controller="julietgroupproject.GUI.MainMenuController">
+     <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
+            <panel id="training_reset_fail_panel" childLayout="horizontal">
+                <effect>
+                         <onActive name="fade" start ="#00" end = "ff" length = "1500"/>
+                </effect>
+                 <control id="training_reset_fail_window" name="window" closeable= "false" height = "135px" title="Reset failed" width="400px" y = "300px" x="400px" >
+                     <panel height = "100%" width = "100%" childLayout = "vertical" >
+                       <panel id = "training_reset_fail_panel_info" height = "75%" childLayout = "vertical" >
+                           <control name="label" valign = "center" id = "load_info_label" width = "100%" text="Unable to reset the alien's training."  />
+                           <control name="label" valign = "center" id = "load_info_label_2" width = "100%" text="Has it been trained before?"  />
+                        </panel>
+                        <panel id = "return_training_reset_fail_panel" childLayout = "center"  valign = "center" height = "25%" width = "100%">
+                            <control name ="button" label="OK"  width = "33%" id = "returnToEditor" visibleToMouse="true">
+                               <interact onClick="showEditor()"/>
+                            </control>
+                        </panel>    
+                     </panel>
+                </control>
+            </panel>
+        </layer>
+    </screen>
+   
+    <screen id="training_reset_success" controller="julietgroupproject.GUI.MainMenuController">
+     <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
+            <panel id="training_reset_success_panel" childLayout="horizontal">
+                <effect>
+                         <onActive name="fade" start ="#00" end = "ff" length = "1500"/>
+                </effect>
+                 <control id="training_reset_success_window" name="window" closeable= "false" height = "100px" title="Successfuly reset training" width="400px" y = "300px" x="400px" >
+                     <panel height = "100%" width = "100%" childLayout = "vertical" >
+                       <panel id = "training_reset_success_panel_info" height = "50%" childLayout = "vertical" >
+                           <control name="label" valign = "center" id = "load_info_label" width = "100%" text="Alien's training has successfully been reset."  />
+                        </panel>
+                        <panel id = "return_training_reset_success_panel" childLayout = "center"  valign = "center" height = "50%" width = "100%">
+                            <control name ="button" label="OK"  width = "33%" id = "returnToEditor" visibleToMouse="true">
+                               <interact onClick="showEditor()"/>
+                            </control>
+                        </panel>    
+                     </panel>
+                </control>
+            </panel>
+        </layer>
+    </screen>
+                                                   
     <screen id="start" controller="julietgroupproject.GUI.MainMenuController">
         <layer id="foreground" childLayout="center">
             
@@ -382,13 +493,13 @@
                             <control name ="button" label="Load Alien" height = "*" width = "*" id = "load_alien" visibleToMouse="true">
                                 <interact onClick="gotoLoadScreen()"/>
                             </control>
-                            <control name ="button" label="Run New Simulation" height = "*" width = "*" id = "new_sim" visibleToMouse="true">
-                                <interact onClick="runNewSimulation()"/>
+                            <control name ="button" label="Start Training" height = "*" width = "*" id = "new_sim" visibleToMouse="true">
+                                <interact onClick="startTraining()"/>
                             </control>
-                            <control name ="button" label="Load Previous Simualtion" height = "*" width = "*" id = "prev_sim" visibleToMouse="true">
-                                <interact onClick="runPreviousSimulation()"/>
+                            <control name ="button" label="Reset Training" height = "*" width = "*" id = "reset_sim" visibleToMouse="true">
+                                <interact onClick="resetTraining()"/>
                             </control>
-                            <control name ="button" label="Toggle direction arrow" height = "*" width = "*" id = "toggle_arrow" visibleToMouse="true">
+                            <control name ="button" label="Toggle Direction Arrow" height = "*" width = "*" id = "toggle_arrow" visibleToMouse="true">
                                 <interact onClick="toggleArrow()"/>
                             </control>
                             <control name ="button" label="Hide Editor" height = "*" width = "*" id = "hide_editor" visibleToMouse="true">

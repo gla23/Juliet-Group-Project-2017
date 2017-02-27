@@ -639,7 +639,24 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
         return false;
     }
-
+    
+    public boolean resetTraining() {
+        if (alien != null) {
+            String name = alien.getName();
+            // File with old name
+            File file = new File("aliens/" + name + "/training.pop");
+            if (file.exists()) {
+                // File with new name
+                DateFormat df = new SimpleDateFormat("yyMMddHHmmss");
+                File file2 = new File("aliens/" + name + "/training" + df.format(new Date()) + ".pop");
+                // Rename file 
+                return file.renameTo(file2);
+            }
+            return false;
+        }
+        return false;
+    }
+    
     public boolean loadAlien(String name) {
         File f = new File("aliens/" + name + "/body.sav");
         try (ObjectInputStream o = new ObjectInputStream(new FileInputStream(f))) {
