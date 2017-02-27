@@ -53,6 +53,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     private String loadType = "";
 
     private String[] aliens;
+    private ArrayList<String> alreadyAddedAliens = new ArrayList<String>();
 
 
     public MainMenuController(UIAppState App) {
@@ -158,10 +159,14 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
                     initialising = true;
                     //loadScrollE.setHeight(200);
-
+                    System.out.println("Aliens " + Arrays.toString(aliens));
+                    System.out.println("Already Added: "  + alreadyAddedAliens.toString());
                     for (int i =0; i<aliens.length; i++) {
-
-                        addLoadButton(loadScrollE, aliens[i]);
+                        if (!alreadyAddedAliens.contains(aliens[i])) {
+                            System.out.println(i);
+                            addLoadButton(loadScrollE, aliens[i]);
+                        }
+                        alreadyAddedAliens.add(aliens[i]);
                     }
                     
 
@@ -349,7 +354,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 screen = nifty.getScreen("start");
                 firstBody = true;
                 addAlienSpecificOptions();
-                addValues();
+                //addValues();
             } else {
                 nifty.gotoScreen("load_fail");
             }
@@ -368,6 +373,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 addValues();
                 //TODO: inform user load was successful
             } else {
+                nifty.gotoScreen("load_fail");
                 //TODO: inform user load was unsuccessful
             }
         }
@@ -470,8 +476,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstLabelE.show();
                 secondLabelE.hide();
                 thirdLabelE.show();
-                firstLabel.setText("Height:");
-                thirdLabel.setText("Radius:");
+                firstLabel.setText("Radius:");
+                thirdLabel.setText("Height:");
                 break;
             case "Ellipsoid":
                 getWidth.show();
@@ -491,8 +497,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstLabelE.show();
                 secondLabelE.hide();
                 thirdLabelE.show();
-                firstLabel.setText("Outer Radius:");
-                thirdLabel.setText("Ring Thickness:");
+                firstLabel.setText("Ring Thickness:");
+                thirdLabel.setText("Outer Radius:");
                 break;
             case "Cuboid":
                 getWidth.show();
@@ -569,8 +575,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstLabelE.show();
                 secondLabelE.hide();
                 thirdLabelE.show();
-                firstLabel.setText("Height:");
-                thirdLabel.setText("Radius:");
+                firstLabel.setText("Radius:");
+                thirdLabel.setText("Height:");
                 break;
             case "Ellipsoid":
                 getWidth.show();
@@ -590,8 +596,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstLabelE.show();
                 secondLabelE.hide();
                 thirdLabelE.show();
-                firstLabel.setText("Outer Radius:");
-                thirdLabel.setText("Ring Thickness:");
+                firstLabel.setText("Ring Thickness:");
+                thirdLabel.setText("Outer Radius:");
                 break;
             case "Cuboid":
                 getWidth.show();
