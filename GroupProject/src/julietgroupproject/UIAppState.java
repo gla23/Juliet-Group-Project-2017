@@ -732,10 +732,17 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(this.alien, this.simulationQueue, 1.0f, this.accuracy, 1f / 60f));
             this.slaves.add(toAdd);
             // speed up by 5 times, 300 = 60 * 5
+            /*
             AppSettings set = new AppSettings(false);
             set.setFrameRate(this.getSpeedUpFactor() * DEFAULT_FRAMERATE);
             toAdd.setSettings(set);
             toAdd.start(JmeContext.Type.Headless);
+            */
+            toAdd.setShowSettings(false);
+            AppSettings sett = new AppSettings(false);
+            sett.setCustomRenderer(FastNullContext.class);
+            toAdd.setSettings(sett);
+            toAdd.start();
         }
 
         this.trainer.start();
