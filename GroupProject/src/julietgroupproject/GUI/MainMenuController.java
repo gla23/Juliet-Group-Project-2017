@@ -265,11 +265,16 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     //Shhhhhh..... there's nothing to see here
                     boolean working = false;
                     DropDown shapeSelect = null;
+                    TabGroup tabs = null;
                     while (!working) {
                         this.sleep(20);
                         shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector_body", DropDown.class);
+                        tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
+                        addLimb = nifty.getScreen("start").findNiftyControl("add_limb_tab", Tab.class);
+                        addBody = nifty.getScreen("start").findNiftyControl("add_body_tab", Tab.class);
                         try {
                             shapeSelect.removeItem("");
+                            tabs.getSelectedTabIndex();
                             working = true;
                         } catch (NullPointerException e) {
                         }
@@ -284,9 +289,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     shapeSelect.addItem("Cylinder");
                     shapeSelect.addItem("Torus");
                     shapeSelect.selectItemByIndex(0);
-                    TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
-                    addLimb = nifty.getScreen("start").findNiftyControl("add_limb_tab", Tab.class);
-                    addBody = nifty.getScreen("start").findNiftyControl("add_body_tab", Tab.class);
 
                     if (firstBody) {
                         tabs.setSelectedTab(addLimb);
@@ -371,10 +373,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstBody = true;
                 addAlienSpecificOptions();
                 addValues();
-                //TODO: inform user load was successful
             } else {
                 nifty.gotoScreen("load_fail");
-                //TODO: inform user load was unsuccessful
             }
         }
     }
