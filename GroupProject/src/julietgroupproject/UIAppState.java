@@ -738,6 +738,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         setupKeys(this.currentAlienNode);
 
         editing = true;
+        
+        setGravity(0.0f);
     }
 
     @Override
