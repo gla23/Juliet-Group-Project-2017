@@ -306,8 +306,17 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
                     boolean symmetric = symmetricBox.isChecked();
 
-                    if (symmetric && block.collisionShapeType.equals("Box")) {
-                        ghostLimb2 = addGhostLimb(block, pt.subtract(pt.project(collision.getContactNormal().negate()).mult(2.0f)), norm.negate());
+                    if (symmetric) {
+                        switch(block.collisionShapeType)
+                        {
+                            case "Box":
+                                ghostLimb2 = addGhostLimb(block, pt.subtract(pt.project(collision.getContactNormal()).mult(2.0f)), norm.negate());
+                                break;
+                            default:
+                                ghostLimb2 = addGhostLimb(block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)),norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)));
+                                break;
+                                
+                        }
                     }
                 }
             }
@@ -729,6 +738,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         setupKeys(this.currentAlienNode);
 
         editing = true;
+        
+        setGravity(0.0f);
     }
 
     @Override
@@ -829,8 +840,16 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
                     boolean symmetric = symmetricBox.isChecked();
 
-                    if (symmetric && block.collisionShapeType.equals("Box")) {
-                        addLimb(block, pt.subtract(pt.project(collision.getContactNormal().negate()).mult(2.0f)), norm.negate());
+                    if (symmetric) {
+                        switch(block.collisionShapeType)
+                        {
+                        case "Box":
+                            addLimb(block, pt.subtract(pt.project(collision.getContactNormal()).mult(2.0f)), norm.negate());
+                            break;
+                        default:
+                            addLimb(block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)),norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)));
+                            break;
+                        }
                     }
                 }
             }
