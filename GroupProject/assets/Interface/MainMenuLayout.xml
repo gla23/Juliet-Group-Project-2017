@@ -54,6 +54,12 @@
                                        <control id="wireMeshCheckBox" align = "center" valign = "center" name="checkbox" />
                                     </panel>
                                  </panel>
+                                 <panel id = "arrowPanel" height = "15%" childLayout = "horizontal" >
+                                    <control name="label" valign = "center" id = "arrow_label" width = "50%" text="Direction Arrow (A) :"  />
+                                    <panel id = "DirectionArrowPanel" valign = "center" width = "50%" childLayout = "vertical" >
+                                       <control id="DirectionArrowCheckBox" align = "center" valign = "center" name="checkbox" />
+                                    </panel>
+                                 </panel>
                                  <panel id = "gravityPanel" height = "15%" childLayout = "horizontal" >
                                     <control name="label" valign = "center" id = "gravtity_label" width = "50%" text="Gravity:"  />
                                     <control id="gravitySlider" valign = "center"name="horizontalSlider" initial = "0.0"  min = "-10.0" max = "10.0" stepSize = "0.1" buttonStepSize = "0.5"/>
@@ -502,9 +508,6 @@
                             </control>
                             <control name ="button" label="Reset Training" height = "*" width = "*" id = "reset_sim" visibleToMouse="true">
                                 <interact onClick="resetTraining()"/>
-                            </control>
-                            <control name ="button" label="Toggle Direction Arrow" height = "*" width = "*" id = "toggle_arrow" visibleToMouse="true">
-                                <interact onClick="toggleArrow()"/>
                             </control>
                             <control name ="button" label="Hide Editor" height = "*" width = "*" id = "hide_editor" visibleToMouse="true">
                                 <interact onClick="hideEditor()"/>
