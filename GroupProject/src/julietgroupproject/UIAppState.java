@@ -168,6 +168,23 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void printVector3f(Vector3f vec) {
         System.out.println(vec);
     }
+    
+    public Geometry makeGhostLimb(Block block) {
+        
+        Block copy = new Block(block);
+        
+        copy.width += 0.02;
+        copy.length += 0.02;
+        copy.height += 0.02;
+             
+        copy.setPosition(copy.getPosition().add(new Vector3f(-0.01f, -0.01f, -0.01f)));
+              
+        Geometry gl = AlienHelper.assembleBlock(copy, block.getGeometry().getWorldTranslation());
+
+        rootNode.attachChild(gl);
+            
+        return gl;
+    }
 
     public Geometry addGhostLimb(Block block, Vector3f contactPt, Vector3f normal) {
         //Take the entries from the sliders for limb properties
@@ -303,22 +320,27 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 }
 
                 if (block != null) {
-                    ghostLimb = addGhostLimb(block, pt, norm);
+                    if (!shiftDown) {
+                        ghostLimb = addGhostLimb(block, pt, norm);
 
-                    CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
-                    boolean symmetric = symmetricBox.isChecked();
+                        CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
+                        boolean symmetric = symmetricBox.isChecked();
 
-                    if (symmetric) {
-                        switch(block.collisionShapeType)
-                        {
-                            case "Box":
-                                ghostLimb2 = addGhostLimb(block, pt.subtract(pt.project(collision.getContactNormal()).mult(2.0f)), norm.negate());
-                                break;
-                            default:
-                                ghostLimb2 = addGhostLimb(block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)),norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)));
-                                break;
-                                
+                        if (symmetric) {
+                            switch(block.collisionShapeType)
+                            {
+                                case "Box":
+                                    ghostLimb2 = addGhostLimb(block, pt.subtract(pt.project(collision.getContactNormal()).mult(2.0f)), norm.negate());
+                                    break;
+                                default:
+                                    ghostLimb2 = addGhostLimb(block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)),norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)));
+                                    break;
+
+                            }
                         }
+                    } else {
+                        ghostLimb = makeGhostLimb(block);
+                        ghostLimb.setMaterial(ghostMaterial2);
                     }
                 }
             }
