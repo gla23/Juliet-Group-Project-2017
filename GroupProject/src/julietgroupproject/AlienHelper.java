@@ -72,7 +72,7 @@ public class AlienHelper {
         } else if (meshShape.equals("Torus")) {
             mesh = new Torus(40, 40, height, width-height);
         } else if (meshShape.equals("Sphere")) {
-            mesh = new Sphere(40, 40, width);
+            mesh = new Sphere(40, 40, 1f);
         } else {
             mesh = new Box(width, height, length);
         }

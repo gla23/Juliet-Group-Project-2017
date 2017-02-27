@@ -26,18 +26,25 @@ public class LearnToBeAnAlien extends SimpleApplication {
     public static void main(String[] args) {
         
         //Disable joint warnings
+
         Logger physicslogger = Logger.getLogger(PhysicsSpace.class.getName());
         physicslogger.setUseParentHandlers(false);
         // keep the default renderer
         LearnToBeAnAlien app = new LearnToBeAnAlien();
-        AppSettings set = new AppSettings(true);
-        app.setSettings(set);
+        app.setShowSettings(false);
+        AppSettings settings = new AppSettings(true);
+        settings.setTitle("Learn to be a flopping cube");
+        settings.put("Width", 1920);
+        settings.put("Height", 1080);
+        settings.setFullscreen(true);
+        app.setSettings(settings);
         app.start();
     }
 
     @Override
     public void simpleInitApp() {
         //disable frame rate info etc
+        
         setDisplayStatView(false);
         BulletAppState physics = new BulletAppState();
         this.stateManager.attach(physics);

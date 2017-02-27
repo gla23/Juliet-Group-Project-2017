@@ -451,9 +451,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Slider jointPosSlider = nifty.getCurrentScreen().findNiftyControl("jointPosSlider", Slider.class);
         Slider jointRotSlider = nifty.getCurrentScreen().findNiftyControl("jointRotSlider", Slider.class);
 
-
-
-
         float limbWidth;
         float limbHeight;
         float limbLength;
@@ -514,6 +511,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             rotation.fromStartEndVectors(new Vector3f(0, 0, 1), normal);
         } else {
             rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
+        }
+        if (currentShape.equals("Sphere")){
+            rotation = rotation.mult(new Matrix3f(limbWidth, 0f, 0f, 0f, limbHeight, 0f, 0f, 0f, limbLength));
         }
         
         limb.rotation = rotation;
