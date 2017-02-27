@@ -145,10 +145,10 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 try {
                     //Shhhhhh..... there's nothing to see here
                     boolean working = false;
-                    Element loadScrollE = null;
+                    DropDown loadScrollE = null;
                     while (!working) {
                         this.sleep(20);
-                            loadScrollE = nifty.getCurrentScreen().findElementByName("loadScrollPanel");
+                            loadScrollE = nifty.getCurrentScreen().findNiftyControl("alien_selector", DropDown.class);
                             
                         try {
                             loadScrollE.getClass();
@@ -164,7 +164,9 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     for (int i =0; i<aliens.length; i++) {
                         if (!alreadyAddedAliens.contains(aliens[i])) {
                             System.out.println(i);
-                            addLoadButton(loadScrollE, aliens[i]);
+                            loadScrollE.addItem(aliens[i]);
+                            //addLoadButton(loadScrollE, aliens[i]);
+                            
                         }
                         alreadyAddedAliens.add(aliens[i]);
                     }
@@ -351,7 +353,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         app.addKeyBindings();
         if ("alien".equals(loadType)) {
             //TODO
-            if (app.loadAlien(sanitizeAlienName(nifty.getScreen("load_dialog").findNiftyControl("loadTextField", TextField.class).getRealText()))) {
+            if (app.loadAlien(sanitizeAlienName((String) nifty.getScreen("load_dialog").findNiftyControl("alien_selector", DropDown.class).getSelection()))) {
                 nifty.gotoScreen("start");
                 screen = nifty.getScreen("start");
                 firstBody = true;
