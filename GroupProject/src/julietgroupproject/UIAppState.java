@@ -383,16 +383,19 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                         ghostLimb = null;
                         ghostLimb2 = null;
 
-                        if (delghost == null) {
-                            delghost = makeGhostLimb(block);
-                            delghost.setMaterial(ghostMaterial2);
-                        }
+                        removeGhostLimb(delghost);
+                        delghost = null;
+                        delghost = makeGhostLimb(block);
+                        delghost.setMaterial(ghostMaterial2);
+
                     }
                 } else {
                     removeGhostLimb(ghostLimb);
                     removeGhostLimb(ghostLimb2);
                     ghostLimb = null;
                     ghostLimb2 = null;
+                    removeGhostLimb(delghost);
+                    delghost = null;
                 }
             }
         } else {
@@ -400,6 +403,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             removeGhostLimb(ghostLimb2);
             ghostLimb = null;
             ghostLimb2 = null;
+            removeGhostLimb(delghost);
+            delghost = null;
         }
         this.isCollisionOccuring = ghostCollisionCheck(ghostLimb);
         this.isCollisionOccuring |= ghostCollisionCheck(ghostLimb2);
@@ -935,7 +940,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 mesh.setChecked(!mesh.isChecked());
             }
         }
-        
+
         if ("ToggleArrow".equals(string)) {
             if (!bln) {
                 CheckBox mesh = nifty.getScreen("editor_options").findNiftyControl("DirectionArrowCheckBox", CheckBox.class);
