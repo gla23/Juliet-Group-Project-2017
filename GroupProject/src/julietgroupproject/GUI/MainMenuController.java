@@ -75,9 +75,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         addAlienSpecificOptions();
     }
     
-    public void toggleArrow() {
-        app.toggleArrow();
-    }
 
     public void addAlienSpecificOptions() {
         firstBody = true;
@@ -508,6 +505,11 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     @NiftyEventSubscriber(id = "wireMeshCheckBox")
     public void onWireMeshChange(final String id, final CheckBoxStateChangedEvent event) {
         app.toggleWireMesh();
+    }
+    
+    @NiftyEventSubscriber(id = "DirectionArrowCheckBox")
+    public void onDirectionArrowChange(final String id, final CheckBoxStateChangedEvent event) {
+        app.toggleArrow();
     }
 
     @NiftyEventSubscriber(id = "gravitySlider")
