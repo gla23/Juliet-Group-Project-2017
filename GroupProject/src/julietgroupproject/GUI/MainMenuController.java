@@ -53,6 +53,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     private String loadType = "";
 
     private String[] aliens;
+    private String currentlySelectedLoadAlien = "";
     private ArrayList<String> alreadyAddedAliens = new ArrayList<String>();
 
 
@@ -151,7 +152,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                             loadScrollE = nifty.getCurrentScreen().findNiftyControl("alien_selector", DropDown.class);
                             
                         try {
-                            loadScrollE.getClass();
+                            loadScrollE.removeItem("");
                             working = true;
                         } catch (NullPointerException e) {
                         }
@@ -348,12 +349,17 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         
         System.out.println(Arrays.toString(aliens));
     }
+    
+    @NiftyEventSubscriber (id = "alien_selector")
+    public void setCurrentLoadAlien(final String id, final DropDownSelectionChangedEvent<String> event) {
+        currentlySelectedLoadAlien = event.getSelection();
+    }
 
     public void confirmLoad() {
         app.addKeyBindings();
         if ("alien".equals(loadType)) {
             //TODO
-            if (app.loadAlien(sanitizeAlienName((String) nifty.getScreen("load_dialog").findNiftyControl("alien_selector", DropDown.class).getSelection()))) {
+            if (app.loadAlien(sanitizeAlienName(currentlySelectedLoadAlien))) {
                 nifty.gotoScreen("start");
                 screen = nifty.getScreen("start");
                 firstBody = true;
