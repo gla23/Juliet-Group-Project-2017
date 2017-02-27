@@ -33,6 +33,8 @@ import java.awt.Panel;
 import java.util.ArrayList;
 
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import julietgroupproject.UIAppState;
 
 public class MainMenuController extends AbstractAppState implements ScreenController {
@@ -166,13 +168,11 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                         if (!alreadyAddedAliens.contains(aliens[i])) {
                             System.out.println(i);
                             loadScrollE.addItem(aliens[i]);
-                            //addLoadButton(loadScrollE, aliens[i]);
-                            
                         }
                         alreadyAddedAliens.add(aliens[i]);
                     }
+                    loadScrollE.selectItemByIndex(0);
                     
-
                     initialising = false;
                 } catch (InterruptedException e) {
                 } catch (NullPointerException e2) {
@@ -183,30 +183,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         };
         thread.start();
     }
+   
     
-
-    public void addLoadButton(Element scroll, final String alien) {
-        System.out.println(alien);
-        scroll.add(new ButtonBuilder(alien+"LoadBut", alien){{
-
-            //childLayoutCenter();
-            valignTop();
-            paddingTop("0px");
-            paddingBottom("0px");
-            marginTop("0px");
-            marginBottom("0px");
-            width("100%");
-
-            //height("30px");
-            //visibleToMouse(true);
-            interactOnClick("handleControlOnClick(" + alien + ")");
-            }}.build(nifty, nifty.getCurrentScreen(), scroll));
-    }
-    
-    public void handleControlOnClick(String alienID) {
-        confirmLoad(alienID);
-        System.out.println(alienID);
-    }
 
     public void addOptionsValues() {
         Thread thread = new Thread() {
@@ -330,21 +308,10 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         loadType = "alien";
         app.removeKeyBindings();
         nifty.gotoScreen("load_dialog");
-
-       //String[] aliens = app.getLoadableAliens();
-        //aliens = new String[]{"first","second","third"};
-        addLoadValues(aliens);
-        //ScrollPanel loadScroll = nifty.getCurrentScreen().findNiftyControl("loadScrollBar", ScrollPanel.class);
-       /* Element loadScrollE = nifty.getCurrentScreen().findElementByName("loadScrollbar");
-                
-
-        loadScrollE.add(new ButtonBuilder("firstBut", aliens[0]){{
-        childLayoutCenter();
-        visibleToMouse(true);
-        interactOnClick("handleControlOnClick(" + "testAlien" + ")");
-        }}.build(nifty, nifty.getCurrentScreen(), loadScrollE));
+           
         
-        */
+
+        addLoadValues(aliens);
         
         
         System.out.println(Arrays.toString(aliens));
@@ -357,7 +324,9 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     public void confirmLoad() {
         app.addKeyBindings();
+        
         if ("alien".equals(loadType)) {
+            System.out.println(currentlySelectedLoadAlien);
             //TODO
             if (app.loadAlien(sanitizeAlienName(currentlySelectedLoadAlien))) {
                 nifty.gotoScreen("start");
@@ -370,23 +339,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             }
         }
     }
-    
-    public void confirmLoad(String givenAlien) {
-        app.addKeyBindings();
-        if ("alien".equals(loadType)) {
-            //TODO
-            if (app.loadAlien(sanitizeAlienName(givenAlien))) {
-                nifty.gotoScreen("start");
-                screen = nifty.getScreen("start");
-                firstBody = true;
-                addAlienSpecificOptions();
-                addValues();
-            } else {
-                nifty.gotoScreen("load_fail");
-            }
-        }
-    }
-
+   
     public void gotoSaveScreen() {
         this.saveType = "alien";
         app.removeKeyBindings();
@@ -484,8 +437,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstLabelE.show();
                 secondLabelE.hide();
                 thirdLabelE.show();
-                firstLabel.setText("Radius:");
-                thirdLabel.setText("Height:");
+                firstLabel.setText("Height:");
+                thirdLabel.setText("Radius:");
                 break;
             case "Ellipsoid":
                 getWidth.show();
@@ -505,8 +458,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstLabelE.show();
                 secondLabelE.hide();
                 thirdLabelE.show();
-                firstLabel.setText("Ring Thickness:");
-                thirdLabel.setText("Outer Radius:");
+                firstLabel.setText("Outer Radius:");
+                thirdLabel.setText("Ring Thickness:");
                 break;
             case "Cuboid":
                 getWidth.show();
