@@ -258,9 +258,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Block limb = createLimb(block, contactPt, normal);
 
         Geometry gl = AlienHelper.assembleBlock(limb, limb.getPosition().add(AlienHelper.getGeometryLocation(block.getGeometry())));
+        Matrix3f rotation = new Matrix3f();
+        rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
         Mesh m = gl.getMesh();
-        AlienHelper.rotateMesh(limb.rotation.invert(), m);
-        gl.setLocalRotation(limb.rotation);
+        AlienHelper.rotateMesh(rotation.invert(), m);
+        gl.setLocalRotation(rotation);
 
         // check for collision
 
