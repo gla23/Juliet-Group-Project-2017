@@ -344,6 +344,24 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     }
                 }
             }
+        } else {
+            /*
+            Slider widthField = nifty.getCurrentScreen().findNiftyControl("bodyWidthSlider", Slider.class);
+            Slider heightField = nifty.getCurrentScreen().findNiftyControl("bodyHeightSlider", Slider.class);
+            Slider lengthField = nifty.getCurrentScreen().findNiftyControl("bodyLengthSlider", Slider.class);
+
+            float bodyWidth = widthField.getValue();
+            float bodyHeight = heightField.getValue();
+            float bodyLength = lengthField.getValue();
+
+            Vector3f pos = Vector3f.ZERO;
+            Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", 0);
+        
+            Geometry gl = AlienHelper.assembleBlock(bodyBlock, pos);
+
+            gl.setMaterial(ghostMaterial);
+            rootNode.attachChild(gl);
+            */
         }
 
     }
