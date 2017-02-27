@@ -5,7 +5,6 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
-import de.lessvoid.nifty.builder.PanelBuilder;
 import de.lessvoid.nifty.controls.CheckBoxStateChangedEvent;
 import de.lessvoid.nifty.controls.DropDown;
 import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
@@ -146,10 +145,10 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 try {
                     //Shhhhhh..... there's nothing to see here
                     boolean working = false;
-                    DropDown loadScrollE = null;
+                    Element loadScrollE = null;
                     while (!working) {
                         this.sleep(20);
-                            loadScrollE = nifty.getScreen("load_dialog").findNiftyControl("alien_selector", DropDown.class);
+                            loadScrollE = nifty.getCurrentScreen().findElementByName("loadScrollPanel");
                             
                         try {
                             loadScrollE.getClass();
@@ -165,8 +164,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     for (int i =0; i<aliens.length; i++) {
                         if (!alreadyAddedAliens.contains(aliens[i])) {
                             System.out.println(i);
-                            //addLoadButton(loadScrollE, aliens[i]);
-                            loadScrollE.addItem(aliens[i]);
+                            addLoadButton(loadScrollE, aliens[i]);
                         }
                         alreadyAddedAliens.add(aliens[i]);
                     }
@@ -175,7 +173,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     initialising = false;
                 } catch (InterruptedException e) {
                 } catch (NullPointerException e2) {
-                    System.out.println("Null Pointer :( ");
+                    System.out.println("HERE2");
                 }
 
             }
@@ -184,23 +182,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
     
 
-    public void addLoadButton(DropDown scroll, final String alien) {
+    public void addLoadButton(Element scroll, final String alien) {
         System.out.println(alien);
-        /*
-        scroll.add(new PanelBuilder(alien + "ButtonPanel"){{
-            childLayoutCenter(); // panel properties, add more...
-            height("30px");
-                // GUI elements
-                control(new ButtonBuilder(alien+"LoadBut", alien){{
-                    alignCenter();
-                    valignCenter();
-                    height("100%");
-                    width("100%");}});
-                
-        }}.build(nifty, nifty.getCurrentScreen(), scroll));;*/
-        scroll.addItem(alien);
-                
-          /*      
         scroll.add(new ButtonBuilder(alien+"LoadBut", alien){{
 
             //childLayoutCenter();
@@ -214,7 +197,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             //height("30px");
             //visibleToMouse(true);
             interactOnClick("handleControlOnClick(" + alien + ")");
-            }}.build(nifty, nifty.getCurrentScreen(), scroll));*/
+            }}.build(nifty, nifty.getCurrentScreen(), scroll));
     }
     
     public void handleControlOnClick(String alienID) {
@@ -337,7 +320,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     private String sanitizeAlienName(String rawName) {
         String sanitizedAlienName;
         sanitizedAlienName = rawName.replaceAll("[^A-Za-z0-9 \\-_]", "");
-        System.out.println("San: " +sanitizedAlienName);
         return sanitizedAlienName;
     }
     
