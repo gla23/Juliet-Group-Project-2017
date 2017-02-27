@@ -27,7 +27,7 @@ public class AlienBrain extends AbstractControl {
     private double[] nnInput;
     private static final float MAX_VELOCITY = 2f;
     private static final float MIN_VELOCITY = 0.1f;
-    private static final float MAX_POWER = 4f;
+    private static final float MAX_POWER = 1f;
     
     private final boolean isFixedTimestep;
     public static final double DEFAULT_UPDATE_INTERVAL = 0.5;

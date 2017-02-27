@@ -31,7 +31,7 @@ public class AlienEvaluator implements CalculateScore {
     @Override
     public double calculateScore(MLMethod nn) {
         SimulationData request = new SimulationData((MLRegression) nn, simTime);
-        simTime += simTimeOffset;
+        //simTime += simTimeOffset;
 
         simTasks.add(request);
 

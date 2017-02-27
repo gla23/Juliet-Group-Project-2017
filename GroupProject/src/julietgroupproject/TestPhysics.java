@@ -112,15 +112,27 @@ public class TestPhysics {
         Alien a = loadAlien("aliens/test3/body.sav");
         ConcurrentLinkedQueue<SimulationData> q = new ConcurrentLinkedQueue<>();
         List<SimulationData> lsd = new ArrayList<>();
-        int bgSimulatorCount = 4;
+        int bgSimulatorCount = 0;
         int fgSimulatorCount = 0;
-        int samplecount = 100;
+        int fastSimulatorCount = 4;
+        int samplecount = 1000;
         float accuracy = 1f / 60f;
         float bgSimTimeStep = 1f / 60f;
         final float defaultSpeed = 1.0f;
         final int defaultFramerate = 60;
-        int bgSpeedUpFactor = 100;
+        int bgSpeedUpFactor = 1000;
         List<SlaveSimulator> list = new ArrayList<>();
+        
+        for (int i = 0; i < fastSimulatorCount; ++i) {
+            SlaveSimulator sim = new SlaveSimulator(new TrainingAppState(a, q, defaultSpeed, accuracy, bgSimTimeStep));
+            sim.setShowSettings(false);
+            AppSettings sett = new AppSettings(true);
+            sett.setCustomRenderer(FastNullContext.class);
+            sim.setSettings(sett);
+            sim.start();
+            list.add(sim);
+        }
+        
         for (int i = 0; i < fgSimulatorCount; ++i) {
             // foreground simulators
             SlaveSimulator s = new SlaveSimulator(new TrainingAppState(a, q, defaultSpeed, accuracy));
@@ -174,15 +186,17 @@ public class TestPhysics {
         final double[] fitness = new double[samplecount];
         for (int i = 0; i < samplecount; i++) {
             //final SimulationData d = new SimulationData(null, 10.0);
-            final SimulationData d = new SimulationData(nn, 10.0);
+            final SimulationData d = new SimulationData(nn, 50.0);
             lsd.add(d);
             q.offer(d);
         }
+        // start timer
+        long t = System.currentTimeMillis();
         for (int i = 0; i < samplecount; i++) {
             fitness[i] = lsd.get(i).getFitness();
         }
         System.out.println(Arrays.toString(fitness));
-        
+        System.out.println("Time taken: " + (System.currentTimeMillis() - t));
         for (SlaveSimulator s : list) {
             s.kill();
         }

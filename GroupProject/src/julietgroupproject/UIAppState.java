@@ -76,7 +76,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private Material ghostMaterial;
     private Material ghostMaterial2;
     private Geometry arrowGeometry;
-    private int speedUpFactor = 1000;
+    private int speedUpFactor = 5000;
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
