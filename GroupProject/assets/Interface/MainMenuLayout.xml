@@ -129,19 +129,20 @@
                                     <control valign = "center" width = "65%" id="loadTextField" name="textfield" />
                                  </panel>
                                  <panel id = "load_options" width = "100%" height = "70%" childLayout = "vertical" >
-                                     <control id="loadScrollbar" style="autoscroll"  name="scrollPanel" horizontal="false" height="100%"> 
+                                     <control id="alien_selector" name="dropDown" />
+                                     <!--<control id="loadScrollbar" style="autoscroll"  name="scrollPanel" horizontal="false" height="100%"> 
+                                     
+                                        <panel id ="loadScrollPanel" backgroundColor = "#dddddddd" width = "100%" childLayout = "vertical">
 
-                                        <panel id ="loadScrollPanel"  width = "100%" childLayout = "vertical">
-
-                                            <!--<control id = "loadScrollTestPanel" name = "panel" height = "100%" width = "100%" childLayout = "vertical" >
+                                            <control id = "loadScrollTestPanel" name = "panel" height = "100%" width = "100%" childLayout = "vertical" >
                                                 
-                                            </control>-->
+                                            </control>
                                             
                                         </panel>
                                                     
                                                     
                                                     
-                                     </control>
+                                   </control>-->
                                      
                             
                                  </panel>

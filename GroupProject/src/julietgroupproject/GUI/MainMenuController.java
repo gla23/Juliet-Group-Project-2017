@@ -53,6 +53,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     private String loadType = "";
 
     private String[] aliens;
+    private String currentlySelectedLoadAlien = "";
+    private ArrayList<String> alreadyAddedAliens = new ArrayList<String>();
 
 
     public MainMenuController(UIAppState App) {
@@ -144,13 +146,13 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 try {
                     //Shhhhhh..... there's nothing to see here
                     boolean working = false;
-                    Element loadScrollE = null;
+                    DropDown loadScrollE = null;
                     while (!working) {
                         this.sleep(20);
-                            loadScrollE = nifty.getCurrentScreen().findElementByName("loadScrollPanel");
+                            loadScrollE = nifty.getCurrentScreen().findNiftyControl("alien_selector", DropDown.class);
                             
                         try {
-                            loadScrollE.getClass();
+                            loadScrollE.removeItem("");
                             working = true;
                         } catch (NullPointerException e) {
                         }
@@ -158,10 +160,16 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
                     initialising = true;
                     //loadScrollE.setHeight(200);
-
+                    System.out.println("Aliens " + Arrays.toString(aliens));
+                    System.out.println("Already Added: "  + alreadyAddedAliens.toString());
                     for (int i =0; i<aliens.length; i++) {
-
-                        addLoadButton(loadScrollE, aliens[i]);
+                        if (!alreadyAddedAliens.contains(aliens[i])) {
+                            System.out.println(i);
+                            loadScrollE.addItem(aliens[i]);
+                            //addLoadButton(loadScrollE, aliens[i]);
+                            
+                        }
+                        alreadyAddedAliens.add(aliens[i]);
                     }
                     
 
@@ -260,11 +268,16 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     //Shhhhhh..... there's nothing to see here
                     boolean working = false;
                     DropDown shapeSelect = null;
+                    TabGroup tabs = null;
                     while (!working) {
                         this.sleep(20);
                         shapeSelect = nifty.getScreen("start").findNiftyControl("shape_selector_body", DropDown.class);
+                        tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
+                        addLimb = nifty.getScreen("start").findNiftyControl("add_limb_tab", Tab.class);
+                        addBody = nifty.getScreen("start").findNiftyControl("add_body_tab", Tab.class);
                         try {
                             shapeSelect.removeItem("");
+                            tabs.getSelectedTabIndex();
                             working = true;
                         } catch (NullPointerException e) {
                         }
@@ -279,9 +292,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     shapeSelect.addItem("Cylinder");
                     shapeSelect.addItem("Torus");
                     shapeSelect.selectItemByIndex(0);
-                    TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
-                    addLimb = nifty.getScreen("start").findNiftyControl("add_limb_tab", Tab.class);
-                    addBody = nifty.getScreen("start").findNiftyControl("add_body_tab", Tab.class);
 
                     if (firstBody) {
                         tabs.setSelectedTab(addLimb);
@@ -339,17 +349,22 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         
         System.out.println(Arrays.toString(aliens));
     }
+    
+    @NiftyEventSubscriber (id = "alien_selector")
+    public void setCurrentLoadAlien(final String id, final DropDownSelectionChangedEvent<String> event) {
+        currentlySelectedLoadAlien = event.getSelection();
+    }
 
     public void confirmLoad() {
         app.addKeyBindings();
         if ("alien".equals(loadType)) {
             //TODO
-            if (app.loadAlien(sanitizeAlienName(nifty.getScreen("load_dialog").findNiftyControl("loadTextField", TextField.class).getRealText()))) {
+            if (app.loadAlien(sanitizeAlienName(currentlySelectedLoadAlien))) {
                 nifty.gotoScreen("start");
                 screen = nifty.getScreen("start");
                 firstBody = true;
                 addAlienSpecificOptions();
-                addValues();
+                //addValues();
             } else {
                 nifty.gotoScreen("load_fail");
             }
@@ -366,9 +381,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstBody = true;
                 addAlienSpecificOptions();
                 addValues();
-                //TODO: inform user load was successful
             } else {
-                //TODO: inform user load was unsuccessful
+                nifty.gotoScreen("load_fail");
             }
         }
     }
@@ -470,8 +484,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstLabelE.show();
                 secondLabelE.hide();
                 thirdLabelE.show();
-                firstLabel.setText("Height:");
-                thirdLabel.setText("Radius:");
+                firstLabel.setText("Radius:");
+                thirdLabel.setText("Height:");
                 break;
             case "Ellipsoid":
                 getWidth.show();
@@ -491,8 +505,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstLabelE.show();
                 secondLabelE.hide();
                 thirdLabelE.show();
-                firstLabel.setText("Outer Radius:");
-                thirdLabel.setText("Ring Thickness:");
+                firstLabel.setText("Ring Thickness:");
+                thirdLabel.setText("Outer Radius:");
                 break;
             case "Cuboid":
                 getWidth.show();
@@ -569,8 +583,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstLabelE.show();
                 secondLabelE.hide();
                 thirdLabelE.show();
-                firstLabel.setText("Height:");
-                thirdLabel.setText("Radius:");
+                firstLabel.setText("Radius:");
+                thirdLabel.setText("Height:");
                 break;
             case "Ellipsoid":
                 getWidth.show();
@@ -590,8 +604,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstLabelE.show();
                 secondLabelE.hide();
                 thirdLabelE.show();
-                firstLabel.setText("Outer Radius:");
-                thirdLabel.setText("Ring Thickness:");
+                firstLabel.setText("Ring Thickness:");
+                thirdLabel.setText("Outer Radius:");
                 break;
             case "Cuboid":
                 getWidth.show();
