@@ -33,10 +33,10 @@ public class LearnToBeAnAlien extends SimpleApplication {
         LearnToBeAnAlien app = new LearnToBeAnAlien();
         app.setShowSettings(false);
         AppSettings settings = new AppSettings(true);
-        settings.setTitle("Learn to be a flopping cube");
-        settings.put("Width", 1920);
-        settings.put("Height", 1080);
-        settings.setFullscreen(true);
+        settings.setTitle("Learn to be a flopping mess");
+        settings.put("Width", 1920*4/5);
+        settings.put("Height",1080*4/5);
+        settings.setFullscreen(false);
         app.setSettings(settings);
         app.start();
     }

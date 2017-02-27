@@ -367,7 +367,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
             //Instantiate the new alien
             Vector3f pos = Vector3f.ZERO;
-
+            
+            
             Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", bodyWeight);
             int texturecode = alien != null ? alien.materialCode : 1;
             alien = new Alien(bodyBlock);
@@ -486,13 +487,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Vector3f newHingePos;
         Vector3f newPos;
          if (currentShape.equals("Cylinder")) {
-             newHingePos = contactPt.add(normal.mult(0.1f));
              newPos = contactPt.add(normal.mult(limbWidth + limbSeperation));
          } else {
-             newHingePos = contactPt.add(normal.mult(0.1f));
              newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeperation));
-         } 
-         
+         }
+         //Vector3f 
+         newHingePos = contactPt.add(normal.mult(4*jointPositionFraction));
         // Work out which hinge axis would make sense for auto hinge axis
         String axisToUse = "ZAxis";
         if (currentHingeAxis.equals("A")) {
