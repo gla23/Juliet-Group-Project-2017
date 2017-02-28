@@ -1144,7 +1144,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     @Override
     public void update(float tpf) {
         
-        if (simInProgress) {     
+        if (simInProgress) {
+            if (this.isFixedTimeStep) { tpf = this.fixedTimeStep; }
             simTimeLimit -= tpf * physics.getSpeed();
             if (simTimeLimit < 0f) {
                 // stop simulation and report result

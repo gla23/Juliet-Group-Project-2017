@@ -10,6 +10,9 @@
 ### Alien saves ###
 *.sav
 
+### Graphs ###
+GroupProject/assets/Graphs/*
+
 ### Java ###
 *.class
 
