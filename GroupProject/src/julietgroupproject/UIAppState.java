@@ -932,8 +932,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
              */
             toAdd.setShowSettings(false);
             AppSettings sett = new AppSettings(false);
-            //sett.setCustomRenderer(FastNullContext.class);
-            sett.setFrameRate(30);
+            sett.setCustomRenderer(FastNullContext.class);
+            //sett.setFrameRate(30);
             toAdd.setSettings(sett);
             toAdd.start();
         }
