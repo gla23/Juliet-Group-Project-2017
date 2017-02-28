@@ -36,7 +36,7 @@ public class AlienEvaluator implements CalculateScore {
         simTasks.add(request);
 
         double val = request.getFitness();
-        System.out.println(++returnedRequests + " returned: " + val);
+        //System.out.println(++returnedRequests + " returned: " + val);
         return val;
     }
 

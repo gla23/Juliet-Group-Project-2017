@@ -31,6 +31,7 @@ import com.jme3.scene.debug.Arrow;
 import com.jme3.system.JmeContext;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.CheckBox;
+import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.Slider;
 import java.io.File;
 import java.io.FileInputStream;
@@ -104,6 +105,22 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     public UIAppState(Alien _alien, double _simSpeed, double _accuracy, double _fixedTimeStep) {
         super(_alien, _simSpeed, _accuracy, _fixedTimeStep);
+    }
+    
+    public void updateLog() {
+        // trainingLog
+        // nifty
+        if (!editing) {
+            ListBox niftyLog = nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class);
+            ArrayList<String> logEntries = trainingLog.getEntries();
+            
+            niftyLog.clear();
+            for (String entry : logEntries) {
+                System.out.println(" ---------------------------------" + entry);
+                niftyLog.insertItem(entry, 0);
+            }
+            
+        }
     }
 
     public void setTexture(int textno) {
@@ -862,6 +879,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.trainer = new AlienTrainer("aliens/" + alien.getName() + "/training.pop",
                 simulationQueue, currentAlienNode.joints.size() + 1,
                 currentAlienNode.joints.size());
+        
+        this.trainer.setLog(trainingLog);
 
         while (this.slaves.size() < SIM_COUNT) {
             SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(this.alien, this.simulationQueue, 1.0f, this.accuracy, 1f / 60f));
@@ -1104,7 +1123,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     @Override
     public void update(float tpf) {
-        if (simInProgress) {
+        
+        if (simInProgress) {     
             simTimeLimit -= tpf * physics.getSpeed();
             if (simTimeLimit < 0f) {
                 // stop simulation and report result
@@ -1112,7 +1132,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             }
         } else {
             updateGhostLimb();
-
+                             
             // try to poll task from the queue
             if (!editing) {
                 SimulationData s;
@@ -1123,6 +1143,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 }
             }
         }
+        
+        updateLog();
     }
 
     @Override
