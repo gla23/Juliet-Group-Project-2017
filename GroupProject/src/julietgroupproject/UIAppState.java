@@ -86,6 +86,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private Material ghostMaterial;
     private Material ghostMaterial2;
     private Geometry arrowGeometry;
+    private boolean showArrow = true;
     private int speedUpFactor = 1000;
     private boolean shiftDown = false;
     private JulietLogger<LogEntry> trainingLog = new JulietLogger<>();
@@ -518,16 +519,30 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         arrowMaterial.setColor("Color", ColorRGBA.Blue);
         arrowGeometry.setMaterial(arrowMaterial);
         arrowGeometry.setLocalTranslation(0, -3.5f, 0);
+        RigidBodyControl r = new RigidBodyControl();
+        arrowGeometry.addControl(r);
+        // Remove the arrow from the collision space.
+        physics.getPhysicsSpace().removeCollisionObject(r);
     }
-
-    public void toggleArrow() {
-        if (arrowGeometry == null) {
-            createArrow();
+    public void showArrow() {
+        if (arrowGeometry == null) createArrow();
+        if (!simRoot.hasChild(arrowGeometry)) {
+            simRoot.attachChild(arrowGeometry);
+            showArrow = true;
         }
+    }
+    public void hideArrow() {
+        if (arrowGeometry == null) createArrow();
         if (simRoot.hasChild(arrowGeometry)) {
             simRoot.detachChild(arrowGeometry);
+            showArrow = false;
+        }
+    }
+    public void toggleArrow() {
+        if (!showArrow) {
+            showArrow();
         } else {
-            simRoot.attachChild(arrowGeometry);
+            hideArrow();
         }
     }
 
@@ -806,6 +821,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.ghostRoot = new Node("ghost root");
         this.rootNode.attachChild(ghostRoot);
 
+        showArrow();
     }
 
     public void addKeyBindings() {
