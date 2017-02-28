@@ -536,7 +536,7 @@
 
             // TODO           
             <panel id = "simulation_logger" width= "20%" valign = "top" align="left" height = "60%" childLayout = "vertical" backgroundColor="#aaaaaa00">
-                <control id="logger_listbox" name="listBox" vertical="optional" horizontal="off" displayItems="15" selectionMode="Disabled" forceSelection="false"/>
+                <control id="logger_listbox" name="listBox" vertical="optional" horizontal="off" displayItems="20" selectionMode="Disabled" forceSelection="false"/>
             </panel>
             
             <panel id = "simulation_button" width= "100%" valign = "bottom" height = "5%" childLayout = "vertical">

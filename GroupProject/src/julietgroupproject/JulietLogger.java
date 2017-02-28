@@ -16,13 +16,13 @@ import java.util.ArrayList;
  */
 public class JulietLogger<T> {
     
-    public static final int DEFAULT_LIMIT = 15;
+    public static final int DEFAULT_LIMIT = 1000;
     private int limit;
-    private ArrayDeque<T> entries = new ArrayDeque<>();
+    private ArrayList<T> entries;
     
     public JulietLogger(int limit) {
         this.limit = limit;
-        entries = new ArrayDeque<>();
+        entries = new ArrayList<>(DEFAULT_LIMIT);
     }
 
     public JulietLogger() {
@@ -30,10 +30,10 @@ public class JulietLogger<T> {
     }
     
     public synchronized void push(T entry) {
-        entries.push(entry);
+        entries.add(entry);
         
         while (entries.size() > limit) {
-            entries.removeLast();
+            entries.remove(0);
         }
     }
     
@@ -51,6 +51,10 @@ public class JulietLogger<T> {
     
     public synchronized ArrayList<T> getEntries() {
         return new ArrayList(entries);
+    }
+    
+    public synchronized ArrayList<T> getLastEntries(int n) {
+        return new ArrayList<>(entries.subList(Math.max(0, entries.size()-n), entries.size()));
     }
     
     public void clear() {

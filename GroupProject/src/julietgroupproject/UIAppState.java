@@ -113,11 +113,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         // nifty
         if (!editing) {
             ListBox niftyLog = nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class);
-            ArrayList<LogEntry> logEntries = trainingLog.getEntries();
+            ArrayList<LogEntry> logEntries = trainingLog.getLastEntries(20);
             
             niftyLog.clear();
             for (LogEntry entry : logEntries) {
-                niftyLog.insertItem(entry, 0);
+                niftyLog.addItem(entry);
             }
             
         }
