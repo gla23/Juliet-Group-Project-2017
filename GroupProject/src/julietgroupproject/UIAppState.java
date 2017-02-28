@@ -44,6 +44,7 @@ import java.io.ObjectOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -117,9 +118,25 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             niftyLog.clear();
             for (LogEntry entry : logEntries) {
                 niftyLog.addItem(entry);
-            }          
+
+                
+            }
+            System.out.println("log");
+            buildGraph(logEntries);
         }
     }
+    
+    public void buildGraph(ArrayList<LogEntry> log) {
+        List<Float> data = new ArrayList<Float>();
+        for (int i = 0; i<log.size(); i++) {
+            float fitness = log.get(i).fitness;
+            data.add(fitness);
+        }
+        System.out.println("Data: " + data);
+        DrawGraph test = new DrawGraph(data, "assets/Graphs/test1.png");
+        test.showIt();
+    }
+  
 
     public void setTexture(int textno) {
         System.out.println("Setting texture to " + textno);
@@ -915,7 +932,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
              */
             toAdd.setShowSettings(false);
             AppSettings sett = new AppSettings(false);
-            sett.setCustomRenderer(FastNullContext.class);
+            //sett.setCustomRenderer(FastNullContext.class);
+            sett.setFrameRate(30);
             toAdd.setSettings(sett);
             toAdd.start();
         }

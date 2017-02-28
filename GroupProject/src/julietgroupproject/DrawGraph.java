@@ -83,8 +83,10 @@ public class DrawGraph extends JPanel {
 
       // create x and y axes 
       g2.drawLine(BORDER_GAP, getHeight() - BORDER_GAP, BORDER_GAP, BORDER_GAP);
+      Stroke temp = g2.getStroke();
+      g2.setStroke(new BasicStroke(5));
       g2.drawLine(BORDER_GAP, getHeight() - BORDER_GAP, getWidth() - BORDER_GAP, getHeight() - BORDER_GAP);
-
+      g2.setStroke(temp);
       // create hatch marks for y axis. 
       for (int i = 0; i < Y_HATCH_CNT; i++) {
          int x0 = BORDER_GAP;

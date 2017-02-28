@@ -506,7 +506,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     @NiftyEventSubscriber(id = "wireMeshCheckBox")
     public void onWireMeshChange(final String id, final CheckBoxStateChangedEvent event) {
         app.toggleWireMesh();
-        makeGraph();
+        //makeGraph();
     }
     
     @NiftyEventSubscriber(id = "DirectionArrowCheckBox")
@@ -584,14 +584,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         aliens = app.getLoadableAliens();        
     }
     
-    public void makeGraph() {
-        List<Float> data = new ArrayList<Float>();
-        data.add(3.1f);
-        data.add(65.2f);
-        data.add(20.4f);
-        data.add(41.6f);
-        data.add(5.2f);
-        data.add(50.7f);
+    public void makeGraph(List<Float> data) {
         DrawGraph test = new DrawGraph(data, "assets/Graphs/test1.png");
         test.showIt();
     }

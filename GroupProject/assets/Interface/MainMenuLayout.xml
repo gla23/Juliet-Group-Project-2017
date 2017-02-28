@@ -540,6 +540,10 @@
                 <control id="logger_listbox" name="listBox" vertical="optional" horizontal="off" displayItems="20" selectionMode="Disabled" forceSelection="false"/>
 
             </panel>
+            <panel id = "simulation_logger" width= "40%" valign = "top" align="right" height = "20%" childLayout = "vertical" backgroundColor="#aaaaaa00">
+               <!--<image id="graphId" width = "100%"  height ="100%" filename="Graphs/test1.png" />-->
+
+            </panel>
             
             <panel id = "simulation_button" width= "100%" valign = "bottom" height = "5%" childLayout = "vertical">
                 <control name = "button" label = "Stop Simulation" id = "stop_simulation" height = "100%" align = "right"  width = "13%"
