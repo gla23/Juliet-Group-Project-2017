@@ -32,6 +32,7 @@ import com.jme3.scene.debug.Arrow;
 import com.jme3.system.JmeContext;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.CheckBox;
+import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.Slider;
 import java.io.File;
 import java.io.FileInputStream;
@@ -86,9 +87,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private Material ghostMaterial;
     private Material ghostMaterial2;
     private Geometry arrowGeometry;
+    private boolean showArrow = true;
     private int speedUpFactor = 1000;
     private boolean shiftDown = false;
-    private ProsserLogger trainingLog = new ProsserLogger();
+    private JulietLogger<LogEntry> trainingLog = new JulietLogger<>();
     private Node ghostRoot;
     private boolean isCollisionOccuring = false;
     int[] jointKeys = { // Used for automatically giving limbs keys
@@ -105,6 +107,18 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     public UIAppState(Alien _alien, double _simSpeed, double _accuracy, double _fixedTimeStep) {
         super(_alien, _simSpeed, _accuracy, _fixedTimeStep);
+    }
+    
+    public void updateLog() {
+        if (!editing) {
+            ListBox niftyLog = nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class);
+            ArrayList<LogEntry> logEntries = trainingLog.getLastEntries(20);
+            
+            niftyLog.clear();
+            for (LogEntry entry : logEntries) {
+                niftyLog.addItem(entry);
+            }          
+        }
     }
 
     public void setTexture(int textno) {
@@ -503,16 +517,30 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         arrowMaterial.setColor("Color", ColorRGBA.Blue);
         arrowGeometry.setMaterial(arrowMaterial);
         arrowGeometry.setLocalTranslation(0, -3.5f, 0);
+        RigidBodyControl r = new RigidBodyControl();
+        arrowGeometry.addControl(r);
+        // Remove the arrow from the collision space.
+        physics.getPhysicsSpace().removeCollisionObject(r);
     }
-
-    public void toggleArrow() {
-        if (arrowGeometry == null) {
-            createArrow();
+    public void showArrow() {
+        if (arrowGeometry == null) createArrow();
+        if (!simRoot.hasChild(arrowGeometry)) {
+            simRoot.attachChild(arrowGeometry);
+            showArrow = true;
         }
+    }
+    public void hideArrow() {
+        if (arrowGeometry == null) createArrow();
         if (simRoot.hasChild(arrowGeometry)) {
             simRoot.detachChild(arrowGeometry);
+            showArrow = false;
+        }
+    }
+    public void toggleArrow() {
+        if (!showArrow) {
+            showArrow();
         } else {
-            simRoot.attachChild(arrowGeometry);
+            hideArrow();
         }
     }
 
@@ -799,6 +827,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.ghostRoot = new Node("ghost root");
         this.rootNode.attachChild(ghostRoot);
 
+        showArrow();
     }
 
     public void addKeyBindings() {
@@ -871,6 +900,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.trainer = new AlienTrainer("aliens/" + alien.getName() + "/training.pop",
                 simulationQueue, currentAlienNode.joints.size() + 1,
                 currentAlienNode.joints.size());
+        
+        this.trainer.setLog(trainingLog);
 
         while (this.slaves.size() < SIM_COUNT) {
             SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(this.alien, this.simulationQueue, 1.0f, this.accuracy, 1f / 60f));
@@ -1115,7 +1146,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     @Override
     public void update(float tpf) {
-        if (simInProgress) {
+        
+        if (simInProgress) {     
             simTimeLimit -= tpf * physics.getSpeed();
             if (simTimeLimit < 0f) {
                 // stop simulation and report result
@@ -1123,7 +1155,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             }
         } else {
             updateGhostLimb();
-
+                             
             // try to poll task from the queue
             if (!editing) {
                 SimulationData s;
@@ -1134,6 +1166,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 }
             }
         }
+        
+        updateLog();
     }
 
     @Override

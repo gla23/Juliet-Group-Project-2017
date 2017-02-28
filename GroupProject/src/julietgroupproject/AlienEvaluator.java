@@ -13,8 +13,7 @@ import org.encog.ml.MLRegression;
 public class AlienEvaluator implements CalculateScore {
 
     private Queue<SimulationData> simTasks;
-    final static double simTimeBase = 10.0;
-    final static double simTimeOffset = 0.005;
+    final static double simTimeBase = 15.0;
     static double simTime;
     long returnedRequests = 0;
 
@@ -31,12 +30,11 @@ public class AlienEvaluator implements CalculateScore {
     @Override
     public double calculateScore(MLMethod nn) {
         SimulationData request = new SimulationData((MLRegression) nn, simTime);
-        //simTime += simTimeOffset;
 
         simTasks.add(request);
 
         double val = request.getFitness();
-        System.out.println(++returnedRequests + " returned: " + val);
+        //System.out.println(++returnedRequests + " returned: " + val);
         return val;
     }
 

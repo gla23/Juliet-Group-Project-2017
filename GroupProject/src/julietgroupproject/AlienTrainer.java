@@ -26,10 +26,10 @@ public class AlienTrainer extends Thread {
     private String filename; //File to save/load population from.
     private int inputCount; //Number of inputs to the NN
     private int outputCount; //Number of outputs from the NN
-    private final int popCount = 200; //population size to use
+    private final int popCount = 20; //population size to use
     private volatile boolean terminating = false;
     private volatile List<SlaveSimulator> slaves;
-    private ProsserLogger log = null;
+    private JulietLogger<LogEntry> log = null;
 
     private void load() {
         pop = null;
@@ -115,14 +115,15 @@ public class AlienTrainer extends Thread {
                 double populationFitness = this.pop.getBestGenome().getScore();
                     
                 //print statistics
-                System.out.println("Error: " + Format.formatDouble(this.train.getError(), 2)); //TODO: Error always returns 1
-                System.out.println("Iterations: " + iterationNumber);
+                //System.out.println("Error: " + Format.formatDouble(this.train.getError(), 2)); //TODO: Error always returns 1
+                //System.out.println("Iterations: " + iterationNumber);
             
                 if (log != null) {
-                    log.push("Iteration #" + iterationNumber + ", " + populationFitness);
+                    log.push(new LogEntry(iterationNumber, (float) populationFitness));
                 }
             } while (!terminating);
         } finally {
+            log.clear();
             this.train.finishTraining();
         }
 
@@ -144,7 +145,7 @@ public class AlienTrainer extends Thread {
         terminating = true;
     }
     
-    public void setLog(ProsserLogger log) {
+    public void setLog(JulietLogger<LogEntry> log) {
         this.log = log;
     }
 }
