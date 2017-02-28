@@ -26,7 +26,7 @@ public class AlienTrainer extends Thread {
     private String filename; //File to save/load population from.
     private int inputCount; //Number of inputs to the NN
     private int outputCount; //Number of outputs from the NN
-    private final int popCount = 20; //population size to use
+    private final int popCount = 30; //population size to use
     private volatile boolean terminating = false;
     private volatile List<SlaveSimulator> slaves;
     private JulietLogger<LogEntry> log = null;

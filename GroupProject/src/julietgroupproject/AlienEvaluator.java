@@ -13,7 +13,7 @@ import org.encog.ml.MLRegression;
 public class AlienEvaluator implements CalculateScore {
 
     private Queue<SimulationData> simTasks;
-    final static double simTimeBase = 15.0;
+    final static double simTimeBase = 20.0;
     static double simTime;
     long returnedRequests = 0;
 
