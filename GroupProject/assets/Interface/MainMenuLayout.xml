@@ -533,7 +533,10 @@
     </screen>
     <screen id="simulation" controller="julietgroupproject.GUI.MainMenuController" childLayout="right">
         <layer id="simluation_layer" childLayout="center" width = "100%" >
-            <panel id = "simulation_center" width= "100%" valign = "bottom" height = "5%" childLayout = "vertical">
+            <panel id = "simulation_logger" width= "100%" valign = "top" height = "20%" childLayout = "vertical">
+                <control id="logger_listbox" name="listBox" vertical="optional" horizontal="off" displayItems="15" selectionMode="Disabled" />
+            </panel>
+            <panel id = "simulation_button" width= "100%" valign = "bottom" height = "5%" childLayout = "vertical">
                 <control name = "button" label = "Stop Simulation" id = "stop_simulation" height = "100%" align = "right"  width = "13%"
                          visibleToMouse = "true" >
                     <interact onClick="stopSimulation()"/>
