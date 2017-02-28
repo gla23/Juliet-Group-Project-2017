@@ -34,6 +34,9 @@ import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.Slider;
+import de.lessvoid.nifty.elements.Element;
+import de.lessvoid.nifty.elements.render.ImageRenderer;
+import de.lessvoid.nifty.render.NiftyImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -119,23 +122,37 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             for (LogEntry entry : logEntries) {
                 niftyLog.insertItem(entry, 0);
             }
-            System.out.println("log");
-            buildGraph(logEntries);
+            //System.out.println("log");
+            ArrayList<LogEntry> fullLogEntries = trainingLog.getEntries();
+            if (fullLogEntries.size()>numLogEntries) {
+                buildGraph(fullLogEntries);
+            }
         }
     }
     
     public void buildGraph(ArrayList<LogEntry> log) {
-        if (log.size()>numLogEntries) {
-            List<Float> data = new ArrayList<Float>();
-            for (int i = 0; i<log.size(); i++) {
-                float fitness = log.get(i).fitness;
-                data.add(fitness);
-            }
-            System.out.println("Data: " + data);
-            DrawGraph test = new DrawGraph(data, "assets/Graphs/test1.png");
-            test.showIt();
-            numLogEntries = log.size();
+        List<Float> data = new ArrayList<Float>();
+        for (int i = 0; i<log.size(); i++) {
+            float fitness = log.get(i).fitness;
+            data.add(fitness);
         }
+        System.out.println("Data: " + data);
+        DrawGraph test = new DrawGraph(data, "assets/Graphs/test1.png");
+        test.showIt();
+        updateGraph();
+        numLogEntries = log.size();
+    }
+    
+    public void updateGraph() {
+        NiftyImage newImage = nifty.getRenderEngine().createImage(nifty.getScreen("simulation"),"Graphs/test1.png", false); // false means don't linear filter the image, true would apply linear filtering
+
+        // find the element with it's id
+        Element element = nifty.getScreen("simulation").findElementByName("graphId");
+
+        // change the image with the ImageRenderer
+        element.getRenderer(ImageRenderer.class).setImage(newImage);
+        
+        System.out.println("Updated");
     }
   
 
@@ -912,7 +929,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             toAdd.setShowSettings(false);
             AppSettings sett = new AppSettings(false);
             sett.setCustomRenderer(FastNullContext.class);
-            //sett.setFrameRate(50);
+            sett.setFrameRate(30);
             toAdd.setSettings(sett);
             toAdd.start();
         }

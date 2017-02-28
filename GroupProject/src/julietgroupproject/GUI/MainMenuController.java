@@ -59,7 +59,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         this.nifty = nifty;
         this.screen = screen;
     }
-
+    
     public void newBody() {
         setCurrentBodyShape();
         app.createNewBody();
