@@ -604,7 +604,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
 
 
-        Slider yawnSlider = nifty.getCurrentScreen().findNiftyControl("yawnSlider", Slider.class);
+        Slider yawSlider = nifty.getCurrentScreen().findNiftyControl("yawSlider", Slider.class);
         Slider pitchSlider = nifty.getCurrentScreen().findNiftyControl("pitchSlider", Slider.class);
         Slider rollSlider = nifty.getCurrentScreen().findNiftyControl("rollSlider", Slider.class);
         Slider jointPosSlider = nifty.getCurrentScreen().findNiftyControl("jointPosSlider", Slider.class);
@@ -618,7 +618,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         float strength;
         float limbSeperation;
         boolean symmetric;
-        float yawn;
+        float yaw;
         float pitch;
         float roll;
         float jointPositionFraction;
@@ -633,7 +633,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         strength = strengthField.getValue();
         limbSeperation = seperationField.getValue();
         symmetric = symmetricBox.isChecked();
-        yawn = yawnSlider.getValue();
+        yaw = yawSlider.getValue();
         pitch = pitchSlider.getValue();
         roll = rollSlider.getValue();
         jointPositionFraction = jointPosSlider.getValue();
@@ -675,9 +675,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             rotationForNormal = rotationForNormal.mult(new Matrix3f(limbWidth, 0f, 0f, 0f, limbHeight, 0f, 0f, 0f, limbLength));
         }
         
-        // Apply yawn pitch roll rotation
+        // Apply yaw pitch roll rotation
         float[] angles = new float[3];
-        angles[0] = yawn;
+        angles[0] = yaw;
         angles[1] = pitch;
         angles[2] = roll;
         Matrix3f rotationForYPR = new Quaternion(angles).toRotationMatrix();
