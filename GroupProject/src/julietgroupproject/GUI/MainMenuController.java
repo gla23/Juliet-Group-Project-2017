@@ -204,26 +204,26 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
                     initialising = true;
 
-                    textureBox.removeItem("Alien1");
-                    textureBox.removeItem("Alien2");
-                    textureBox.removeItem("Alien3");
-                    textureBox.removeItem("Alien4");
+                    textureBox.removeItem("Plant");
+                    textureBox.removeItem("Snake");
+                    textureBox.removeItem("Mosaic");
+                    textureBox.removeItem("Zebra");
 
-                    textureBox.addItem("Alien1");
-                    textureBox.addItem("Alien2");
-                    textureBox.addItem("Alien3");
-                    textureBox.addItem("Alien4");
+                    textureBox.addItem("Plant");
+                    textureBox.addItem("Snake");
+                    textureBox.addItem("Mosaic");
+                    textureBox.addItem("Zebra");
 
-                    String tex = "Alien1";
+                    String tex = "Zebra";
                     int textNo = app.getTextureNo();
                     if (textNo == 0) {
-                        tex = "Alien1";
+                        tex = "Plant";
                     } else if (textNo == 1) {
-                        tex = "Alien2";
+                        tex = "Snake";
                     } else if (textNo == 2) {
-                        tex = "Alien3";
+                        tex = "Mosaic";
                     } else if (textNo == 3) {
-                        tex = "Alien4";
+                        tex = "Zebra";
                     }
                     textureBox.selectItem(tex);
 
@@ -401,13 +401,13 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         if (!initialising) {
             String selectedTex = event.getSelection();
             int textno = 3;
-            if (selectedTex.equals("Alien1")) {
+            if (selectedTex.equals("Plant")) {
                 textno = 0;
-            } else if (selectedTex.equals("Alien2")) {
+            } else if (selectedTex.equals("Snake")) {
                 textno = 1;
-            } else if (selectedTex.equals("Alien3")) {
+            } else if (selectedTex.equals("Mosaic")) {
                 textno = 2;
-            } else if (selectedTex.equals("Alien4")) {
+            } else if (selectedTex.equals("Zebra")) {
                 textno = 3;
             }
             app.setTexture(textno);

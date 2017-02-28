@@ -109,8 +109,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
     
     public void updateLog() {
-        // trainingLog
-        // nifty
         if (!editing) {
             ListBox niftyLog = nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class);
             ArrayList<LogEntry> logEntries = trainingLog.getLastEntries(20);
@@ -118,8 +116,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             niftyLog.clear();
             for (LogEntry entry : logEntries) {
                 niftyLog.addItem(entry);
-            }
-            
+            }          
         }
     }
 
