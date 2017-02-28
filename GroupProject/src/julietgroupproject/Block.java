@@ -17,11 +17,14 @@ public class Block implements Serializable {
     public float mass;
     public float friction;
     public Matrix3f rotation = Matrix3f.IDENTITY;
+    public Matrix3f rotationForYPR = Matrix3f.IDENTITY;
     public String collisionShapeType;
     public String hingeType;
+    public boolean createdBySymetric = false;
     private LinkedList<Block> connectedLimbs = new LinkedList<Block>(); // List of Blocks that this is the parent of
     private transient Geometry geo;
     private Vector3f normal = new Vector3f(1,0,0);
+    
     
 
     public Block(Vector3f pos, Vector3f hingePos, float width, float height, float length, String collisionShapeType, String hingeType,float mass) {

@@ -37,7 +37,7 @@ public class AlienHelper {
      * @return the assembled Geometry
      */
     public static Geometry assembleBlock(Block block, Vector3f location) {
-        return createLimb(block.collisionShapeType, block.width, block.height, block.length, location, block.mass,block.rotation);
+        return createLimb(block.collisionShapeType, block.width, block.height, block.length, location, block.mass,block.rotation,block.rotationForYPR);
     }
 
     /**
@@ -51,7 +51,7 @@ public class AlienHelper {
      */
     public static void recursivelyAddBlocks(Block rootBlock, Block parentBlock, Geometry parentGeometry, AlienNode alienNode) {
         for (Block b : parentBlock.getConnectedLimbs()) {
-            Geometry g = createLimb(b.collisionShapeType, b.width, b.height, b.length, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getPosition()), b.mass,b.rotation);
+            Geometry g = createLimb(b.collisionShapeType, b.width, b.height, b.length, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getPosition()), b.mass,b.rotation,b.rotationForYPR);
             b.applyProperties(g);
 
             //printVector3f(b.getHingePosition());
@@ -64,9 +64,10 @@ public class AlienHelper {
         }
     }
 
-    public static Geometry createLimb(String meshShape, float width, float height, float length, Vector3f location, float mass, Matrix3f rotation) {
+    public static Geometry createLimb(String meshShape, float width, float height, float length, Vector3f location, float mass, Matrix3f rotation, Matrix3f rotationForYPR) {
 
         Mesh mesh;
+        Vector3f moveOriginOfRotation = Vector3f.ZERO;
         if (meshShape.equals("Cylinder")) {
             mesh = new Cylinder(40, 40, length, 2*width, true);
         } else if (meshShape.equals("Torus")) {
@@ -75,8 +76,9 @@ public class AlienHelper {
             mesh = new Sphere(40, 40, 1f);
         } else {
             mesh = new Box(width, height, length);
+            moveOriginOfRotation = new Vector3f(width,0f,0f);
         }
-        mesh = rotateMesh(rotation, mesh);
+        mesh = transformMesh(rotation, rotationForYPR, moveOriginOfRotation, mesh);
         Geometry limb = new Geometry("Limb", mesh);
         RigidBodyControl r;
         r = new RigidBodyControl(CollisionShapeFactory.createDynamicMeshShape(limb), mass);
@@ -137,7 +139,7 @@ public class AlienHelper {
         return alienNode;
     }
     
-    public static Mesh rotateMesh(Matrix3f m, Mesh mesh){        
+    public static Mesh transformMesh(Matrix3f rotation, Matrix3f rotationForYPR, Vector3f moveOrigin, Mesh mesh){        
         // Get the buffer from the mesh and put in array of vectors
         VertexBuffer vb = mesh.getBuffer(Type.Position);
         FloatBuffer vbData = (FloatBuffer)vb.getData();
@@ -146,7 +148,12 @@ public class AlienHelper {
         points = BufferUtils.getVector3Array(vbData);
         
         for (int i = 0; i < elements; i++) {
-            BufferUtils.setInBuffer(m.mult(points[i]), vbData, i);
+            points[i] = points[i].add(moveOrigin);
+            points[i] = rotationForYPR.mult((points[i]));
+            points[i] = points[i].add(new Vector3f(-moveOrigin.x,-moveOrigin.y,-moveOrigin.z));
+            points[i] = rotation.mult((points[i]));
+            BufferUtils.setInBuffer(points[i], vbData, i);
+            
         }
         
         //Update it:

@@ -19,6 +19,7 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Matrix3f;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -195,7 +196,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         return gl;
 
     }
-
+    
+    
+    
     public void relocateGhostLimb(Geometry gl, Block block, Vector3f contactPt, Vector3f normal) {
         //Take the entries from the sliders for limb properties
         Slider widthField = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
@@ -226,9 +229,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         limbSeperation = seperationField.getValue();
 
 
-        //Get the current shape from the selector
-        //myMainMenuController.setCurrentLimbShape();
-
 
         //Find hinge and postion vectors given shape and click position
         //TODO fix this so that is gets the actual distance, and also make that distance correct when it is rotated
@@ -247,9 +247,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         //Build the new limb
         Matrix3f rotation = new Matrix3f();
         rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
-
+                
+        
         //Mesh m = gl.getMesh();
-        //AlienHelper.rotateMesh(rotation, m);
+        //AlienHelper.rotateMesh(rotationForNormal, m);
         gl.setLocalRotation(rotation);
         gl.setLocalTranslation(newPos.add(AlienHelper.getGeometryLocation(block.getGeometry())));
     }
@@ -262,7 +263,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Matrix3f rotation = new Matrix3f();
         rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
         Mesh m = gl.getMesh();
-        AlienHelper.rotateMesh(rotation.invert(), m);
+        AlienHelper.transformMesh(rotation.invert(),Matrix3f.IDENTITY,Vector3f.ZERO, m);
         gl.setLocalRotation(rotation);
 
         // check for collision
@@ -565,9 +566,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
 
 
-        Slider rollSlider = nifty.getCurrentScreen().findNiftyControl("rollSlider", Slider.class);
-        Slider yawSlider = nifty.getCurrentScreen().findNiftyControl("yawSlider", Slider.class);
+        Slider yawnSlider = nifty.getCurrentScreen().findNiftyControl("yawnSlider", Slider.class);
         Slider pitchSlider = nifty.getCurrentScreen().findNiftyControl("pitchSlider", Slider.class);
+        Slider rollSlider = nifty.getCurrentScreen().findNiftyControl("rollSlider", Slider.class);
         Slider jointPosSlider = nifty.getCurrentScreen().findNiftyControl("jointPosSlider", Slider.class);
         Slider jointRotSlider = nifty.getCurrentScreen().findNiftyControl("jointRotSlider", Slider.class);
 
@@ -579,9 +580,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         float strength;
         float limbSeperation;
         boolean symmetric;
-        float roll;
-        float yaw;
+        float yawn;
         float pitch;
+        float roll;
         float jointPositionFraction;
         float jointStartRotation;
         // currentHingeAxis Will be either "X", "Y", "Z" or "A" for auto
@@ -594,9 +595,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         strength = strengthField.getValue();
         limbSeperation = seperationField.getValue();
         symmetric = symmetricBox.isChecked();
-        roll = rollSlider.getValue();
-        yaw = yawSlider.getValue();
+        yawn = yawnSlider.getValue();
         pitch = pitchSlider.getValue();
+        roll = rollSlider.getValue();
         jointPositionFraction = jointPosSlider.getValue();
         jointStartRotation = jointRotSlider.getValue();
 
@@ -624,19 +625,27 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         //Build the new limb
         Block limb = new Block(newPos, newHingePos, limbWidth, limbHeight, limbLength, currentShape, axisToUse, weight);
-        Matrix3f rotation = new Matrix3f();
-
+        Matrix3f rotationForNormal = new Matrix3f();
+        
+        
         if (currentShape.equals("Cylinder")) {
-            rotation.fromStartEndVectors(new Vector3f(0, 0, 1), normal);
+            rotationForNormal.fromStartEndVectors(new Vector3f(0, 0, 1), normal);
         } else {
-            rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
+            rotationForNormal.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
         }
         if (currentShape.equals("Sphere")) {
-            rotation = rotation.mult(new Matrix3f(limbWidth, 0f, 0f, 0f, limbHeight, 0f, 0f, 0f, limbLength));
+            rotationForNormal = rotationForNormal.mult(new Matrix3f(limbWidth, 0f, 0f, 0f, limbHeight, 0f, 0f, 0f, limbLength));
         }
-
-        limb.rotation = rotation;
-
+        
+        // Apply yawn pitch roll rotation
+        float[] angles = new float[3];
+        angles[0] = yawn;
+        angles[1] = pitch;
+        angles[2] = roll;
+        Matrix3f rotationForYPR = new Quaternion(angles).toRotationMatrix();
+        
+        limb.rotation = rotationForNormal;
+        limb.rotationForYPR = rotationForYPR;
         // Stores the normal the limb was created at in the limb for future use
         limb.setNormal(normal);
 
@@ -1013,8 +1022,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
                         CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
                         boolean symmetric = symmetricBox.isChecked();
-
+                        
+                        
                         if (symmetric) {
+                            block.createdBySymetric = true;
                             switch (block.collisionShapeType) {
                                 case "Box":
                                     addLimb(block, pt.subtract(pt.project(collision.getContactNormal()).mult(2.0f)), norm.negate());
