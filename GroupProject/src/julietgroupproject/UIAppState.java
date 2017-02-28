@@ -88,7 +88,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private Geometry arrowGeometry;
     private int speedUpFactor = 1000;
     private boolean shiftDown = false;
-    private JulietLogger trainingLog = new JulietLogger();
+    private JulietLogger<LogEntry> trainingLog = new JulietLogger<>();
     private Node ghostRoot;
     private boolean isCollisionOccuring = false;
     int[] jointKeys = { // Used for automatically giving limbs keys
@@ -112,11 +112,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         // nifty
         if (!editing) {
             ListBox niftyLog = nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class);
-            ArrayList<String> logEntries = trainingLog.getEntries();
+            ArrayList<LogEntry> logEntries = trainingLog.getEntries();
             
             niftyLog.clear();
-            for (String entry : logEntries) {
-                System.out.println(" ---------------------------------" + entry);
+            for (LogEntry entry : logEntries) {
                 niftyLog.insertItem(entry, 0);
             }
             

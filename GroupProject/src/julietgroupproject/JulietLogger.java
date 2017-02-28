@@ -14,11 +14,11 @@ import java.util.ArrayList;
  *
  * @author George
  */
-public class JulietLogger {
+public class JulietLogger<T> {
     
     public static final int DEFAULT_LIMIT = 15;
     private int limit;
-    private ArrayDeque<String> entries = new ArrayDeque<>();
+    private ArrayDeque<T> entries = new ArrayDeque<>();
     
     public JulietLogger(int limit) {
         this.limit = limit;
@@ -29,7 +29,7 @@ public class JulietLogger {
         this(DEFAULT_LIMIT);
     }
     
-    public synchronized void push(String entry) {
+    public synchronized void push(T entry) {
         entries.push(entry);
         
         while (entries.size() > limit) {
@@ -49,7 +49,11 @@ public class JulietLogger {
         this.limit = limit;
     }
     
-    public synchronized ArrayList<String> getEntries() {
+    public synchronized ArrayList<T> getEntries() {
         return new ArrayList(entries);
+    }
+    
+    public void clear() {
+        entries.clear();
     }
 }

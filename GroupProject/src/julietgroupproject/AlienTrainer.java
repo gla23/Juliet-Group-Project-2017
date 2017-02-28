@@ -29,7 +29,7 @@ public class AlienTrainer extends Thread {
     private final int popCount = 20; //population size to use
     private volatile boolean terminating = false;
     private volatile List<SlaveSimulator> slaves;
-    private JulietLogger log = null;
+    private JulietLogger<LogEntry> log = null;
 
     private void load() {
         pop = null;
@@ -119,10 +119,11 @@ public class AlienTrainer extends Thread {
                 //System.out.println("Iterations: " + iterationNumber);
             
                 if (log != null) {
-                    log.push("Iteration #" + iterationNumber + ", " + populationFitness);
+                    log.push(new LogEntry(iterationNumber, (float) populationFitness));
                 }
             } while (!terminating);
         } finally {
+            log.clear();
             this.train.finishTraining();
         }
 
@@ -144,7 +145,7 @@ public class AlienTrainer extends Thread {
         terminating = true;
     }
     
-    public void setLog(JulietLogger log) {
+    public void setLog(JulietLogger<LogEntry> log) {
         this.log = log;
     }
 }

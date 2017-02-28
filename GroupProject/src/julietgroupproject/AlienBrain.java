@@ -29,7 +29,7 @@ public abstract class AlienBrain extends AbstractControl {
     private MLData out;
     protected static final float MAX_VELOCITY = 2f;
     protected static final float MIN_VELOCITY = 0.1f;
-    protected static final float MAX_POWER = 1f;
+    protected static final float MAX_POWER = 2f;
     
     private final boolean isFixedTimestep;
     private static final double DEFAULT_UPDATE_INTERVAL = 0.5;
