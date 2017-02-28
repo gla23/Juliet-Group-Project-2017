@@ -87,8 +87,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private Geometry delghost;
     private Material ghostMaterial;
     private Material ghostMaterial2;
-    private Geometry arrowGeometry;
-    private boolean showArrow = true;
     private int speedUpFactor = 1000;
     private boolean shiftDown = false;
     private JulietLogger<LogEntry> trainingLog = new JulietLogger<>();
@@ -526,33 +524,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     }
 
-    private void createArrow() {
-        Arrow directionArrow = new Arrow(new Vector3f(7, 0, 0));
-        directionArrow.setLineWidth(5);
-        arrowGeometry = new Geometry("Arrow", directionArrow);
-        Material arrowMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        arrowMaterial.setColor("Color", ColorRGBA.Blue);
-        arrowGeometry.setMaterial(arrowMaterial);
-        arrowGeometry.setLocalTranslation(0, -3.5f, 0);
-        RigidBodyControl r = new RigidBodyControl();
-        arrowGeometry.addControl(r);
-        // Remove the arrow from the collision space.
-        physics.getPhysicsSpace().removeCollisionObject(r);
-    }
-    public void showArrow() {
-        if (arrowGeometry == null) createArrow();
-        if (!simRoot.hasChild(arrowGeometry)) {
-            simRoot.attachChild(arrowGeometry);
-            showArrow = true;
-        }
-    }
-    public void hideArrow() {
-        if (arrowGeometry == null) createArrow();
-        if (simRoot.hasChild(arrowGeometry)) {
-            simRoot.detachChild(arrowGeometry);
-            showArrow = false;
-        }
-    }
     public void toggleArrow() {
         if (!showArrow) {
             showArrow();
@@ -886,6 +857,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (inputManager.hasMapping("ToggleMesh")) {
             inputManager.deleteMapping("ToggleMesh");
         }
+        if (inputManager.hasMapping("ToggleArrow")) {
+            inputManager.deleteMapping("ToggleArrow");
+        }
         if (inputManager.hasMapping("ToggleSmooth")) {
             inputManager.deleteMapping("ToggleSmooth");
         }
@@ -909,6 +883,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         this.physics.setEnabled(false);
         resetGravity();
+        
+        showArrow();
 
         if (currentAlienNode == null) {
             instantiateAlien(alien, Vector3f.ZERO);
@@ -1002,8 +978,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         if ("ToggleArrow".equals(string)) {
             if (!bln) {
-                CheckBox mesh = nifty.getScreen("editor_options").findNiftyControl("DirectionArrowCheckBox", CheckBox.class);
-                mesh.setChecked(!mesh.isChecked());
+                CheckBox arrow = nifty.getScreen("editor_options").findNiftyControl("directionArrowCheckBox", CheckBox.class);
+                arrow.setChecked(!arrow.isChecked());
             }
         }
 
@@ -1187,7 +1163,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         
         updateLog();
     }
-
+    
     @Override
     public void cleanup() {
         if (this.trainer != null) {

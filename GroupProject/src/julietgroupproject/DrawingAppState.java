@@ -18,6 +18,7 @@ import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.debug.Arrow;
 import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
 import com.jme3.ui.Picture;
@@ -51,6 +52,8 @@ public class DrawingAppState extends SimulatorAppState {
     
     protected Material[] materials;
     
+    private Geometry arrowGeometry;
+    protected boolean showArrow;
 
     public DrawingAppState(Alien _alien, double _simSpeed, double _accuracy) {
         super(_alien, _simSpeed, _accuracy);
@@ -60,6 +63,12 @@ public class DrawingAppState extends SimulatorAppState {
         super(_alien, _simSpeed, _accuracy, _fixedTimeStep);
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+        showArrow();
+    }
+    
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
@@ -161,5 +170,37 @@ public class DrawingAppState extends SimulatorAppState {
         //node.setMaterial(alienMaterial2);
 
         return node;
+    }
+    
+    private void createArrow() {
+        Arrow directionArrow = new Arrow(new Vector3f(7, 0, 0));
+        directionArrow.setLineWidth(5);
+        arrowGeometry = new Geometry("Arrow", directionArrow);
+        Material arrowMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        arrowMaterial.setColor("Color", ColorRGBA.Blue);
+        arrowGeometry.setMaterial(arrowMaterial);
+        arrowGeometry.setLocalTranslation(0, -3.5f, 0);
+        RigidBodyControl r = new RigidBodyControl();
+        arrowGeometry.addControl(r);
+        // Remove arrow from physics
+        physics.getPhysicsSpace().removeCollisionObject(r);
+    }
+
+    public boolean showArrow() {
+        if (arrowGeometry == null) createArrow();
+        if (!simRoot.hasChild(arrowGeometry)) {
+            simRoot.attachChild(arrowGeometry);
+            showArrow = true;
+        }
+        return showArrow;
+    }
+
+    public boolean hideArrow() {
+        if (arrowGeometry == null) createArrow();
+        if (simRoot.hasChild(arrowGeometry)) {
+            simRoot.detachChild(arrowGeometry);
+            showArrow = false;
+        }
+        return showArrow;
     }
 }

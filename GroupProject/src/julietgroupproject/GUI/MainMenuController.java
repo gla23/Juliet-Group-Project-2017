@@ -5,33 +5,21 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
+import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.controls.CheckBoxStateChangedEvent;
 import de.lessvoid.nifty.controls.DropDown;
 import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
 import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.controls.RadioButtonGroupStateChangedEvent;
-
-
 import de.lessvoid.nifty.controls.SliderChangedEvent;
 import de.lessvoid.nifty.controls.Tab;
 import de.lessvoid.nifty.controls.TabGroup;
 import de.lessvoid.nifty.controls.TextField;
-
-import de.lessvoid.nifty.controls.ScrollPanel;
-import de.lessvoid.nifty.controls.Slider;
-import de.lessvoid.nifty.controls.SliderChangedEvent;
-import de.lessvoid.nifty.controls.Tab;
-import de.lessvoid.nifty.controls.TabGroup;
-import de.lessvoid.nifty.controls.button.builder.ButtonBuilder;
-
 import de.lessvoid.nifty.effects.EffectEventId;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
-import java.awt.Panel;
-
 import java.util.ArrayList;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -55,6 +43,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     private volatile boolean initialising = false;
     private String saveType = "";
     private String loadType = "";
+    private boolean showArrow = true;
 
     private String[] aliens;
     private String currentlySelectedLoadAlien = "";
@@ -134,9 +123,9 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     public void stopSimulation() {
         this.app.endTraining();
-
         nifty.gotoScreen("start");
         addValues();
+        if (!showArrow) showArrow = app.hideArrow();
     }
     
     public void addLoadValues(final String[] aliens) {
@@ -292,8 +281,10 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     public void startTraining() {
-        if (app.beginTraining())
+        if (app.beginTraining()) {
             nifty.gotoScreen("simulation");
+            showArrow = true;
+        }
     }
 
     private String sanitizeAlienName(String rawName) {
@@ -369,7 +360,11 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         nifty.gotoScreen("editor_options");
         //Window window = nifty.getCurrentScreen().findNiftyControl("editor_options_window", Window.class);
         addOptionsValues();
-
+        nifty.getScreen("editor_options").findNiftyControl("directionArrowCheckBox", CheckBox.class).setChecked(showArrow);
+    }
+    
+    public boolean arrowShown() {
+        return showArrow;
     }
 
     public void attachLimb() {
@@ -509,9 +504,14 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         //makeGraph();
     }
     
-    @NiftyEventSubscriber(id = "DirectionArrowCheckBox")
+    @NiftyEventSubscriber(id = "directionArrowCheckBox")
     public void onDirectionArrowChange(final String id, final CheckBoxStateChangedEvent event) {
-        app.toggleArrow();
+        showArrow = event.getCheckBox().isChecked();
+        if (showArrow) {
+            showArrow = app.showArrow();
+        } else {
+            showArrow = app.hideArrow();
+        }
     }
 
     @NiftyEventSubscriber(id = "gravitySlider")
