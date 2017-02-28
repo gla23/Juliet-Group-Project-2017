@@ -1070,9 +1070,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         setChaseCam(currentAlienNode);
         MLRegression nn = (MLRegression) ObjectCloner.deepCopy(data.getToEvaluate());
         if (this.isFixedTimeStep) {
-            this.currentAlienNode.addControl(new AlienBrain(nn, physics.getPhysicsSpace().getAccuracy(), physics.getSpeed(), this.fixedTimeStep));
+            this.currentAlienNode.addControl(new BasicAlienBrain(nn, physics.getPhysicsSpace().getAccuracy(), physics.getSpeed(), this.fixedTimeStep));
         } else {
-            this.currentAlienNode.addControl(new AlienBrain(nn, physics.getPhysicsSpace().getAccuracy(), physics.getSpeed()));
+            this.currentAlienNode.addControl(new BasicAlienBrain(nn, physics.getPhysicsSpace().getAccuracy(), physics.getSpeed()));
         }
         this.simInProgress = true;
     }

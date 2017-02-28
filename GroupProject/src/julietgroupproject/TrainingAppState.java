@@ -69,9 +69,9 @@ public class TrainingAppState extends SimulatorAppState {
         this.currentAlienNode = instantiateAlien(this.alien, this.startLocation);
         AlienBrain brain;
         if (isFixedTimeStep) {
-            brain = new AlienBrain(data.getToEvaluate(), this.physics.getPhysicsSpace().getAccuracy(), this.physics.getSpeed(), this.fixedTimeStep);
+            brain = new BasicAlienBrain(data.getToEvaluate(), this.physics.getPhysicsSpace().getAccuracy(), this.physics.getSpeed(), this.fixedTimeStep);
         } else {
-            brain = new AlienBrain(data.getToEvaluate(), this.physics.getPhysicsSpace().getAccuracy(), this.physics.getSpeed());
+            brain = new BasicAlienBrain(data.getToEvaluate(), this.physics.getPhysicsSpace().getAccuracy(), this.physics.getSpeed());
         }
         this.currentAlienNode.addControl(brain);
         this.simInProgress = true;
