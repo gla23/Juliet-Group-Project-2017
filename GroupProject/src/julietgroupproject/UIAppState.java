@@ -117,9 +117,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             
             niftyLog.clear();
             for (LogEntry entry : logEntries) {
-                niftyLog.addItem(entry);
-
-                
+                niftyLog.insertItem(entry, 0);
             }
             System.out.println("log");
             buildGraph(logEntries);
