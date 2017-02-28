@@ -54,11 +54,11 @@ public class DrawGraph extends JPanel {
    }
    
    public void showIt() {
-       SwingUtilities.invokeLater(new Runnable() {
-         public void run() {
+       //SwingUtilities.invokeLater(new Runnable() {
+         //public void run() {
             createAndShowGui();
-         }
-      });
+        // }
+      //});
    }
 
    @Override
@@ -143,6 +143,7 @@ public class DrawGraph extends JPanel {
         try
         {
             ImageIO.write(image, "png", new File(file));
+            
             System.out.println("Panel saved as Image.");
         }
         catch(Exception e)

@@ -92,6 +92,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private boolean shiftDown = false;
     private JulietLogger<LogEntry> trainingLog = new JulietLogger<>();
     private Node ghostRoot;
+    private int numLogEntries = 0;
     private boolean isCollisionOccuring = false;
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
@@ -126,14 +127,17 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
     
     public void buildGraph(ArrayList<LogEntry> log) {
-        List<Float> data = new ArrayList<Float>();
-        for (int i = 0; i<log.size(); i++) {
-            float fitness = log.get(i).fitness;
-            data.add(fitness);
+        if (log.size()>numLogEntries) {
+            List<Float> data = new ArrayList<Float>();
+            for (int i = 0; i<log.size(); i++) {
+                float fitness = log.get(i).fitness;
+                data.add(fitness);
+            }
+            System.out.println("Data: " + data);
+            DrawGraph test = new DrawGraph(data, "assets/Graphs/test1.png");
+            test.showIt();
+            numLogEntries = log.size();
         }
-        System.out.println("Data: " + data);
-        DrawGraph test = new DrawGraph(data, "assets/Graphs/test1.png");
-        test.showIt();
     }
   
 
@@ -910,7 +914,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             toAdd.setShowSettings(false);
             AppSettings sett = new AppSettings(false);
             sett.setCustomRenderer(FastNullContext.class);
-            //sett.setFrameRate(30);
+            //sett.setFrameRate(50);
             toAdd.setSettings(sett);
             toAdd.start();
         }
