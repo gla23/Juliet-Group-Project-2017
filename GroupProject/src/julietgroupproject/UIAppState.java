@@ -139,7 +139,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         System.out.println("Data: " + data);
         DrawGraph test = new DrawGraph(data, "assets/Graphs/test1.png");
         test.showIt();
-        updateGraph();
+        //updateGraph();
         numLogEntries = log.size();
     }
     
