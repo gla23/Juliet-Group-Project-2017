@@ -27,7 +27,7 @@ public abstract class AlienBrain extends AbstractControl {
     protected double[] nnInput;
     private MLData in;
     private MLData out;
-    protected static final float MAX_VELOCITY = 2f;
+    protected static final float MAX_VELOCITY = 1f;
     protected static final float MIN_VELOCITY = 0.1f;
     protected static final float MAX_POWER = 3f;
     
