@@ -14,18 +14,18 @@ import java.util.ArrayList;
  *
  * @author George
  */
-public class ProsserLogger {
+public class JulietLogger {
     
     public static final int DEFAULT_LIMIT = 15;
     private int limit;
     private ArrayDeque<String> entries = new ArrayDeque<>();
     
-    public ProsserLogger(int limit) {
+    public JulietLogger(int limit) {
         this.limit = limit;
         entries = new ArrayDeque<>();
     }
 
-    public ProsserLogger() {
+    public JulietLogger() {
         this(DEFAULT_LIMIT);
     }
     

@@ -29,7 +29,7 @@ public class AlienTrainer extends Thread {
     private final int popCount = 200; //population size to use
     private volatile boolean terminating = false;
     private volatile List<SlaveSimulator> slaves;
-    private ProsserLogger log = null;
+    private JulietLogger log = null;
 
     private void load() {
         pop = null;
@@ -144,7 +144,7 @@ public class AlienTrainer extends Thread {
         terminating = true;
     }
     
-    public void setLog(ProsserLogger log) {
+    public void setLog(JulietLogger log) {
         this.log = log;
     }
 }
