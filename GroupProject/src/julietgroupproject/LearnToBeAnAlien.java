@@ -31,7 +31,7 @@ public class LearnToBeAnAlien extends SimpleApplication {
         physicslogger.setUseParentHandlers(false);
         // keep the default renderer
         LearnToBeAnAlien app = new LearnToBeAnAlien();
-        app.setShowSettings(false);
+        app.setShowSettings((System.getProperty("os.name").toLowerCase()).contains("mac"));
         AppSettings settings = new AppSettings(true);
         settings.setTitle("Learn to be a flopping mess");
         settings.put("Width", 1920*4/5);
