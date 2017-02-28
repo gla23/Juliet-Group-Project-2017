@@ -33,8 +33,10 @@ import java.awt.Panel;
 import java.util.ArrayList;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import julietgroupproject.DrawGraph;
 import julietgroupproject.UIAppState;
 
 public class MainMenuController extends AbstractAppState implements ScreenController {
@@ -121,7 +123,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     public void hideEditor() {
         nifty.gotoScreen("hidden");
-
     }
 
     public void showEditor() {
@@ -505,6 +506,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     @NiftyEventSubscriber(id = "wireMeshCheckBox")
     public void onWireMeshChange(final String id, final CheckBoxStateChangedEvent event) {
         app.toggleWireMesh();
+        makeGraph();
     }
     
     @NiftyEventSubscriber(id = "DirectionArrowCheckBox")
@@ -579,7 +581,19 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     @Override
     public void onStartScreen() {
-        aliens = app.getLoadableAliens();
+        aliens = app.getLoadableAliens();        
+    }
+    
+    public void makeGraph() {
+        List<Float> data = new ArrayList<Float>();
+        data.add(3.1f);
+        data.add(65.2f);
+        data.add(20.4f);
+        data.add(41.6f);
+        data.add(5.2f);
+        data.add(50.7f);
+        DrawGraph test = new DrawGraph(data, "assets/Graphs/test1.png");
+        test.showIt();
     }
 
     @Override
