@@ -53,6 +53,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import julietgroupproject.GUI.MainMenuController;
+import org.encog.ml.MLMethod;
 import org.encog.ml.MLRegression;
 import org.encog.util.obj.ObjectCloner;
 
@@ -933,6 +934,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         setChaseCam(this.currentAlienNode);
         setupKeys(this.currentAlienNode);
 
+        restartAlien();
+        
         editing = true;
 
         setGravity(0.0f);
@@ -1153,7 +1156,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             // try to poll task from the queue
             if (!editing) {
                 SimulationData s;
-                s = this.simulationQueue.peek();
+                s = new SimulationData(trainer.getBestSoFar(), AlienEvaluator.simTime);
                 if (s != null) {
                     System.out.println(Thread.currentThread().getId() + ": starting simulation!");
                     startSimulation(s);

@@ -8,6 +8,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Queue;
+import org.encog.ml.MLRegression;
+import org.encog.ml.ea.genome.Genome;
 import org.encog.ml.ea.train.EvolutionaryAlgorithm;
 import org.encog.neural.neat.NEATPopulation;
 import org.encog.neural.neat.NEATUtil;
@@ -84,7 +86,7 @@ public class AlienTrainer extends Thread {
         if (this.pop == null) {
             resetTraining();
         }
-
+        
         /* score has its calculateScore method called concurrently
          * by the trainer. The calculateScore method puts requests
          * into the simTasks queue to be resolved externally.
@@ -104,11 +106,17 @@ public class AlienTrainer extends Thread {
         System.out.println("Population reset");
     }
 
+    public MLRegression getBestSoFar()
+    {
+        return (MLRegression)train.getCODEC().decode(train.getBestGenome());
+    }
+    
     @Override
     public void run() {
 
         try {
             do {
+                
                 this.train.iteration(); //perform the next training iteration.#
 
                 int iterationNumber = this.train.getIteration();

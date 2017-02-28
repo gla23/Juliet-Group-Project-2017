@@ -13,8 +13,7 @@ import org.encog.ml.MLRegression;
 public class AlienEvaluator implements CalculateScore {
 
     private Queue<SimulationData> simTasks;
-    final static double simTimeBase = 20.0;
-    static double simTime;
+    final static double simTime = 20.0;
     long returnedRequests = 0;
 
     @Override
@@ -45,7 +44,6 @@ public class AlienEvaluator implements CalculateScore {
      * @param _simTasks the thread-safe queue containing simulation tasks
      */
     public AlienEvaluator(Queue<SimulationData> _simTasks) {
-        simTime = simTimeBase;
         simTasks = _simTasks;
     }
 }
