@@ -875,7 +875,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public boolean beginTraining() {
-        if (alien == null) {
+        if (alien == null || alien.rootBlock.getConnectedLimbs().size() == 0) {
             return false;
         }
 

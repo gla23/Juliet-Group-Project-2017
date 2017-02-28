@@ -187,9 +187,31 @@
                  <control id="save_fail_window" name="window" closeable= "false" height = "100px" title="Save failed" width="400px" y = "300px" x="400px" >
                      <panel height = "100%" width = "100%" childLayout = "vertical" >
                        <panel id = "save_fail_panel_info" height = "50%" childLayout = "horizontal" >
-                           <control name="label" valign = "center" id = "load_info_label" width = "100%" text="Unable to save file"  />
+                           <control name="label" valign = "center" id = "save_info_label" width = "100%" text="Unable to save file"  />
                         </panel>
                         <panel id = "return_save_fail_panel" childLayout = "center"  valign = "center" height = "50%" width = "100%">
+                            <control name ="button" label="OK"  width = "33%" id = "returnToEditor" visibleToMouse="true">
+                               <interact onClick="showEditor()"/>
+                            </control>
+                        </panel>     
+                     </panel>
+                </control>
+            </panel>
+        </layer>
+    </screen>    
+	
+	<screen id="simulate_fail" controller="julietgroupproject.GUI.MainMenuController">
+     <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
+            <panel id="simulate_fail_panel" childLayout="horizontal">
+                <effect>
+                         <onActive name="fade" start ="#00" end = "ff" length = "1500"/>
+                </effect>
+                 <control id="simulate_fail_window" name="window" closeable= "false" height = "100px" title="Simulation failed" width="400px" y = "300px" x="400px" >
+                     <panel height = "100%" width = "100%" childLayout = "vertical" >
+                       <panel id = "simulate_fail_panel_info" height = "50%" childLayout = "horizontal" >
+                           <control name="label" valign = "center" id = "simulate_info_label" width = "100%" text="Unable to simulate: need a body and limbs."  />
+                        </panel>
+                        <panel id = "return_simulate_fail_panel" childLayout = "center"  valign = "center" height = "50%" width = "100%">
                             <control name ="button" label="OK"  width = "33%" id = "returnToEditor" visibleToMouse="true">
                                <interact onClick="showEditor()"/>
                             </control>

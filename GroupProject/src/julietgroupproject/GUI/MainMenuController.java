@@ -285,6 +285,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             nifty.gotoScreen("simulation");
             showArrow = true;
         }
+        else
+            nifty.gotoScreen("simulate_fail");
     }
 
     private String sanitizeAlienName(String rawName) {
