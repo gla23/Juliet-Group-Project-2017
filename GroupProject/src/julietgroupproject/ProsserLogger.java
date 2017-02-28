@@ -14,16 +14,22 @@ import java.util.ArrayList;
  *
  * @author George
  */
-public class Logger {
+public class ProsserLogger {
     
-    private int limit = 15;
+    public static final int DEFAULT_LIMIT = 15;
+    private int limit;
     private ArrayDeque<String> entries = new ArrayDeque<>();
     
-    public Logger(int limit) {
+    public ProsserLogger(int limit) {
         this.limit = limit;
+        entries = new ArrayDeque<>();
+    }
+
+    public ProsserLogger() {
+        this(DEFAULT_LIMIT);
     }
     
-    public void push(String entry) {
+    public synchronized void push(String entry) {
         entries.push(entry);
         
         while (entries.size() > limit) {
@@ -43,7 +49,7 @@ public class Logger {
         this.limit = limit;
     }
     
-    public ArrayList<String> getEntries() {
+    public synchronized ArrayList<String> getEntries() {
         return new ArrayList(entries);
     }
 }

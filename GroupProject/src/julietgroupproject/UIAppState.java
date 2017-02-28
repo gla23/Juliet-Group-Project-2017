@@ -87,6 +87,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private Geometry arrowGeometry;
     private int speedUpFactor = 1000;
     private boolean shiftDown = false;
+    private ProsserLogger trainingLog = new ProsserLogger();
     private Node ghostRoot;
     private boolean isCollisionOccuring = false;
     int[] jointKeys = { // Used for automatically giving limbs keys

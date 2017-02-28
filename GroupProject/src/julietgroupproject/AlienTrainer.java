@@ -29,6 +29,7 @@ public class AlienTrainer extends Thread {
     private final int popCount = 200; //population size to use
     private volatile boolean terminating = false;
     private volatile List<SlaveSimulator> slaves;
+    private ProsserLogger log = null;
 
     private void load() {
         pop = null;
@@ -110,9 +111,16 @@ public class AlienTrainer extends Thread {
             do {
                 this.train.iteration(); //perform the next training iteration.#
 
+                int iterationNumber = this.train.getIteration();
+                double populationFitness = this.pop.getBestGenome().getScore();
+                    
                 //print statistics
                 System.out.println("Error: " + Format.formatDouble(this.train.getError(), 2)); //TODO: Error always returns 1
-                System.out.println("Iterations: " + Format.formatInteger(this.train.getIteration()));
+                System.out.println("Iterations: " + iterationNumber);
+            
+                if (log != null) {
+                    log.push("Iteration #" + iterationNumber + ", " + populationFitness);
+                }
             } while (!terminating);
         } finally {
             this.train.finishTraining();
@@ -134,5 +142,9 @@ public class AlienTrainer extends Thread {
     public void terminateTraining(List<SlaveSimulator> _slaves) {
         slaves = _slaves;
         terminating = true;
+    }
+    
+    public void setLog(ProsserLogger log) {
+        this.log = log;
     }
 }
