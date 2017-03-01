@@ -104,18 +104,6 @@ public class DrawGraph {
          g2.drawLine(x0, y0, x1, y1);
       }
 
-      // and for x axis
-      int numHatches = 20;
-      int step = Math.min((int) (scores.size() / numHatches), 1);
-      
-      for (int i = 0; i < scores.size()-1 ; i+=step) {
-         int x0 = (i + 1) * (width - BORDER_GAP * 2) / (scores.size() - 1) + BORDER_GAP;
-         int x1 = x0;
-         int y0 = height - BORDER_GAP;
-         int y1 = y0 - GRAPH_POINT_WIDTH;
-         g2.drawLine(x0, y0, x1, y1);
-      }
-
       Stroke oldStroke = g2.getStroke();
       g2.setColor(GRAPH_COLOR);
       g2.setStroke(GRAPH_STROKE);
