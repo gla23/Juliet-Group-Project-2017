@@ -41,8 +41,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     private boolean Z = false;
     private boolean auto = false;
     private volatile boolean initialising = false;
-    private String saveType = "";
-    private String loadType = "";
     private boolean showArrow = true;
     boolean alienNamed = false;
 
@@ -316,7 +314,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
     
     public void gotoLoadScreen() {
-        loadType = "alien";
         app.removeKeyBindings();
         nifty.gotoScreen("load_dialog");
            
@@ -356,26 +353,23 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     public void confirmLoad() {
         app.addKeyBindings();
         
-        if ("alien".equals(loadType)) {
-            System.out.println(currentlySelectedLoadAlien);
-            //TODO
-            if (app.loadAlien(sanitizeAlienName(currentlySelectedLoadAlien))) {
-                alienNamed = true;
-                nifty.gotoScreen("start");
-                screen = nifty.getScreen("start");
-                firstBody = true;
-                addAlienSpecificOptions();
-                addValues();
-                showArrow = app.showArrow();
-                app.addKeyBindings();
-            } else {
-                nifty.gotoScreen("load_fail");
-            }
+        System.out.println(currentlySelectedLoadAlien);
+        //TODO
+        if (app.loadAlien(sanitizeAlienName(currentlySelectedLoadAlien))) {
+            alienNamed = true;
+            nifty.gotoScreen("start");
+            screen = nifty.getScreen("start");
+            firstBody = true;
+            addAlienSpecificOptions();
+            addValues();
+            showArrow = app.showArrow();
+            app.addKeyBindings();
+        } else {
+            nifty.gotoScreen("load_fail");
         }
     }
    
     public void gotoSaveScreen() {
-        this.saveType = "alien";
         app.removeKeyBindings();
         Thread thread = new Thread () {@Override public void run(){
             boolean worked = false;
@@ -401,24 +395,23 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     public void confirmSave() {
+        
+        System.out.println("save confirmed");
+        
         app.addKeyBindings();
-        if ("alien".equals(saveType)) {
-            String name = screen.findNiftyControl("saveTextField", TextField.class).getRealText();
-            String sanitizedName = sanitizeAlienName(name);
-            if (sanitizedName.length() > 0 && app.saveAlien(sanitizedName)) {
-                alienNamed = true;
-                ArrayList<String> aliensTemp = new ArrayList<String>(Arrays.asList(aliens));
-                aliensTemp.add(name);
-                
-                aliensTemp.toArray(aliens);
-                nifty.gotoScreen("save_success");
-                //TODO: inform user save was successful
+        
+        String name = nifty.getScreen("save_dialog").findNiftyControl("saveTextField", TextField.class).getRealText();
+        String sanitizedName = sanitizeAlienName(name);
+        if (sanitizedName.length() > 0 && app.saveAlien(sanitizedName)) {
+            alienNamed = true;
+            ArrayList<String> aliensTemp = new ArrayList<String>(Arrays.asList(aliens));
+            aliensTemp.add(name);
 
-            } else {
-                nifty.gotoScreen("save_fail");
-            }
+            aliensTemp.toArray(aliens);
+            nifty.gotoScreen("save_success");
+        } else {
+            nifty.gotoScreen("save_fail");
         }
-        //TODO limbs
     }
 
     public void editorOptions() {
@@ -443,11 +436,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     public void setLimbCheckbox() {
-    }
-
-    public void saveLimb() {
-        this.saveType = "limb";
-        nifty.gotoScreen("save");
     }
 
     public void pulsateToggle() {
