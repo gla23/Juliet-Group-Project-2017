@@ -28,7 +28,7 @@ public class AlienTrainer extends Thread {
     private final int popCount = 30; //population size to use
     private volatile boolean terminating = false;
     private volatile List<SlaveSimulator> slaves;
-    private final int iterationsBetweenSaves = 20;
+    private final int iterationsBetweenSaves = 5;
 
     public AlienTrainer(SavedAlien _savedAlien, Queue<SimulationData> _simTasks) {
         
