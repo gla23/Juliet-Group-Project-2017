@@ -141,7 +141,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
             //System.out.println("log");
             if (savedAlien.savedEntryCount() > numLogEntries) {
-                buildGraph(new ArrayList(savedAlien.getEntries()));
+                buildGraph(savedAlien.getEntries());
             }
         }
     }
@@ -153,8 +153,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             System.out.println(niftyLabel.getText());
         }
     }
-    
-    public void buildGraph(ArrayList<GenerationResult> log) {
+  
+    public void buildGraph(List<GenerationResult> log) {
         List<Float> data = new ArrayList<Float>();
         Element element = nifty.getScreen("simulation").findElementByName("graphId");
         if (log.size() < 1) {
