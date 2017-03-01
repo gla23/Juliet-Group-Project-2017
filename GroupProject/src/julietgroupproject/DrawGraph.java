@@ -93,10 +93,8 @@ public class DrawGraph {
 
       // create x and y axes 
       g2.drawLine(BORDER_GAP, height - BORDER_GAP, BORDER_GAP, BORDER_GAP);
-      Stroke temp = g2.getStroke();
-      g2.setStroke(new BasicStroke(5));
       g2.drawLine(BORDER_GAP, height - BORDER_GAP, width - BORDER_GAP, height - BORDER_GAP);
-      g2.setStroke(temp);
+      
       // create hatch marks for y axis. 
       for (int i = 0; i < Y_HATCH_CNT; i++) {
          int x0 = BORDER_GAP;
@@ -107,7 +105,10 @@ public class DrawGraph {
       }
 
       // and for x axis
-      for (int i = 0; i < scores.size() - 1; i++) {
+      int numHatches = 20;
+      int step = Math.min((int) (scores.size() / numHatches), 1);
+      
+      for (int i = 0; i < scores.size()-1 ; i+=step) {
          int x0 = (i + 1) * (width - BORDER_GAP * 2) / (scores.size() - 1) + BORDER_GAP;
          int x1 = x0;
          int y0 = height - BORDER_GAP;
