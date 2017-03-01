@@ -66,7 +66,7 @@ public class SimulatorAppState extends AbstractAppState {
         this.accuracy = _accuracy;
         this.alien = _alien;
         Vector3f temp = new Vector3f();
-        Vector3f.UNIT_Y.mult(-9.81f, temp);
+        Vector3f.UNIT_Y.mult(-9f, temp);
         standardG = temp;
         this.isFixedTimeStep = false;
         this.fixedTimeStep = 0.0f;
@@ -77,7 +77,7 @@ public class SimulatorAppState extends AbstractAppState {
         this.accuracy = _accuracy;
         this.alien = _alien;
         Vector3f temp = new Vector3f();
-        Vector3f.UNIT_Y.mult(-9.81f, temp);
+        Vector3f.UNIT_Y.mult(-9f, temp);
         standardG = temp;
         this.isFixedTimeStep = true;
         this.fixedTimeStep = (float)_fixedTimeStep;
