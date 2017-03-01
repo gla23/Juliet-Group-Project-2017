@@ -110,8 +110,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private SimulationData showOffRequest = null;
     private boolean runningSingle = false;
     private volatile boolean forceReset = false;
-    private Vector3f editLocation = new Vector3f(0, 20, 0);
-    
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
@@ -262,7 +260,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         System.out.println("Setting texture to " + textno);
         removeAlien(currentAlienNode);
         alien.materialCode = textno;
-        instantiateAlien(alien, this.editLocation);
+        instantiateAlien(alien, this.startLocation);
         setChaseCam(this.currentAlienNode);
         setupKeys(this.currentAlienNode);
     }
@@ -308,7 +306,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void restartAlien() {
         if (currentAlienNode != null) {
             removeAlien(currentAlienNode);
-            instantiateAlien(alien, editLocation);
+            instantiateAlien(alien, startLocation);
             setChaseCam(currentAlienNode);
             setupKeys(currentAlienNode);
         }
@@ -651,7 +649,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             int texturecode = alien != null ? alien.materialCode : 1;
             setAlien(new Alien(bodyBlock));
             alien.materialCode = texturecode;
-            instantiateAlien(alien, editLocation);
+            instantiateAlien(alien, startLocation);
             setChaseCam(this.currentAlienNode);
             setupKeys(this.currentAlienNode);
         }
@@ -822,7 +820,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         //Add new limb to alien and instantiate
         block.addLimb(limb);
 
-        instantiateAlien(alien, editLocation);
+        instantiateAlien(alien, startLocation);
         setChaseCam(this.currentAlienNode);
         setupKeys(this.currentAlienNode);
 
@@ -855,7 +853,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             alien = a.body;
             this.savedAlien = a;
             resetAlien();
-            instantiateAlien(alien, editLocation);
+            instantiateAlien(alien, startLocation);
             setChaseCam(this.currentAlienNode);
             setupKeys(this.currentAlienNode);
             return true;
@@ -1038,7 +1036,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         resetAlien();
 
-        instantiateAlien(alien, editLocation);
+        instantiateAlien(alien, startLocation);
         setChaseCam(this.currentAlienNode);
         setupKeys(this.currentAlienNode);
 

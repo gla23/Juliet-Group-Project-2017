@@ -22,7 +22,6 @@ public class LearnToBeAnAlien extends SimpleApplication {
     public static final double SIM_SPEED = 1.0f;
     public static final double SIM_ACCURACY = 1f/60f;
     public static final double FIXED_TIME_STEP = 1.0/60.0;
-    public static final int FRAMERATE = 60;
     
     public static void main(String[] args) {
         
@@ -37,7 +36,6 @@ public class LearnToBeAnAlien extends SimpleApplication {
         settings.setTitle("Learn To Be An Alien");
         settings.put("Width", 1920*4/5);
         settings.put("Height",1080*4/5);
-        settings.setFrameRate(FRAMERATE);
         settings.setFullscreen(false);
         app.setSettings(settings);
         app.start();
