@@ -140,7 +140,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
             //System.out.println("log");
             if (savedAlien.savedEntryCount() > numLogEntries) {
-                buildGraph(savedAlien.getEntries());
+                buildGraph(new ArrayList(savedAlien.getEntries()));
             }
         }
     }
@@ -153,7 +153,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
     }
     
-    public void buildGraph(ArrayList<LogEntry> log) {
+    public void buildGraph(ArrayList<GenerationResult> log) {
         List<Float> data = new ArrayList<Float>();
         for (int i = 0; i < log.size(); i++) {
             float fitness = log.get(i).fitness;
@@ -1189,7 +1189,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             // try to poll task from the queue
             if (!editing && savedAlien.savedEntryCount() > 0) {
                 startSimulation(new SimulationData(savedAlien.getMostRecent().bestGenome, AlienEvaluator.simTime));
-                
+            }
+            
             if (!editing) {
                 SimulationData s;
                 s = new SimulationData(trainer.getBestSoFar(), AlienEvaluator.simTime);
