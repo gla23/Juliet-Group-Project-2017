@@ -142,9 +142,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             niftyLog.setFocusItemByIndex(logEntries.size() - 1);
 
             //System.out.println("log");
-            if (savedAlien.savedEntryCount() > numLogEntries) {
-                System.out.println(savedAlien.getEntries());
+
+            if (savedAlien.savedEntryCount() !=  numLogEntries) {
                 buildGraph(savedAlien.getEntries());
+                // buildGraph(saveAlien.getLastEntries(50));
             }
         }
     }
