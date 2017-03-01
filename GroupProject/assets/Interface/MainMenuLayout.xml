@@ -485,7 +485,7 @@
                                                                 </effect>
                                                             </control>
                                                                 
-                                                            <control name="label" id = "eigth_label" height = "3%" text="Yawn:" />
+                                                            <control name="label" id = "eigth_label" height = "3%" text="Yaw:" />
                                                             <control id="yawSlider" name="horizontalSlider" initial = "0.0" width="100%" min = "-1.571" max = "1.571" stepSize = "0.2" buttonStepSize = "0.5"/>
                                                                 
                                                             <control name="label" id = "ninth_label" height = "3%" text="Pitch:" />
