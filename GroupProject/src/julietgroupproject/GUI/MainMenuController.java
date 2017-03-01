@@ -5,11 +5,13 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
+import de.lessvoid.nifty.controls.Button;
 import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.controls.CheckBoxStateChangedEvent;
 import de.lessvoid.nifty.controls.DropDown;
 import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
 import de.lessvoid.nifty.controls.Label;
+import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
 import de.lessvoid.nifty.controls.RadioButtonGroupStateChangedEvent;
 import de.lessvoid.nifty.controls.SliderChangedEvent;
 import de.lessvoid.nifty.controls.Tab;
@@ -116,20 +118,33 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     public void showEditor() {
         if (alienNamed)
         {
+            app.addKeyBindings();
             nifty.gotoScreen("start");
             addValues();
-            app.addKeyBindings();
+            checkPrevSim();
         }
         else
         {
             nifty.gotoScreen("begin");
+            checkPrevSim();
+        }
+    }
+    
+    public void checkPrevSim() {
+        Button resume = nifty.getScreen("start").findNiftyControl("new_sim", Button.class);
+        if (app.savedAlien.pop != null) {
+            
+            resume.setText("Resume Training");
+        } else {
+            resume.setText("Start Training");
         }
     }
 
     public void stopSimulation() {
-        this.app.endTraining();
+        this.app.endSimulation();
         nifty.gotoScreen("start");
         addValues();
+        checkPrevSim();
         if (!showArrow) showArrow = app.hideArrow();
     }
     
@@ -340,6 +355,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         if (sanitizedName.length() > 0) {
             app.savedAlien.setName(sanitizedName);
             alienNamed = true;
+            app.savedAlien.alienChanged();
             showEditor();
             showArrow = app.showArrow();
         }
@@ -357,13 +373,14 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         //TODO
         if (app.loadAlien(sanitizeAlienName(currentlySelectedLoadAlien))) {
             alienNamed = true;
+            app.addKeyBindings();
             nifty.gotoScreen("start");
+            checkPrevSim();
             screen = nifty.getScreen("start");
             firstBody = true;
             addAlienSpecificOptions();
             addValues();
             showArrow = app.showArrow();
-            app.addKeyBindings();
         } else {
             nifty.gotoScreen("load_fail");
         }
@@ -530,6 +547,13 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         app.restartAlien();
     }
 
+    @NiftyEventSubscriber(id = "logger_listbox")
+    public void logItemSelected(final String id, final ListBoxSelectionChangedEvent<julietgroupproject.GenerationResult> event)
+    {
+        if (event.getSelection().size() > 0)
+            app.showOffGeneration(event.getSelection().get(0).generation);
+    }
+    
     @NiftyEventSubscriber(id = "hingeAxisButtons")
     public void onXChange(final String id, final RadioButtonGroupStateChangedEvent event) {
         switch (event.getSelectedId()) {
@@ -632,7 +656,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     @Override
     public void onStartScreen() {
-        aliens = app.getLoadableAliens();        
+        aliens = app.getLoadableAliens();     
     }
     
     public void makeGraph(List<Float> data) {
@@ -686,7 +710,12 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     public void resetAlien() {
         app.resetAlien();
-        TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
+        alienNamed = false;
+        
+        app.removeKeyBindings();
+        nifty.gotoScreen("name_dialog");
+        
+        TabGroup tabs = nifty.getScreen("start").findNiftyControl("limb_body_tabs", TabGroup.class);
         // tabs.addTab(addBody);
         tabs.setSelectedTab(addBody);
 

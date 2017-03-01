@@ -33,7 +33,7 @@ public class DrawGraph {
    private static final Color GRAPH_COLOR = Color.green;
    private static final Color GRAPH_POINT_COLOR = new Color(150, 50, 50, 180);
    private static final Stroke GRAPH_STROKE = new BasicStroke(3f);
-   private static final int GRAPH_POINT_WIDTH = 12;
+   private static final int GRAPH_POINT_WIDTH = 4;
    private static final int Y_HATCH_CNT = 10;
 
    private DrawGraph() {}
@@ -95,6 +95,7 @@ public class DrawGraph {
       g2.drawLine(BORDER_GAP, height - BORDER_GAP, BORDER_GAP, BORDER_GAP);
       g2.drawLine(BORDER_GAP, height - BORDER_GAP, width - BORDER_GAP, height - BORDER_GAP);
       
+      /*
       // create hatch marks for y axis. 
       for (int i = 0; i < Y_HATCH_CNT; i++) {
          int x0 = BORDER_GAP;
@@ -102,7 +103,7 @@ public class DrawGraph {
          int y0 = height - (((i + 1) * (height - BORDER_GAP * 2)) / Y_HATCH_CNT + BORDER_GAP);
          int y1 = y0;
          g2.drawLine(x0, y0, x1, y1);
-      }
+      }*/
 
       Stroke oldStroke = g2.getStroke();
       g2.setColor(GRAPH_COLOR);
@@ -114,7 +115,7 @@ public class DrawGraph {
          int y2 = graphPoints.get(i + 1).y;
          g2.drawLine(x1, y1, x2, y2);         
       }
-
+      
       g2.setStroke(oldStroke);      
       g2.setColor(GRAPH_POINT_COLOR);
       for (int i = 0; i < graphPoints.size(); i++) {

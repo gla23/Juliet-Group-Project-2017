@@ -522,11 +522,11 @@
                                                             <control name="label" id = "twelth_label" height = "3%" text="Joint Start Rotation:" />
                                                             <control id="jointRotSlider" name="horizontalSlider" initial = "0" width="100%" min = "3" max = "3" stepSize = "0.1" buttonStepSize = "0.5"/>
                                                               
-                                                            
+                                                            <!--
                                                             <panel id ="space_taker_2" childLayout = "vertical" height = "8%"/>     
                                                             <control name ="button" label="Save Limb" height = "4%" align = "center" width = "80%" id = "save_limb_button" visibleToMouse="true">
                                                                 <interact onClick="saveLimb()"/>
-                                                            </control>
+                                                            </control>-->
                                                         </panel>
                                                             
                                                             
@@ -538,7 +538,7 @@
                                                 </control>
                                             </control>
                                                 
-                                                
+                                                <!--
                                             <control id="saved_limb_tab" name="tab" caption="Saved">
                                                 <control id="savedLimbScrollbar" style="autoscroll"  name="scrollPanel" horizontal="false" height="100%"> 
                                                     
@@ -546,7 +546,7 @@
                                                     
                                                     
                                                 </control>
-                                            </control>
+                                            </control>-->
                                         </control>
                                     </panel>
                                     <panel id = "space_taker" height = "5%"/>
@@ -576,7 +576,7 @@
                             <control name ="button" label="Load Alien" height = "*" width = "*" id = "load_alien" visibleToMouse="true">
                                 <interact onClick="gotoLoadScreen()"/>
                             </control>
-                            <control name ="button" label="Start Training" height = "*" width = "*" id = "new_sim" visibleToMouse="true">
+                            <control name ="button" label="Train Alien" height = "*" width = "*" id = "new_sim" visibleToMouse="true">
                                 <interact onClick="startTraining()"/>
                             </control>
                             <control name ="button" label="Show Best" height = "*" width = "*" id = "best_sim" visibleToMouse="true">
@@ -611,15 +611,17 @@
         <layer id="simluation_layer" childLayout="center" width="100%" >
 
             <panel id="alien_message_box" width="20%" valign="bottom" align="center" height="5%" childLayout="vertical" backgroundColor="#00000088">
-                <control id="alien_message" width="100%" height="100%" name="label" text="Hello" color="ffffffff">
+                <control id="alien_message" width="100%" height="100%" name="label" text="" color="ffffffff">
                 </control> 
             </panel>
          
             <panel id="simulation_logger" width="20%" valign="top" align="left" height="60%" childLayout="vertical" backgroundColor="#aaaaaa00">
-                <control id="logger_listbox" name="listBox" vertical="optional" horizontal="off" displayItems="20" selectionMode="Disabled" color="#aaaaaa33">
+                <control id="logger_listbox" name="listBox" vertical="optional" horizontal="off" displayItems="20" selectionMode="Enabled" color="#aaaaaa33">
                     <effect>
                         <onActive name="fade" start="#ff" end="55" length="1"/>
                     </effect>
+                </control>
+				<control id="current_gen_message" width="100%" height="*" name="label" text="" color="ffffffff">
                 </control>
             </panel>
 
