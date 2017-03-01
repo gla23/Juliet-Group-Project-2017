@@ -160,7 +160,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     {
         if (savedAlien.savedEntryCount() > genNumber && genNumber > 0)
         {
-            showOffRequest = new SimulationData(savedAlien.getEntries().get(genNumber).bestGenome, AlienEvaluator.simTime);
+            showOffRequest = new SimulationData(savedAlien.getEntries().get(genNumber).bestGenome, 6*AlienEvaluator.simTime);
         }
     }
     
@@ -1279,7 +1279,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 }
                 if (s != null) {
                     System.out.println(Thread.currentThread().getId() + ": starting simulation!");
-                    setAlienMessage("Hi");
+                    setAlienMessage("Simulating generation 684");
                     startSimulation(s);
                 }
                 else
