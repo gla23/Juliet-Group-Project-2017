@@ -160,10 +160,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     }
                 }
                 niftyLog.selectItemByIndex(niftyLog.itemCount() - 1);
-                showOffRequest = niftyLog.itemCount() - 1;
+                showOffRequest = savedAlien.savedEntryCount() - 1;
             }
             
             if (savedAlien.savedEntryCount() !=  numLogEntries) {
+                nifty.getScreen("simulation").findNiftyControl("current_gen_message", Label.class).setText("Current generation: " + savedAlien.savedEntryCount());
                 // buildGraph(saveAlien.getLastEntries(50));
                 buildGraph(logEntries);
             }
@@ -183,7 +184,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     {
         bestSoFar = Float.NEGATIVE_INFINITY;
         
-        nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class);
+        nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class).clear();
                 
         runningSingle = true;
         if (alien == null || alien.rootBlock.getConnectedLimbs().size() == 0) {
@@ -1003,7 +1004,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             return false;
         }
         
-        nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class);
+        nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class).clear();
 
         bestSoFar = Float.NEGATIVE_INFINITY;
         
@@ -1311,7 +1312,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 {
                     if (showOffRequest >= 0 && showOffRequest < savedAlien.savedEntryCount())
                     {
-                        setAlienMessage("Running generation " + showOffRequest + " with fitness of " + df.format(savedAlien.getEntries().get(showOffRequest).fitness));
+                        setAlienMessage("Running generation " + (showOffRequest + 1) + " with fitness of " + df.format(savedAlien.getEntries().get(showOffRequest).fitness));
                         s = new SimulationData(savedAlien.getEntries().get(showOffRequest).bestGenome, AlienEvaluator.simTime);
                     }
                 }

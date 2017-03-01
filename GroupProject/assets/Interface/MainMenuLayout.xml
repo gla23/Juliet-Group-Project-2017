@@ -611,7 +611,7 @@
         <layer id="simluation_layer" childLayout="center" width="100%" >
 
             <panel id="alien_message_box" width="20%" valign="bottom" align="center" height="5%" childLayout="vertical" backgroundColor="#00000088">
-                <control id="alien_message" width="100%" height="100%" name="label" text="Hello" color="ffffffff">
+                <control id="alien_message" width="100%" height="100%" name="label" text="" color="ffffffff">
                 </control> 
             </panel>
          
@@ -620,6 +620,8 @@
                     <effect>
                         <onActive name="fade" start="#ff" end="55" length="1"/>
                     </effect>
+                </control>
+				<control id="current_gen_message" width="100%" height="*" name="label" text="" color="ffffffff">
                 </control>
             </panel>
 
