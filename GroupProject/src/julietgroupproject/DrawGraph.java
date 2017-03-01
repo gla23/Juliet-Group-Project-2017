@@ -72,9 +72,9 @@ public class DrawGraph {
       g2.setColor(Color.BLACK);
       
       double xScale = ((double) width - 2 * BORDER_GAP) / (scores.size() - 1);
-      if (scores.size() < 3) { xScale = (width - 2 * BORDER_GAP) / 2; }
+      if (scores.size() < 2) { xScale = (width - 2 * BORDER_GAP) / 2; }
       double yScale = ((double) height - 2 * BORDER_GAP) / (double)(maxIntScore + 1 - minIntScore);
-      if (scores.size() < 3) { yScale = (height - 2 * BORDER_GAP) / 2; }
+      if (scores.size() < 2) { yScale = (height - 2 * BORDER_GAP) / 2; }
       //System.out.println("xScale:" + xScale + ", yScale:" + yScale);
 
       List<Point> graphPoints = new ArrayList<Point>();
