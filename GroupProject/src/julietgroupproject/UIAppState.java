@@ -201,6 +201,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         runningSingle = false;
 
         nifty.gotoScreen("start");
+        myMainMenuController.checkPrevSim();
         myMainMenuController.addValues();
         if (!showArrow) showArrow = hideArrow();
         
