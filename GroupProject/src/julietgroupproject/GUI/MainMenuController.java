@@ -353,6 +353,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 try
                 {
                     nifty.getScreen("save_dialog").findNiftyControl("saveTextField", TextField.class).setText(app.savedAlien.getName());
+                    worked = true;
                 } catch(NullPointerException e)
                 {
                     try {
