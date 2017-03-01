@@ -11,6 +11,7 @@ import de.lessvoid.nifty.controls.CheckBoxStateChangedEvent;
 import de.lessvoid.nifty.controls.DropDown;
 import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
 import de.lessvoid.nifty.controls.Label;
+import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
 import de.lessvoid.nifty.controls.RadioButtonGroupStateChangedEvent;
 import de.lessvoid.nifty.controls.SliderChangedEvent;
 import de.lessvoid.nifty.controls.Tab;
@@ -140,7 +141,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     public void stopSimulation() {
-        this.app.endTraining();
+        this.app.endSimulation();
         nifty.gotoScreen("start");
         addValues();
         checkPrevSim();
@@ -546,6 +547,14 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         app.restartAlien();
     }
 
+    @NiftyEventSubscriber(id = "logger_listbox")
+    public void logItemSelected(final String id, final ListBoxSelectionChangedEvent<julietgroupproject.GenerationResult> event)
+    {
+        System.out.println("Callback!" + event.getSelection().size());
+        if (event.getSelection().size() > 0)
+            app.showOffGeneration(event.getSelection().get(0).generation);
+    }
+    
     @NiftyEventSubscriber(id = "hingeAxisButtons")
     public void onXChange(final String id, final RadioButtonGroupStateChangedEvent event) {
         switch (event.getSelectedId()) {

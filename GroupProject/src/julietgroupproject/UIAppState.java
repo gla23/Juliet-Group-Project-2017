@@ -110,6 +110,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private SimulationData showOffRequest = null;
     private boolean runningSingle = false;
     private volatile boolean forceReset = false;
+    private float bestSoFar = Float.NEGATIVE_INFINITY;
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
@@ -136,20 +137,29 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             ListBox niftyLog = nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class);
             List<GenerationResult> logEntries = savedAlien.getEntries();
 
-            niftyLog.clear();
             
-            float bestFitness = Float.NEGATIVE_INFINITY;
-            for (GenerationResult entry : logEntries) {
-                if (entry.fitness > bestFitness)
-                {
-                    niftyLog.addItem(entry);
-                    bestFitness = entry.fitness;
-                }
-            }
             //niftyLog.setFocusItemByIndex(logEntries.size() - 1);
 
             //System.out.println("log");
 
+            
+            
+            if (savedAlien.savedEntryCount() > 0 && bestSoFar != savedAlien.getMostRecent().fitness)
+            {
+                niftyLog.clear();
+                
+                bestSoFar = savedAlien.getMostRecent().fitness;
+                float bestFitness = Float.NEGATIVE_INFINITY;
+                for (GenerationResult entry : logEntries) {
+                    if (entry.fitness > bestFitness)
+                    {
+                        niftyLog.addItem(entry);
+                        bestFitness = entry.fitness;
+                    }
+                }
+                niftyLog.selectItemByIndex(niftyLog.itemCount() - 1);
+            }
+            
             if (savedAlien.savedEntryCount() !=  numLogEntries) {
                 // buildGraph(saveAlien.getLastEntries(50));
                 buildGraph(logEntries);
@@ -159,6 +169,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     
     public synchronized void showOffGeneration(int genNumber)
     {
+        System.out.println(genNumber);
         if (savedAlien.savedEntryCount() > genNumber && genNumber > 0)
         {
             showOffRequest = new SimulationData(savedAlien.getEntries().get(genNumber).bestGenome, AlienEvaluator.simTime);
@@ -167,6 +178,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     
     public synchronized void showBest()
     {
+        bestSoFar = Float.NEGATIVE_INFINITY;
+        
         runningSingle = true;
         if (alien == null || alien.rootBlock.getConnectedLimbs().size() == 0) {
             return;
@@ -226,7 +239,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             float fitness = log.get(i).fitness;
             data.add(fitness);
         }
-        System.out.println("Data: " + data);
         //System.out.println("W:" + element.getWidth() + " H:" + element.getHeight());
         BufferedImage img = DrawGraph.plotGraph(data, element.getWidth(), element.getHeight());
 
@@ -833,7 +845,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     public boolean resetTraining() {
         savedAlien.alienChanged();
-        return AlienHelper.writeAlien(savedAlien);
+        return true;
     }
 
     public String[] getLoadableAliens() {
@@ -987,6 +999,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             return false;
         }
 
+        bestSoFar = Float.NEGATIVE_INFINITY;
+        
         resetGravity();
 
         showArrow();
@@ -1029,9 +1043,15 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     public void endTraining() {
         this.trainer.terminateTraining(slaves);
-
-        //slaves are cleaned up by trainer after current requests have been answered
-
+    }
+    
+    public void endSimulation()
+    {
+        if (!runningSingle)
+        {
+            endTraining();
+        }
+        showOffRequest = null;
         this.stopSimulation();
 
         resetAlien();
@@ -1045,8 +1065,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         editing = true;
 
         setGravity(0.0f);
-        
-        //restartAlien();
     }
 
     @Override
@@ -1286,7 +1304,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 else
                 {
                     s = showOffRequest;
-                    showOffRequest = null;
+                    //showOffRequest = null;
                 }
                 if (s != null) {
                     System.out.println(Thread.currentThread().getId() + ": starting simulation!");
