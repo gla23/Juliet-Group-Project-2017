@@ -133,19 +133,25 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void updateLog() {
         if (!editing) {
             ListBox niftyLog = nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class);
-            List<GenerationResult> logEntries = savedAlien.getLastEntries(20);
+            List<GenerationResult> logEntries = savedAlien.getEntries();
 
             niftyLog.clear();
+            
+            float bestFitness = Float.NEGATIVE_INFINITY;
             for (GenerationResult entry : logEntries) {
-                niftyLog.addItem(entry);
+                if (entry.fitness > bestFitness)
+                {
+                    niftyLog.addItem(entry);
+                    bestFitness = entry.fitness;
+                }
             }
-            niftyLog.setFocusItemByIndex(logEntries.size() - 1);
+            //niftyLog.setFocusItemByIndex(logEntries.size() - 1);
 
             //System.out.println("log");
 
             if (savedAlien.savedEntryCount() !=  numLogEntries) {
-                buildGraph(savedAlien.getEntries());
                 // buildGraph(saveAlien.getLastEntries(50));
+                buildGraph(logEntries);
             }
         }
     }
