@@ -295,6 +295,19 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         else
             nifty.gotoScreen("simulate_fail");
     }
+    
+    public void showBest()
+    {
+        if (this.app.savedAlien.savedEntryCount() > 0)
+        {
+            nifty.gotoScreen("simulation");
+            this.app.showBest();
+        }
+        else
+        {
+            nifty.gotoScreen("show_best_fail");
+        }
+    }
 
     private String sanitizeAlienName(String rawName) {
         String sanitizedAlienName;

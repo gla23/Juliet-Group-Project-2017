@@ -108,6 +108,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private int numLogEntries = 0;
     private boolean isCollisionOccuring = false;
     private SimulationData showOffRequest = null;
+    private boolean runningSingle = false;
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
@@ -142,6 +143,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
             //System.out.println("log");
             if (savedAlien.savedEntryCount() > numLogEntries) {
+                System.out.println(savedAlien.getEntries());
                 buildGraph(savedAlien.getEntries());
             }
         }
@@ -153,6 +155,48 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         {
             showOffRequest = new SimulationData(savedAlien.getEntries().get(genNumber).bestGenome, AlienEvaluator.simTime);
         }
+    }
+    
+    public synchronized void showBest()
+    {
+        runningSingle = true;
+        if (alien == null || alien.rootBlock.getConnectedLimbs().size() == 0) {
+            return;
+        }
+
+        resetGravity();
+
+        showArrow();
+
+        if (currentAlienNode == null) {
+            instantiateAlien(alien, Vector3f.ZERO);
+        }
+        
+        showOffGeneration(savedAlien.savedEntryCount() - 1);
+        
+        editing = false;
+    }
+    
+    private synchronized void endSingleSim()
+    {
+        this.stopSimulation();
+
+        resetAlien();
+
+        instantiateAlien(alien, startLocation);
+        setChaseCam(this.currentAlienNode);
+        setupKeys(this.currentAlienNode);
+
+        restartAlien();
+
+        editing = true;
+        runningSingle = false;
+
+        nifty.gotoScreen("start");
+        myMainMenuController.addValues();
+        if (!showArrow) showArrow = hideArrow();
+        
+        setGravity(0.0f);
     }
     
     public void setAlienMessage(String msg) {
@@ -1204,11 +1248,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             {
                 updateGhostLimb();
             }
-               
             
             if (!editing) {
                 SimulationData s = null;
-                if (showOffRequest == null)
+                if (showOffRequest == null && !runningSingle)
                 {
                     if (savedAlien.savedEntryCount() > 0)
                     {
@@ -1231,6 +1274,13 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     System.out.println(Thread.currentThread().getId() + ": starting simulation!");
                     setAlienMessage("Hi");
                     startSimulation(s);
+                }
+                else
+                {
+                    if (runningSingle)
+                    {
+                        endSingleSim();
+                    }
                 }
             }
         }

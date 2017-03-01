@@ -228,6 +228,28 @@
             </panel>
         </layer>
     </screen>    
+            
+    <screen id="show_best_fail" controller="julietgroupproject.GUI.MainMenuController">
+     <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
+            <panel id="show_best_fail_panel" childLayout="horizontal">
+                <effect>
+                         <onActive name="fade" start ="#00" end = "ff" length = "1500"/>
+                </effect>
+                 <control id="show_best_fail_window" name="window" closeable= "false" height = "100px" title="Save failed" width="400px" y = "300px" x="400px" >
+                     <panel height = "100%" width = "100%" childLayout = "vertical" >
+                       <panel id = "save_fail_panel_info" height = "50%" childLayout = "horizontal" >
+                           <control name="label" valign = "center" id = "save_info_label" width = "100%" text="Unable to show best: alien has not been trained."  />
+                        </panel>
+                        <panel id = "return_show_best_fail_panel" childLayout = "center"  valign = "center" height = "50%" width = "100%">
+                            <control name ="button" label="OK"  width = "33%" id = "returnToEditor" visibleToMouse="true">
+                               <interact onClick="showEditor()"/>
+                            </control>
+                        </panel>     
+                     </panel>
+                </control>
+            </panel>
+        </layer>
+    </screen>   
 	
 	<screen id="simulate_fail" controller="julietgroupproject.GUI.MainMenuController">
      <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
@@ -556,6 +578,9 @@
                             </control>
                             <control name ="button" label="Start Training" height = "*" width = "*" id = "new_sim" visibleToMouse="true">
                                 <interact onClick="startTraining()"/>
+                            </control>
+                            <control name ="button" label="Show Best" height = "*" width = "*" id = "best_sim" visibleToMouse="true">
+                                <interact onClick="showBest()"/>
                             </control>
                             <control name ="button" label="Reset Training" height = "*" width = "*" id = "reset_sim" visibleToMouse="true">
                                 <interact onClick="resetTraining()"/>
