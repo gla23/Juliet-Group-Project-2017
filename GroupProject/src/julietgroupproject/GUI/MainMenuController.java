@@ -618,8 +618,10 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
     
     public void makeGraph(List<Float> data) {
+        
+        /*
         DrawGraph test = new DrawGraph(data, "assets/Graphs/test1.png");
-        test.showIt();
+        test.showIt();*/
     }
 
     @Override

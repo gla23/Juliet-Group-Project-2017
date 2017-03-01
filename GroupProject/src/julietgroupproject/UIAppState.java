@@ -2,6 +2,9 @@ package julietgroupproject;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.asset.AssetKey;
+import com.jme3.asset.DesktopAssetManager;
+import com.jme3.asset.TextureKey;
 import com.jme3.bullet.collision.PhysicsCollisionEvent;
 import com.jme3.bullet.collision.PhysicsCollisionListener;
 import com.jme3.bullet.control.GhostControl;
@@ -30,6 +33,10 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.debug.Arrow;
 import com.jme3.system.JmeContext;
+import com.jme3.texture.Image;
+import com.jme3.texture.Texture;
+import com.jme3.texture.Texture.MagFilter;
+import com.jme3.texture.plugins.AWTLoader;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.controls.ListBox;
@@ -37,6 +44,7 @@ import de.lessvoid.nifty.controls.Slider;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.ImageRenderer;
 import de.lessvoid.nifty.render.NiftyImage;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -104,6 +112,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         KeyInput.KEY_J, KeyInput.KEY_K,
         KeyInput.KEY_V, KeyInput.KEY_B,
         KeyInput.KEY_N, KeyInput.KEY_M};
+    private final AWTLoader awtLoader = new AWTLoader();
+    TextureKey graph = new TextureKey("graph",false);
+    Texture graphTex;
 
     public UIAppState(SavedAlien _alien, double _simSpeed, double _accuracy) {
         super(_alien.body, _simSpeed, _accuracy);
@@ -114,50 +125,62 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         super(_alien.body, _simSpeed, _accuracy, _fixedTimeStep);
         savedAlien = _alien;
     }
-    
+
     public void updateLog() {
         if (!editing) {
             ListBox niftyLog = nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class);
             List<GenerationResult> logEntries = savedAlien.getLastEntries(20);
-            
+
             niftyLog.clear();
             for (GenerationResult entry : logEntries) {
                 niftyLog.addItem(entry);
             }
-            niftyLog.setFocusItemByIndex(logEntries.size()-1);
-            
+            niftyLog.setFocusItemByIndex(logEntries.size() - 1);
+
             //System.out.println("log");
-            if (savedAlien.savedEntryCount()>numLogEntries) {
+            if (savedAlien.savedEntryCount() > numLogEntries) {
                 buildGraph(savedAlien.getEntries());
             }
         }
     }
-    
+
     public void buildGraph(List<GenerationResult> log) {
         List<Float> data = new ArrayList<Float>();
-        for (int i = 0; i<log.size(); i++) {
+        for (int i = 0; i < log.size(); i++) {
             float fitness = log.get(i).fitness;
             data.add(fitness);
         }
         System.out.println("Data: " + data);
-        DrawGraph test = new DrawGraph(data, "assets/Graphs/test1.png");
-        test.showIt();
+
+        Element element = nifty.getScreen("simulation").findElementByName("graphId");
+        //System.out.println("W:" + element.getWidth() + " H:" + element.getHeight());
+        BufferedImage img = DrawGraph.plotGraph(data, element.getWidth(), element.getHeight());
+
+        Image i = this.awtLoader.load(img, true);
+        this.graphTex.setImage(i);
+        ((DesktopAssetManager)assetManager).deleteFromCache(graph);
+        String newTempTextureName = Long.toString(System.nanoTime());
+        this.graph = new TextureKey(newTempTextureName);
+        ((DesktopAssetManager)assetManager).addToCache(graph, graphTex);
+        NiftyImage newGraph = nifty.getRenderEngine().createImage(nifty.getScreen("simulation"), newTempTextureName, false);
+        element.getRenderer(ImageRenderer.class).setImage(newGraph);
         //updateGraph();
         numLogEntries = log.size();
     }
-    
+
+    /*
     public void updateGraph() {
-        NiftyImage newImage = nifty.getRenderEngine().createImage(nifty.getScreen("simulation"),"Graphs/test1.png", false); // false means don't linear filter the image, true would apply linear filtering
+        //NiftyImage newImage = nifty.getRenderEngine().createImage(nifty.getScreen("simulation"),"Graphs/test1.png", false); // false means don't linear filter the image, true would apply linear filtering
+
 
         // find the element with it's id
         Element element = nifty.getScreen("simulation").findElementByName("graphId");
 
         // change the image with the ImageRenderer
-        element.getRenderer(ImageRenderer.class).setImage(newImage);
-        
+
         System.out.println("Updated");
     }
-  
+    */
 
     public void setTexture(int textno) {
         System.out.println("Setting texture to " + textno);
@@ -191,9 +214,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             alienNode.removeFromParent();
         }
     }
-    
-    private void setAlien(Alien a)
-    {
+
+    private void setAlien(Alien a) {
         this.savedAlien.body = a;
         this.alien = a;
         this.savedAlien.alienChanged();
@@ -255,9 +277,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         return gl;
 
     }
-    
-    
-    
+
     public void relocateGhostLimb(Geometry gl, Block block, Vector3f contactPt, Vector3f normal) {
         //Take the entries from the sliders for limb properties
         Slider widthField = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
@@ -306,8 +326,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         //Build the new limb
         Matrix3f rotation = new Matrix3f();
         rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
-                
-        
+
+
         //Mesh m = gl.getMesh();
         //AlienHelper.rotateMesh(rotationForNormal, m);
         gl.setLocalRotation(rotation);
@@ -322,7 +342,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Matrix3f rotation = new Matrix3f();
         rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
         Mesh m = gl.getMesh();
-        AlienHelper.transformMesh(rotation.invert(),Matrix3f.IDENTITY,Vector3f.ZERO, m);
+        AlienHelper.transformMesh(rotation.invert(), Matrix3f.IDENTITY, Vector3f.ZERO, m);
         gl.setLocalRotation(rotation);
 
         // check for collision
@@ -674,8 +694,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         //Build the new limb
         Block limb = new Block(newPos, newHingePos, limbWidth, limbHeight, limbLength, currentShape, axisToUse, weight);
         Matrix3f rotationForNormal = new Matrix3f();
-        
-        
+
+
         if (currentShape.equals("Cylinder")) {
             rotationForNormal.fromStartEndVectors(new Vector3f(0, 0, 1), normal);
         } else {
@@ -684,14 +704,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (currentShape.equals("Sphere")) {
             rotationForNormal = rotationForNormal.mult(new Matrix3f(limbWidth, 0f, 0f, 0f, limbHeight, 0f, 0f, 0f, limbLength));
         }
-        
+
         // Apply yaw pitch roll rotation
         float[] angles = new float[3];
         angles[0] = yaw;
         angles[1] = pitch;
         angles[2] = roll;
         Matrix3f rotationForYPR = new Quaternion(angles).toRotationMatrix();
-        
+
         limb.rotation = rotationForNormal;
         limb.rotationForYPR = rotationForYPR;
         // Stores the normal the limb was created at in the limb for future use
@@ -730,8 +750,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         ghostLimb2 = null;
     }
 
-    
-
     public boolean resetTraining() {
         savedAlien.alienChanged();
         return AlienHelper.writeAlien(savedAlien);
@@ -758,13 +776,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             setChaseCam(this.currentAlienNode);
             setupKeys(this.currentAlienNode);
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
-    
+
     public boolean saveAlien(String name) {
         if (savedAlien != null) {
             savedAlien.setName(name);
@@ -819,6 +835,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.rootNode.attachChild(ghostRoot);
 
         showArrow();
+        
+        // load default graph texture
+        graphTex = assetManager.loadTexture(new TextureKey("Graphs/test1.png", false));
+        graphTex.setAnisotropicFilter(16);
+        graphTex.setMagFilter(MagFilter.Bilinear.Bilinear);
     }
 
     public void addKeyBindings() {
@@ -883,13 +904,13 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
 
         resetGravity();
-        
+
         showArrow();
 
         if (currentAlienNode == null) {
             instantiateAlien(alien, Vector3f.ZERO);
         }
-        
+
         this.savedAlien.inputCount = currentAlienNode.joints.size() + 1;
         this.savedAlien.outputCount = currentAlienNode.joints.size();
 
@@ -914,9 +935,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
 
         this.trainer.start();
-        
+
         editing = false;
-        
+
         return true;
     }
 
@@ -934,7 +955,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         setupKeys(this.currentAlienNode);
 
         restartAlien();
-        
+
         editing = true;
 
         setGravity(0.0f);
@@ -1049,8 +1070,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
                         CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
                         boolean symmetric = symmetricBox.isChecked();
-                        
-                        
+
+
                         if (symmetric) {
                             block.createdBySymetric = true;
                             switch (block.collisionShapeType) {
@@ -1142,9 +1163,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     @Override
     public void update(float tpf) {
-        
+
         if (simInProgress) {
-            if (this.isFixedTimeStep) { tpf = this.fixedTimeStep; }
+            if (this.isFixedTimeStep) {
+                tpf = this.fixedTimeStep;
+            }
             simTimeLimit -= tpf * physics.getSpeed();
             if (simTimeLimit < 0f) {
                 // stop simulation and report result
@@ -1152,17 +1175,17 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             }
         } else {
             updateGhostLimb();
-                             
+
             // try to poll task from the queue
             if (!editing && savedAlien.savedEntryCount() > 0) {
                 startSimulation(new SimulationData(savedAlien.getMostRecent().bestGenome, AlienEvaluator.simTime));
-                
+
             }
         }
-        
+
         updateLog();
     }
-    
+
     @Override
     public void cleanup() {
         if (this.trainer != null) {

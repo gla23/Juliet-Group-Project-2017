@@ -595,8 +595,11 @@
                 </control>
 
             </panel>
-            <panel id = "simulation_logger" width= "40%" valign = "top" align="right" height = "20%" childLayout = "vertical" backgroundColor="#aaaaaa00">
-               <!--<image id="graphId" width = "100%"  height ="100%" filename="Graphs/test1.png" />-->
+            <panel id = "simulation_graph" width= "40%" valign = "top" align="right" height = "20%" childLayout = "vertical" backgroundColor="#aaaaaa00">
+               <!--image id="graphId" width = "100%"  height ="100%" filename="Textures/blank.png" /-->
+               <!-- put the image we show before any graph is generated in
+                    assets/Textures/blank.png or whatever -->
+               <image id="graphId" width = "100%"  height ="100%" />
 
             </panel>
             
