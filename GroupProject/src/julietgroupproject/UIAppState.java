@@ -39,6 +39,7 @@ import com.jme3.texture.Texture.MagFilter;
 import com.jme3.texture.plugins.AWTLoader;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.CheckBox;
+import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.Slider;
 import de.lessvoid.nifty.elements.Element;
@@ -143,8 +144,16 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             }
         }
     }
-
-    public void buildGraph(List<GenerationResult> log) {
+    
+    public void setAlienMessage(String msg) {
+        if (!editing) {
+            Label niftyLabel = nifty.getScreen("simulation").findNiftyControl("alien_message", Label.class);
+            niftyLabel.setText(msg);
+            System.out.println(niftyLabel.getText());
+        }
+    }
+    
+    public void buildGraph(ArrayList<LogEntry> log) {
         List<Float> data = new ArrayList<Float>();
         for (int i = 0; i < log.size(); i++) {
             float fitness = log.get(i).fitness;
@@ -275,7 +284,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Geometry gl = AlienHelper.assembleBlock(copy, block.getGeometry().getWorldTranslation());
         ghostRoot.attachChild(gl);
         return gl;
-
+        
     }
 
     public void relocateGhostLimb(Geometry gl, Block block, Vector3f contactPt, Vector3f normal) {
@@ -937,6 +946,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.trainer.start();
 
         editing = false;
+        //setAlienMessage("Starting training...");
 
         return true;
     }
@@ -1179,7 +1189,15 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             // try to poll task from the queue
             if (!editing && savedAlien.savedEntryCount() > 0) {
                 startSimulation(new SimulationData(savedAlien.getMostRecent().bestGenome, AlienEvaluator.simTime));
-
+                
+            if (!editing) {
+                SimulationData s;
+                s = new SimulationData(trainer.getBestSoFar(), AlienEvaluator.simTime);
+                if (s != null) {
+                    System.out.println(Thread.currentThread().getId() + ": starting simulation!");
+                    setAlienMessage("Hi");
+                    startSimulation(s);
+                }
             }
         }
 
