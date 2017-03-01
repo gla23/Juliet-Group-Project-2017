@@ -120,8 +120,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             
             niftyLog.clear();
             for (LogEntry entry : logEntries) {
-                niftyLog.insertItem(entry, 0);
+                niftyLog.addItem(entry);
             }
+            niftyLog.setFocusItemByIndex(logEntries.size()-1);
+            
             //System.out.println("log");
             ArrayList<LogEntry> fullLogEntries = trainingLog.getEntries();
             if (fullLogEntries.size()>numLogEntries) {
@@ -139,7 +141,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         System.out.println("Data: " + data);
         DrawGraph test = new DrawGraph(data, "assets/Graphs/test1.png");
         test.showIt();
-        updateGraph();
+        //updateGraph();
         numLogEntries = log.size();
     }
     
