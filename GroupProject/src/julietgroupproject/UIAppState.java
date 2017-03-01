@@ -36,9 +36,11 @@ import com.jme3.system.JmeContext;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
+import com.jme3.texture.Texture2D;
 import com.jme3.texture.plugins.AWTLoader;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.CheckBox;
+import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.controls.ListBox;
 import de.lessvoid.nifty.controls.Slider;
 import de.lessvoid.nifty.elements.Element;
@@ -141,6 +143,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             if (savedAlien.savedEntryCount() > numLogEntries) {
                 buildGraph(savedAlien.getEntries());
             }
+        }
+    }
+    
+    public void setAlienMessage(String msg) {
+        if (!editing) {
+            Label niftyLabel = nifty.getScreen("simulation").findNiftyControl("alien_message", Label.class);
+            niftyLabel.setText(msg);
+            System.out.println(niftyLabel.getText());
         }
     }
 
@@ -837,7 +847,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         showArrow();
         
         // load default graph texture
-        graphTex = assetManager.loadTexture(new TextureKey("Graphs/test1.png", false));
+        graphTex = new Texture2D();//assetManager.loadTexture(new TextureKey("Graphs/test1.png", false));
         graphTex.setAnisotropicFilter(16);
         graphTex.setMagFilter(MagFilter.Bilinear.Bilinear);
     }
@@ -1179,7 +1189,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             // try to poll task from the queue
             if (!editing && savedAlien.savedEntryCount() > 0) {
                 startSimulation(new SimulationData(savedAlien.getMostRecent().bestGenome, AlienEvaluator.simTime));
-
             }
         }
 

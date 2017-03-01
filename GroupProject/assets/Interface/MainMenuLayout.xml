@@ -585,8 +585,6 @@
     <screen id="simulation" controller="julietgroupproject.GUI.MainMenuController" childLayout="right">
         <layer id="simluation_layer" childLayout="center" width = "100%" >
 
-
-            // TODO           
             <panel id = "simulation_logger" width= "20%" valign = "top" align="left" height = "60%" childLayout = "vertical" backgroundColor="#aaaaaa00">
                 <control id="logger_listbox" name="listBox" vertical="optional" horizontal="off" displayItems="20" selectionMode="Disabled" color="#aaaaaa33">
                     <effect>
@@ -595,6 +593,11 @@
                 </control>
 
             </panel>
+
+            <panel id="alien_message_box" width="20%" valign="bottom" align="center" height="5%" childLayout="vertical" backgroundColor="#00000088">
+                <control id="alien_message" width="100%" height="100%" name="label" text="Hello" color="ffffffff">
+                </control> 
+            </panel>
             <panel id = "simulation_graph" width= "40%" valign = "top" align="right" height = "20%" childLayout = "vertical" backgroundColor="#aaaaaa00">
                <!--image id="graphId" width = "100%"  height ="100%" filename="Textures/blank.png" /-->
                <!-- put the image we show before any graph is generated in
@@ -602,14 +605,12 @@
                <image id="graphId" width = "100%"  height ="100%" />
 
             </panel>
-            
-            <panel id = "simulation_button" width= "100%" valign = "bottom" height = "5%" childLayout = "vertical">
-                <control name = "button" label = "Stop Simulation" id = "stop_simulation" height = "100%" align = "right"  width = "13%"
-                         visibleToMouse = "true" >
+            <panel id="simulation_button" width="100%" valign="bottom" height="5%" childLayout="vertical">
+                <control name="button" label="Stop Simulation" id="stop_simulation" height="100%" align="right"  width="13%"
+                         visibleToMouse="true" >
                     <interact onClick="stopSimulation()"/>
                 </control>
             </panel>
-            
         </layer>
     </screen>
 </nifty>
