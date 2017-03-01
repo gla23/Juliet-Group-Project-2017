@@ -308,6 +308,18 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         System.out.println(Arrays.toString(aliens));
     }
     
+    public void gotoNameScreen()
+    {
+        app.removeKeyBindings();
+        nifty.gotoScreen("name_dialog");
+    }
+    
+    public void confirmName()
+    {
+        app.savedAlien.setName(nifty.getScreen("name_dialog").findNiftyControl("nameTextField", TextField.class).getRealText());
+        showEditor();
+    }
+    
     @NiftyEventSubscriber (id = "alien_selector")
     public void setCurrentLoadAlien(final String id, final DropDownSelectionChangedEvent<String> event) {
         currentlySelectedLoadAlien = event.getSelection();
@@ -334,6 +346,25 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     public void gotoSaveScreen() {
         this.saveType = "alien";
         app.removeKeyBindings();
+        Thread thread = new Thread () {@Override public void run(){
+            boolean worked = false;
+            while(!worked)
+            {
+                try
+                {
+                    nifty.getScreen("save_dialog").findNiftyControl("saveTextField", TextField.class).setText(app.savedAlien.getName());
+                } catch(NullPointerException e)
+                {
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(MainMenuController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    worked = false;
+                }
+            }
+        }};
+        thread.start();
         nifty.gotoScreen("save_dialog");
     }
 

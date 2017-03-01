@@ -33,7 +33,7 @@ public class LearnToBeAnAlien extends SimpleApplication {
         LearnToBeAnAlien app = new LearnToBeAnAlien();
         app.setShowSettings((System.getProperty("os.name").toLowerCase()).contains("mac"));
         AppSettings settings = new AppSettings(true);
-        settings.setTitle("Learn to be a flopping mess");
+        settings.setTitle("Learn To Be An Alien");
         settings.put("Width", 1920*4/5);
         settings.put("Height",1080*4/5);
         settings.setFullscreen(false);
@@ -48,7 +48,7 @@ public class LearnToBeAnAlien extends SimpleApplication {
         setDisplayStatView(false);
         BulletAppState physics = new BulletAppState();
         this.stateManager.attach(physics);
-        UIAppState uiAppState = new UIAppState(null, SIM_SPEED, SIM_ACCURACY, FIXED_TIME_STEP);
+        UIAppState uiAppState = new UIAppState(new SavedAlien(), SIM_SPEED, SIM_ACCURACY, FIXED_TIME_STEP);
         this.stateManager.attach(uiAppState);
     }
 }

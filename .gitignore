@@ -16,6 +16,9 @@ GroupProject/assets/Graphs/*
 ### Java ###
 *.class
 
+### Trained individuals
+*.gen
+
 # BlueJ files
 *.ctxt
 

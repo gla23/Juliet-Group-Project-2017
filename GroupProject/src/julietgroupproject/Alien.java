@@ -12,23 +12,10 @@ import java.util.Random;
  */
 public class Alien implements Serializable {
     public Block rootBlock;
-    private String name;
     public int materialCode = 3;
-    private static Random rng = new Random();
     
     public Alien(Block rootBlock) {
         this.rootBlock = rootBlock;
-        name = "alien" + Integer.toString(rng.nextInt());
-    }
-    
-    public String getName()
-    {
-        return name;
-    }
-    
-    public void setName(String _name)
-    {
-        name = _name;
     }
     
     public int getCode() {

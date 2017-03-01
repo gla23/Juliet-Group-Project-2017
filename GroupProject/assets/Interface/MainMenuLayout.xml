@@ -15,7 +15,7 @@
                             <!-- <onClick name = "fade" start = "#ff" end = "#00" length = "2000"/>-->
                              <onActive name="changeFont" font = "Interface/Fonts/Begin.fnt"/>
                         </effect>
-                        <interact onClick="showEditor()"/>
+                        <interact onClick="gotoNameScreen()"/>
                      </control>
                      <control name="button" label="Load Saved Alien"  height = "*" width = "*" id="loadAlienButton" align="center" valign="center" 
                                     visibleToMouse="true" > 
@@ -110,6 +110,35 @@
                                  </control>
                                  <control name ="button" label="Cancel"  width = "*" id = "returnToEditor" visibleToMouse="true">
                                      <interact onClick="showEditor()"/>
+                                 </control>
+                             </panel>    
+                         </panel>
+                        
+                    </control>
+                    
+                </panel>
+        </layer>
+    </screen>
+	
+	<screen id="name_dialog" controller="julietgroupproject.GUI.MainMenuController">
+         <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
+            
+                <panel id="name_panel" childLayout="horizontal">
+                    <effect>
+                             <onActive name="fade" start ="#00" end = "ff" length = "1500"/>
+                    </effect>
+                     <control id="name_window" name="window" closeable= "false" height = "145px" title="Name Alien" width="400px" y = "300px" x="400px" >
+                         <panel height = "100%" width = "100%" childLayout = "vertical" >
+                             <panel id = "name_input_panel" height = "50%" childLayout = "horizontal" >
+                                 <control name="label" valign = "center" id = "name_label" width = "35%" text="File name:"  />
+                                 <control valign = "center" width = "65%" id="nameTextField" name="textfield" />
+                             </panel>
+                             <panel id = "name_input_panel_info" height = "25%" childLayout = "horizontal" >
+                                 <control name="label" valign = "center" id = "name_info_label" width = "100%" text="Alphanumeric characters, dashes, spaces and underscores only."  />
+                             </panel>
+                             <panel id = "return_name_panel" childLayout = "vertical"  height = "100%" width = "100%">
+                                 <control name ="button" label="Name alien"  width = "*" id = "confirmName" visibleToMouse="true">
+                                     <interact onClick="confirmName()"/>
                                  </control>
                              </panel>    
                          </panel>

@@ -18,7 +18,19 @@ import com.jme3.scene.shape.Cylinder;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.scene.shape.Torus;
 import com.jme3.util.BufferUtils;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.FloatBuffer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.encog.ml.MLRegression;
 
 /**
  * Helper class to help instantiate an Alien Block as a Node, with
@@ -159,5 +171,51 @@ public class AlienHelper {
         //Update it:
         vb.setUpdateNeeded();
         return mesh;
+    }
+    
+    public static SavedAlien readAlien(String name)
+    {
+        File f = new File("aliens/" + name + "/" + name + "_current.sav");
+        try (ObjectInputStream o = new ObjectInputStream(new FileInputStream(f))) {
+            return (SavedAlien) o.readObject();
+        } catch (IOException | ClassNotFoundException ex) {
+            Logger.getLogger(UIAppState.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
+    public static boolean writeAlien(SavedAlien alien)
+    {
+        if (alien == null)
+            return false;
+        File f = new File("aliens/" + alien.getName() + "/" + alien.getName() + "_current.sav");
+        f.getParentFile().mkdirs();
+        
+        
+        //backup the existing file if the population was reset.
+        if (alien.getHasBeenReset())
+        {
+            for (File toRename : f.getParentFile().listFiles()) {
+                if (toRename.getPath().contains(alien.getName() + "_current.sav")) {
+                    DateFormat df = new SimpleDateFormat("yyMMddHHmmss");
+                    Date dateobj = new Date();
+                    File target = new File(toRename.getPath().substring(0, toRename.getPath().length() - 4) + df.format(dateobj) + ".sav");
+                    toRename.renameTo(target);
+                }
+            }
+                
+        }
+        
+        
+        try (ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(f))) {
+            o.writeObject(alien);
+
+            alien.alienSaved();
+            
+            return true;
+        } catch (IOException ex) {
+            Logger.getLogger(UIAppState.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
     }
 }

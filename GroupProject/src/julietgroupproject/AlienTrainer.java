@@ -23,67 +23,19 @@ import org.encog.util.Format;
  */
 public class AlienTrainer extends Thread {
 
-    private NEATPopulation pop; //The population being trained
     private EvolutionaryAlgorithm train; //Manages training
-    private String filename; //File to save/load population from.
-    private int inputCount; //Number of inputs to the NN
-    private int outputCount; //Number of outputs from the NN
+    private SavedAlien savedAlien;
     private final int popCount = 30; //population size to use
     private volatile boolean terminating = false;
     private volatile List<SlaveSimulator> slaves;
-    private JulietLogger<LogEntry> log = null;
+    private final int iterationsBetweenSaves = 20;
 
-    private void load() {
-        pop = null;
-
-        //read in a serialized population from a file
-        try {
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename));
-
-            pop = (NEATPopulation) in.readObject();
-
-            in.close();
-
-            System.out.println("Loaded successfully");
-        } catch (IOException e) {
-            System.out.println("Error reading from file: creating new population");
-        } catch (ClassNotFoundException e) {
-            System.out.println("Error reading from file: creating new population");
-        }
-    }
-
-    private void save() {
-        //TODO: can cause stack overflow as NEATPopulation's Serialize is not implemented properly
+    public AlienTrainer(SavedAlien _savedAlien, Queue<SimulationData> _simTasks) {
         
-        //serialize the population and write it to a file.
-        try {
-            File f = new File(filename);
-            
-            f.getParentFile().mkdirs();
-            
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(f));
-
-            out.writeObject(pop);
-
-            out.close();
-
-            System.out.println("Saved successfully");
-        } catch (IOException e) {
-            System.out.println("Error saving to file.");
-        }
-    }
-
-    public AlienTrainer(String _filename, Queue<SimulationData> _simTasks, int _inputCount, int _outputCount) {
-        filename = _filename;
-
-        inputCount = _inputCount;
-        outputCount = _outputCount;
-
-        //try to load from saved file
-        this.load();
-
-        //if unsucessful, create new population
-        if (this.pop == null) {
+        savedAlien = _savedAlien;
+        
+        //if no population saved, create new population
+        if (this.savedAlien.pop == null) {
             resetTraining();
         }
         
@@ -93,16 +45,18 @@ public class AlienTrainer extends Thread {
          */
         AlienEvaluator score = new AlienEvaluator(_simTasks);
 
-        train = NEATUtil.constructNEATTrainer(pop, score);
+        train = NEATUtil.constructNEATTrainer(this.savedAlien.pop, score);
         OriginalNEATSpeciation speciation = new OriginalNEATSpeciation();
         speciation.setCompatibilityThreshold(1);
         train.setSpeciation(new OriginalNEATSpeciation());
     }
 
     private void resetTraining() {
-        pop = new NEATPopulation(inputCount, outputCount, popCount);
-        pop.setActivationCycles(4);
-        pop.reset();
+        System.out.println("Resetting training");
+        this.savedAlien.alienChanged();
+        this.savedAlien.pop = new NEATPopulation(savedAlien.inputCount, savedAlien.outputCount, popCount);
+        this.savedAlien.pop.setActivationCycles(4);
+        this.savedAlien.pop.reset();
         System.out.println("Population reset");
     }
 
@@ -119,24 +73,22 @@ public class AlienTrainer extends Thread {
                 
                 this.train.iteration(); //perform the next training iteration.#
 
-                int iterationNumber = this.train.getIteration();
-                double populationFitness = this.pop.getBestGenome().getScore();
-                    
-                //print statistics
-                //System.out.println("Error: " + Format.formatDouble(this.train.getError(), 2)); //TODO: Error always returns 1
-                //System.out.println("Iterations: " + iterationNumber);
-            
-                if (log != null) {
-                    log.push(new LogEntry(iterationNumber, (float) populationFitness));
+                if (this.train.getIteration() % iterationsBetweenSaves == 0)
+                {
+                    AlienHelper.writeAlien(savedAlien);
                 }
+                
+                int iterationNumber = this.train.getIteration();
+                double populationFitness = this.savedAlien.pop.getBestGenome().getScore();
+                    
+                this.savedAlien.addEntry(new GenerationResult(iterationNumber, (float) populationFitness, getBestSoFar()));
             } while (!terminating);
         } finally {
-            log.clear();
             this.train.finishTraining();
         }
 
         //write out current population state to file.
-        this.save();
+        AlienHelper.writeAlien(savedAlien);
         
         if (slaves != null)
         {
@@ -151,9 +103,5 @@ public class AlienTrainer extends Thread {
     public void terminateTraining(List<SlaveSimulator> _slaves) {
         slaves = _slaves;
         terminating = true;
-    }
-    
-    public void setLog(JulietLogger<LogEntry> log) {
-        this.log = log;
     }
 }

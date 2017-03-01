@@ -5,22 +5,26 @@
  */
 package julietgroupproject;
 
+import java.io.Serializable;
 import java.text.DecimalFormat;
+import org.encog.ml.MLRegression;
 
 /**
  *
  * @author George
  */
-public class LogEntry {
+public class GenerationResult implements Serializable{
     
     private static DecimalFormat df = new DecimalFormat(".###");
             
     public int generation;
     public float fitness;
+    public MLRegression bestGenome;
     
-    public LogEntry(int generation, float fitness) {
+    public GenerationResult(int generation, float fitness, MLRegression bestGenome) {
         this.generation = generation;
         this.fitness = fitness;
+        this.bestGenome = bestGenome;
     }
     
     @Override

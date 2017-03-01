@@ -69,6 +69,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     float time;
     float minBoxDimension = 0.4f;
     float minSphereDimension = 0.4f;
+    public SavedAlien savedAlien;
     private Nifty nifty;
     private boolean wireMesh = true;
     private ChaseCamera chaseCam;
@@ -93,7 +94,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private Material ghostMaterial2;
     private int speedUpFactor = 1000;
     private boolean shiftDown = false;
-    private JulietLogger<LogEntry> trainingLog = new JulietLogger<>();
     private Node ghostRoot;
     private int numLogEntries = 0;
     private boolean isCollisionOccuring = false;
@@ -105,34 +105,35 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         KeyInput.KEY_V, KeyInput.KEY_B,
         KeyInput.KEY_N, KeyInput.KEY_M};
 
-    public UIAppState(Alien _alien, double _simSpeed, double _accuracy) {
-        super(_alien, _simSpeed, _accuracy);
+    public UIAppState(SavedAlien _alien, double _simSpeed, double _accuracy) {
+        super(_alien.body, _simSpeed, _accuracy);
+        savedAlien = _alien;
     }
 
-    public UIAppState(Alien _alien, double _simSpeed, double _accuracy, double _fixedTimeStep) {
-        super(_alien, _simSpeed, _accuracy, _fixedTimeStep);
+    public UIAppState(SavedAlien _alien, double _simSpeed, double _accuracy, double _fixedTimeStep) {
+        super(_alien.body, _simSpeed, _accuracy, _fixedTimeStep);
+        savedAlien = _alien;
     }
     
     public void updateLog() {
         if (!editing) {
             ListBox niftyLog = nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class);
-            ArrayList<LogEntry> logEntries = trainingLog.getLastEntries(20);
+            List<GenerationResult> logEntries = savedAlien.getLastEntries(20);
             
             niftyLog.clear();
-            for (LogEntry entry : logEntries) {
+            for (GenerationResult entry : logEntries) {
                 niftyLog.addItem(entry);
             }
             niftyLog.setFocusItemByIndex(logEntries.size()-1);
             
             //System.out.println("log");
-            ArrayList<LogEntry> fullLogEntries = trainingLog.getEntries();
-            if (fullLogEntries.size()>numLogEntries) {
-                buildGraph(fullLogEntries);
+            if (savedAlien.savedEntryCount()>numLogEntries) {
+                buildGraph(savedAlien.getEntries());
             }
         }
     }
     
-    public void buildGraph(ArrayList<LogEntry> log) {
+    public void buildGraph(List<GenerationResult> log) {
         List<Float> data = new ArrayList<Float>();
         for (int i = 0; i<log.size(); i++) {
             float fitness = log.get(i).fitness;
@@ -189,6 +190,13 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             this.physics.getPhysicsSpace().removeAll(alienNode);
             alienNode.removeFromParent();
         }
+    }
+    
+    private void setAlien(Alien a)
+    {
+        this.savedAlien.body = a;
+        this.alien = a;
+        this.savedAlien.alienChanged();
     }
 
     public void setCurrentShape(String shape) {
@@ -505,6 +513,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public void createNewBody() {
+        savedAlien.alienChanged();
         if (this.currentAlienNode == null) {
 
             //Take the entries from text fields for limb size, do some error handling
@@ -537,7 +546,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
             Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", bodyWeight);
             int texturecode = alien != null ? alien.materialCode : 1;
-            alien = new Alien(bodyBlock);
+            setAlien(new Alien(bodyBlock));
             alien.materialCode = texturecode;
             instantiateAlien(alien, startLocation);
             setChaseCam(this.currentAlienNode);
@@ -579,6 +588,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public void removeLimb(Block block) {
+        savedAlien.alienChanged();
         if (block != null) {
             if (block == alien.rootBlock) {
                 resetAlien();
@@ -692,7 +702,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     //To be run when right click on body, adds new limb with dimensions defined in text fields
     public void addLimb(Block block, Vector3f contactPt, Vector3f normal) {
-
+        savedAlien.alienChanged();
         // check if valid:
         if (this.isCollisionOccuring) {
             return;
@@ -720,47 +730,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         ghostLimb2 = null;
     }
 
-    public boolean saveAlien(String name) {
-        if (alien != null) {
-            alien.setName(name);
-            File f = new File("aliens/" + alien.getName() + "/body.sav");
-            f.getParentFile().mkdirs();
-            try (ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(f))) {
-                o.writeObject(alien);
-
-                //invalidate the training file, it it exists, in case the number of joints was changed
-                //keep it but renamed to prevent data loss
-                for (File toRename : f.getParentFile().listFiles()) {
-                    if (toRename.getPath().contains("training.pop")) {
-                        DateFormat df = new SimpleDateFormat("yyMMddHHmmss");
-                        Date dateobj = new Date();
-                        File target = new File(toRename.getPath().substring(0, toRename.getPath().length() - 4) + df.format(dateobj) + ".pop");
-                        toRename.renameTo(target);
-                    }
-                }
-                return true;
-            } catch (IOException ex) {
-                Logger.getLogger(UIAppState.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        return false;
-    }
+    
 
     public boolean resetTraining() {
-        if (alien != null) {
-            String name = alien.getName();
-            // File with old name
-            File file = new File("aliens/" + name + "/training.pop");
-            if (file.exists()) {
-                // File with new name
-                DateFormat df = new SimpleDateFormat("yyMMddHHmmss");
-                File file2 = new File("aliens/" + name + "/training" + df.format(new Date()) + ".pop");
-                // Rename file 
-                return file.renameTo(file2);
-            }
-            return false;
-        }
-        return false;
+        savedAlien.alienChanged();
+        return AlienHelper.writeAlien(savedAlien);
     }
 
     public String[] getLoadableAliens() {
@@ -775,19 +749,26 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public boolean loadAlien(String name) {
-        File f = new File("aliens/" + name + "/body.sav");
-        try (ObjectInputStream o = new ObjectInputStream(new FileInputStream(f))) {
-            Alien a = (Alien) o.readObject();
-            if (a != null) {
-                alien = a;
-                resetAlien();
-                instantiateAlien(alien, startLocation);
-                setChaseCam(this.currentAlienNode);
-                setupKeys(this.currentAlienNode);
-                return true;
-            }
-        } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(UIAppState.class.getName()).log(Level.SEVERE, null, ex);
+        SavedAlien a = AlienHelper.readAlien(name);
+        if (a != null && a.body != null) {
+            alien = a.body;
+            this.savedAlien = a;
+            resetAlien();
+            instantiateAlien(alien, startLocation);
+            setChaseCam(this.currentAlienNode);
+            setupKeys(this.currentAlienNode);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
+    public boolean saveAlien(String name) {
+        if (savedAlien != null) {
+            savedAlien.setName(name);
+            return AlienHelper.writeAlien(savedAlien);
         }
         return false;
     }
@@ -901,9 +882,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             return false;
         }
 
-        editing = false;
-
-        this.physics.setEnabled(false);
         resetGravity();
         
         showArrow();
@@ -911,12 +889,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (currentAlienNode == null) {
             instantiateAlien(alien, Vector3f.ZERO);
         }
-
-        this.trainer = new AlienTrainer("aliens/" + alien.getName() + "/training.pop",
-                simulationQueue, currentAlienNode.joints.size() + 1,
-                currentAlienNode.joints.size());
         
-        this.trainer.setLog(trainingLog);
+        this.savedAlien.inputCount = currentAlienNode.joints.size() + 1;
+        this.savedAlien.outputCount = currentAlienNode.joints.size();
+
+        this.trainer = new AlienTrainer(savedAlien, simulationQueue);
 
         while (this.slaves.size() < SIM_COUNT) {
             SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(this.alien, this.simulationQueue, 1.0f, this.accuracy, 1f / 60f));
@@ -937,8 +914,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
 
         this.trainer.start();
-
-
+        
+        editing = false;
+        
         return true;
     }
 
@@ -1147,7 +1125,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (this.currentSim != null) {
             double fitness = this.calcFitness();
             //this.currentSim.setFitness(fitness);
-            System.out.println("Stopping simulation! " + this.currentSim.toString());
+            //System.out.println("Stopping simulation! " + this.currentSim.toString());
         }
         // turn physics off to save CPU time
         // don't need this in front end
@@ -1176,13 +1154,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             updateGhostLimb();
                              
             // try to poll task from the queue
-            if (!editing) {
-                SimulationData s;
-                s = new SimulationData(trainer.getBestSoFar(), AlienEvaluator.simTime);
-                if (s != null) {
-                    System.out.println(Thread.currentThread().getId() + ": starting simulation!");
-                    startSimulation(s);
-                }
+            if (!editing && savedAlien.savedEntryCount() > 0) {
+                startSimulation(new SimulationData(savedAlien.getMostRecent().bestGenome, AlienEvaluator.simTime));
+                
             }
         }
         
