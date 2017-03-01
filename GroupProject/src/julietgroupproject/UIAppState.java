@@ -107,6 +107,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private Node ghostRoot;
     private int numLogEntries = 0;
     private boolean isCollisionOccuring = false;
+    private SimulationData showOffRequest = null;
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
@@ -143,6 +144,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             if (savedAlien.savedEntryCount() > numLogEntries) {
                 buildGraph(savedAlien.getEntries());
             }
+        }
+    }
+    
+    public synchronized void showOffGeneration(int genNumber)
+    {
+        if (savedAlien.savedEntryCount() > genNumber && genNumber > 0)
+        {
+            showOffRequest = new SimulationData(savedAlien.getEntries().get(genNumber).bestGenome, AlienEvaluator.simTime);
         }
     }
     
@@ -1191,16 +1200,33 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 stopSimulation();
             }
         } else {
-            updateGhostLimb();
-
-            // try to poll task from the queue
-            if (!editing && savedAlien.savedEntryCount() > 0) {
-                startSimulation(new SimulationData(savedAlien.getMostRecent().bestGenome, AlienEvaluator.simTime));
+            if (editing)
+            {
+                updateGhostLimb();
             }
+               
             
             if (!editing) {
-                SimulationData s;
-                s = new SimulationData(trainer.getBestSoFar(), AlienEvaluator.simTime);
+                SimulationData s = null;
+                if (showOffRequest == null)
+                {
+                    if (savedAlien.savedEntryCount() > 0)
+                    {
+                        s = new SimulationData(savedAlien.getMostRecent().bestGenome, AlienEvaluator.simTime);
+                    }
+                    else
+                    {
+                        if (trainer != null)
+                        {
+                            s = new SimulationData(trainer.getBestSoFar(), AlienEvaluator.simTime);
+                        }
+                    }
+                }
+                else
+                {
+                    s = showOffRequest;
+                    showOffRequest = null;
+                }
                 if (s != null) {
                     System.out.println(Thread.currentThread().getId() + ": starting simulation!");
                     setAlienMessage("Hi");

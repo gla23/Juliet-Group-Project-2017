@@ -24,7 +24,6 @@ public class SavedAlien implements Serializable{
     
     public synchronized void alienChanged()
     {
-        System.out.println("Invalidating");
         pop = null;
         generations = new ArrayList<>();
         hasBeenReset = true;
