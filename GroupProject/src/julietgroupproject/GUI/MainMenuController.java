@@ -5,6 +5,7 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
+import de.lessvoid.nifty.controls.Button;
 import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.controls.CheckBoxStateChangedEvent;
 import de.lessvoid.nifty.controls.DropDown;
@@ -119,10 +120,22 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             app.addKeyBindings();
             nifty.gotoScreen("start");
             addValues();
+            checkPrevSim();
         }
         else
         {
             nifty.gotoScreen("begin");
+            checkPrevSim();
+        }
+    }
+    
+    public void checkPrevSim() {
+        Button resume = nifty.getScreen("start").findNiftyControl("new_sim", Button.class);
+        if (app.savedAlien.pop != null) {
+            
+            resume.setText("Resume Training");
+        } else {
+            resume.setText("Start Training");
         }
     }
 
@@ -130,6 +143,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         this.app.endTraining();
         nifty.gotoScreen("start");
         addValues();
+        checkPrevSim();
         if (!showArrow) showArrow = app.hideArrow();
     }
     
@@ -340,6 +354,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         if (sanitizedName.length() > 0) {
             app.savedAlien.setName(sanitizedName);
             alienNamed = true;
+            app.savedAlien.alienChanged();
             showEditor();
             showArrow = app.showArrow();
         }
@@ -359,6 +374,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             alienNamed = true;
             app.addKeyBindings();
             nifty.gotoScreen("start");
+            checkPrevSim();
             screen = nifty.getScreen("start");
             firstBody = true;
             addAlienSpecificOptions();
@@ -632,7 +648,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     @Override
     public void onStartScreen() {
-        aliens = app.getLoadableAliens();        
+        aliens = app.getLoadableAliens();     
     }
     
     public void makeGraph(List<Float> data) {
