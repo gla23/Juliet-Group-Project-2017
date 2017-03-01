@@ -598,19 +598,11 @@
                 </control>
             </panel>
 
-            <panel id="alien_message_box" width="20%" valign="bottom" align="center" height="5%" childLayout="vertical" backgroundColor="#00000088">
-                <control id="alien_message" width="100%" height="100%" name="label" text="Hello" color="ffffffff">
-                </control> 
-            </panel>
             <panel id = "simulation_graph" width= "40%" valign = "top" align="right" height = "20%" childLayout = "vertical" backgroundColor="#aaaaaa00">
                <!--image id="graphId" width = "100%"  height ="100%" filename="Textures/blank.png" /-->
                <!-- put the image we show before any graph is generated in
                     assets/Textures/blank.png or whatever -->
                <image id="graphId" width = "100%"  height ="100%" />
-
-            
-            <panel id="simulation_logger" width="40%" valign="top" align="right" height="20%" childLayout="vertical" backgroundColor="#aaaaaa00">
-               <!--<image id="graphId" width = "100%"  height ="100%" filename="Graphs/test1.png" />-->
             </panel>
 
             <panel id="simulation_button" width="100%" valign="bottom" height="5%" childLayout="vertical">
