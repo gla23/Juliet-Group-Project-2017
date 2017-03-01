@@ -522,11 +522,11 @@
                                                             <control name="label" id = "twelth_label" height = "3%" text="Joint Start Rotation:" />
                                                             <control id="jointRotSlider" name="horizontalSlider" initial = "0" width="100%" min = "3" max = "3" stepSize = "0.1" buttonStepSize = "0.5"/>
                                                               
-                                                            
+                                                            <!--
                                                             <panel id ="space_taker_2" childLayout = "vertical" height = "8%"/>     
                                                             <control name ="button" label="Save Limb" height = "4%" align = "center" width = "80%" id = "save_limb_button" visibleToMouse="true">
                                                                 <interact onClick="saveLimb()"/>
-                                                            </control>
+                                                            </control>-->
                                                         </panel>
                                                             
                                                             
@@ -538,7 +538,7 @@
                                                 </control>
                                             </control>
                                                 
-                                                
+                                                <!--
                                             <control id="saved_limb_tab" name="tab" caption="Saved">
                                                 <control id="savedLimbScrollbar" style="autoscroll"  name="scrollPanel" horizontal="false" height="100%"> 
                                                     
@@ -546,7 +546,7 @@
                                                     
                                                     
                                                 </control>
-                                            </control>
+                                            </control>-->
                                         </control>
                                     </panel>
                                     <panel id = "space_taker" height = "5%"/>
@@ -576,7 +576,7 @@
                             <control name ="button" label="Load Alien" height = "*" width = "*" id = "load_alien" visibleToMouse="true">
                                 <interact onClick="gotoLoadScreen()"/>
                             </control>
-                            <control name ="button" label="Start Training" height = "*" width = "*" id = "new_sim" visibleToMouse="true">
+                            <control name ="button" label="Train Alien" height = "*" width = "*" id = "new_sim" visibleToMouse="true">
                                 <interact onClick="startTraining()"/>
                             </control>
                             <control name ="button" label="Show Best" height = "*" width = "*" id = "best_sim" visibleToMouse="true">
