@@ -1,6 +1,7 @@
 package julietgroupproject;
 
 import com.jme3.bullet.PhysicsSpace;
+import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -36,6 +37,8 @@ public class Block implements Serializable {
         this.collisionShapeType = collisionShapeType;
         this.hingeType = hingeType;
         this.mass = mass;
+        
+        this.friction = 5f;
     }
     
     // shitty copy - don't use
@@ -62,8 +65,9 @@ public class Block implements Serializable {
         geo.rotate(0.1f,0.4f,0.7f);*/
         
         
-        // Set the friction of the limb
-        //g.getControl(RigidBodyControl.class).setFriction(friction);
+        // Set limb properties
+        g.getControl(RigidBodyControl.class).setFriction(friction);
+        //g.getControl(RigidBodyControl.class).setMass(mass);
     }
     
     public void setNormal(Vector3f norm) {

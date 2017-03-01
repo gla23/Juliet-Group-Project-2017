@@ -153,16 +153,19 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             System.out.println(niftyLabel.getText());
         }
     }
-
+  
     public void buildGraph(List<GenerationResult> log) {
         List<Float> data = new ArrayList<Float>();
+        Element element = nifty.getScreen("simulation").findElementByName("graphId");
+        if (log.size() < 1) {
+            element.getRenderer(ImageRenderer.class).setImage(null);
+            return;
+        }
         for (int i = 0; i < log.size(); i++) {
             float fitness = log.get(i).fitness;
             data.add(fitness);
         }
         System.out.println("Data: " + data);
-
-        Element element = nifty.getScreen("simulation").findElementByName("graphId");
         //System.out.println("W:" + element.getWidth() + " H:" + element.getHeight());
         BufferedImage img = DrawGraph.plotGraph(data, element.getWidth(), element.getHeight());
 
@@ -285,7 +288,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Geometry gl = AlienHelper.assembleBlock(copy, block.getGeometry().getWorldTranslation());
         ghostRoot.attachChild(gl);
         return gl;
-
+        
     }
 
     public void relocateGhostLimb(Geometry gl, Block block, Vector3f contactPt, Vector3f normal) {
@@ -847,7 +850,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         showArrow();
         
         // load default graph texture
-        graphTex = new Texture2D();//assetManager.loadTexture(new TextureKey("Graphs/test1.png", false));
+        graphTex = new Texture2D();
         graphTex.setAnisotropicFilter(16);
         graphTex.setMagFilter(MagFilter.Bilinear.Bilinear);
     }
@@ -947,6 +950,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.trainer.start();
 
         editing = false;
+        //setAlienMessage("Starting training...");
 
         return true;
     }
@@ -1189,6 +1193,16 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             // try to poll task from the queue
             if (!editing && savedAlien.savedEntryCount() > 0) {
                 startSimulation(new SimulationData(savedAlien.getMostRecent().bestGenome, AlienEvaluator.simTime));
+            }
+            
+            if (!editing) {
+                SimulationData s;
+                s = new SimulationData(trainer.getBestSoFar(), AlienEvaluator.simTime);
+                if (s != null) {
+                    System.out.println(Thread.currentThread().getId() + ": starting simulation!");
+                    setAlienMessage("Hi");
+                    startSimulation(s);
+                }
             }
         }
 

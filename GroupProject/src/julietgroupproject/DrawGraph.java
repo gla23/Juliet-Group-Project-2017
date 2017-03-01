@@ -12,6 +12,7 @@ import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import javax.imageio.ImageIO;
@@ -19,9 +20,8 @@ import javax.swing.*;
 
 @SuppressWarnings("serial")
 public class DrawGraph {
-    
+   private static final float MAX_FIT = 200;
    private static final int MAX_SCORE = 10000;
-   private static final float MAX_FIT = 70;
    private static final int BORDER_GAP = 30;
    //private static final int BORDER_GAP = 10;
    private static final int PREF_W = 800;
@@ -62,6 +62,8 @@ public class DrawGraph {
       BufferedImage bi = new BufferedImage(width, height,BufferedImage.TYPE_INT_RGB);
       Graphics g = bi.getGraphics();
       List<Integer> scores = convertToInt(inputScores);
+      int maxIntScore = Collections.max(scores);
+      int minIntScore = Collections.min(scores);
       
       Graphics2D g2 = (Graphics2D)g;
       g2.setColor(GRAPH_BACKGROUND_COLOUR);
@@ -71,13 +73,14 @@ public class DrawGraph {
       
       double xScale = ((double) width - 2 * BORDER_GAP) / (scores.size() - 1);
       if (scores.size() < 3) { xScale = (width - 2 * BORDER_GAP) / 2; }
-      double yScale = ((double) height - 2 * BORDER_GAP) / (MAX_SCORE - 1);
-      System.out.println("xScale:" + xScale + ", yScale:" + yScale);
+      double yScale = ((double) height - 2 * BORDER_GAP) / (double)(maxIntScore + 1 - minIntScore);
+      if (scores.size() < 3) { yScale = (height - 2 * BORDER_GAP) / 2; }
+      //System.out.println("xScale:" + xScale + ", yScale:" + yScale);
 
       List<Point> graphPoints = new ArrayList<Point>();
       for (int i = 0; i < scores.size(); i++) {
          int x1 = (int) (i * xScale + BORDER_GAP);
-         int y1 = (int) ((MAX_SCORE - scores.get(i)) * yScale + BORDER_GAP);
+         int y1 = (int) ((maxIntScore - scores.get(i)) * yScale + BORDER_GAP);
          graphPoints.add(new Point(x1, y1));
       }
 
