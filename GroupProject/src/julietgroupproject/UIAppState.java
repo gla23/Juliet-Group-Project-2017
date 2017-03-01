@@ -36,6 +36,7 @@ import com.jme3.system.JmeContext;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
+import com.jme3.texture.Texture2D;
 import com.jme3.texture.plugins.AWTLoader;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.CheckBox;
@@ -146,13 +147,16 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     public void buildGraph(List<GenerationResult> log) {
         List<Float> data = new ArrayList<Float>();
+        Element element = nifty.getScreen("simulation").findElementByName("graphId");
+        if (log.size() < 1) {
+            element.getRenderer(ImageRenderer.class).setImage(null);
+            return;
+        }
         for (int i = 0; i < log.size(); i++) {
             float fitness = log.get(i).fitness;
             data.add(fitness);
         }
         System.out.println("Data: " + data);
-
-        Element element = nifty.getScreen("simulation").findElementByName("graphId");
         //System.out.println("W:" + element.getWidth() + " H:" + element.getHeight());
         BufferedImage img = DrawGraph.plotGraph(data, element.getWidth(), element.getHeight());
 
@@ -837,7 +841,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         showArrow();
         
         // load default graph texture
-        graphTex = assetManager.loadTexture(new TextureKey("Graphs/test1.png", false));
+        graphTex = new Texture2D();
         graphTex.setAnisotropicFilter(16);
         graphTex.setMagFilter(MagFilter.Bilinear.Bilinear);
     }
