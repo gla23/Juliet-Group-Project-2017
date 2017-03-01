@@ -993,7 +993,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.trainer = new AlienTrainer(savedAlien, simulationQueue);
 
         while (this.slaves.size() < SIM_COUNT) {
-            SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(this.alien, this.simulationQueue, 1.0f, this.accuracy, 1f / 60f));
+            Alien alienToTrain = (Alien)ObjectCloner.deepCopy(alien);
+            SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(alienToTrain, this.simulationQueue, 1.0f, this.accuracy, 1f / 60f));
             this.slaves.add(toAdd);
             // speed up by 5 times, 300 = 60 * 5
             /*
