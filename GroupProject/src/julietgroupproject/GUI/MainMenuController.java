@@ -116,9 +116,9 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     public void showEditor() {
         if (alienNamed)
         {
+            app.addKeyBindings();
             nifty.gotoScreen("start");
             addValues();
-            app.addKeyBindings();
         }
         else
         {
@@ -357,13 +357,13 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         //TODO
         if (app.loadAlien(sanitizeAlienName(currentlySelectedLoadAlien))) {
             alienNamed = true;
+            app.addKeyBindings();
             nifty.gotoScreen("start");
             screen = nifty.getScreen("start");
             firstBody = true;
             addAlienSpecificOptions();
             addValues();
             showArrow = app.showArrow();
-            app.addKeyBindings();
         } else {
             nifty.gotoScreen("load_fail");
         }
@@ -686,7 +686,12 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     public void resetAlien() {
         app.resetAlien();
-        TabGroup tabs = nifty.getCurrentScreen().findNiftyControl("limb_body_tabs", TabGroup.class);
+        alienNamed = false;
+        
+        app.removeKeyBindings();
+        nifty.gotoScreen("name_dialog");
+        
+        TabGroup tabs = nifty.getScreen("start").findNiftyControl("limb_body_tabs", TabGroup.class);
         // tabs.addTab(addBody);
         tabs.setSelectedTab(addBody);
 

@@ -109,6 +109,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private boolean isCollisionOccuring = false;
     private SimulationData showOffRequest = null;
     private boolean runningSingle = false;
+    private volatile boolean forceReset = false;
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
@@ -551,7 +552,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     removeGhostLimb(delghost);
                     delghost = null;
                 }
-            }
+            } else {
+            removeGhostLimb(ghostLimb);
+            removeGhostLimb(ghostLimb2);
+            ghostLimb = null;
+            ghostLimb2 = null;
+            removeGhostLimb(delghost);
+            delghost = null;
+        }
         } else {
             removeGhostLimb(ghostLimb);
             removeGhostLimb(ghostLimb2);
@@ -1036,6 +1044,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         editing = true;
 
         setGravity(0.0f);
+        
+        //restartAlien();
     }
 
     @Override

@@ -49,7 +49,9 @@ public class AlienHelper {
      * @return the assembled Geometry
      */
     public static Geometry assembleBlock(Block block, Vector3f location) {
-        return createLimb(block.collisionShapeType, block.width, block.height, block.length, location, block.mass,block.rotation,block.rotationForYPR);
+        Geometry g = createLimb(block.collisionShapeType, block.width, block.height, block.length, location, block.mass,block.rotation,block.rotationForYPR);
+        block.applyProperties(g);
+        return g;
     }
 
     /**
