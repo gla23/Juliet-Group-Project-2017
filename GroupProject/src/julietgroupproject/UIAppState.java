@@ -847,12 +847,15 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.ghostRoot = new Node("ghost root");
         this.rootNode.attachChild(ghostRoot);
 
-        showArrow();
-        
         // load default graph texture
         graphTex = new Texture2D();
         graphTex.setAnisotropicFilter(16);
         graphTex.setMagFilter(MagFilter.Bilinear.Bilinear);
+        if (showArrow) {
+            showArrow();
+        } else {
+            hideArrow();
+        }
     }
 
     public void addKeyBindings() {

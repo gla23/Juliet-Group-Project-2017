@@ -53,7 +53,7 @@ public class DrawingAppState extends SimulatorAppState {
     protected Material[] materials;
     
     private Geometry arrowGeometry;
-    protected boolean showArrow;
+    protected boolean showArrow = false;
 
     public DrawingAppState(Alien _alien, double _simSpeed, double _accuracy) {
         super(_alien, _simSpeed, _accuracy);
@@ -65,8 +65,13 @@ public class DrawingAppState extends SimulatorAppState {
 
     @Override
     public void reset() {
+        boolean arrow = this.showArrow;
         super.reset();
-        showArrow();
+        if (arrow) { 
+            showArrow();
+        } else {
+            hideArrow();
+        }
     }
     
     @Override

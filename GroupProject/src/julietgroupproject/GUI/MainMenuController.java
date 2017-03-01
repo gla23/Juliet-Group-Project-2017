@@ -113,7 +113,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     public void hideEditor() {
         nifty.gotoScreen("hidden");
     }
-
+    
     public void showEditor() {
         nifty.gotoScreen("start");
 
@@ -316,8 +316,10 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     
     public void confirmName()
     {
+        app.addKeyBindings();
         app.savedAlien.setName(nifty.getScreen("name_dialog").findNiftyControl("nameTextField", TextField.class).getRealText());
         showEditor();
+        showArrow = app.showArrow();
     }
     
     @NiftyEventSubscriber (id = "alien_selector")
@@ -336,7 +338,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 screen = nifty.getScreen("start");
                 firstBody = true;
                 addAlienSpecificOptions();
-                //addValues();
+                addValues();
+                showArrow = app.showArrow();
             } else {
                 nifty.gotoScreen("load_fail");
             }
@@ -397,9 +400,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         nifty.getScreen("editor_options").findNiftyControl("directionArrowCheckBox", CheckBox.class).setChecked(showArrow);
     }
     
-    public boolean arrowShown() {
-        return showArrow;
-    }
 
     public void attachLimb() {
         //TODO     
