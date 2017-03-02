@@ -461,7 +461,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             this.ghostBody = null;
         } else if (currentAlienNode == null && actuallyEditing) {
             int texturecode = textureNo;
-                Material m = this.materials_t[texturecode];
+            Material m = this.materials_t[texturecode];
             float bodyWidth = getNiftyFloat("bodyWidth");
             float bodyHeight = getNiftyFloat("bodyHeight");
             float bodyLength = getNiftyFloat("bodyLength");
@@ -497,6 +497,20 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 this.isCollisionOccuring = true;
             }
         }
+    }
+    
+    public void updatePrevBodyValues() {
+        float bodyWidth = getNiftyFloat("bodyWidth");
+        float bodyHeight = getNiftyFloat("bodyHeight");
+        float bodyLength = getNiftyFloat("bodyLength");
+        String currentShape = getNiftyString("currentBodyShape");
+        Vector3f pos = this.startLocation;
+        
+        prevBodyWidth = bodyWidth;
+        prevBodyHeight = bodyHeight;
+        prevBodyLength = bodyLength;
+        prevBodyShape = currentShape;
+        prevBodyLocation = pos;
     }
 
     public void updateGhostLimb() {
@@ -1304,9 +1318,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     @Override
     public void update(float tpf) {
-        
-        //PROSSER
-        System.out.println(nifty.getCurrentScreen().getScreenId());
 
         if (simInProgress) {
             if (this.isFixedTimeStep) {
@@ -1359,6 +1370,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         updateLog();
         updateGhostBody();
+        updatePrevBodyValues();
     }
 
     @Override
