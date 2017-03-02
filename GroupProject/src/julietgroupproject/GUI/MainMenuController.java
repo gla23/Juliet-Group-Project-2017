@@ -548,8 +548,9 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     @NiftyEventSubscriber(id = "logger_listbox")
-    public void logItemSelected(final String id, final ListBoxSelectionChangedEvent<julietgroupproject.GenerationResult> event) {
-        System.out.println("Callback!" + event.getSelection().size());
+
+    public void logItemSelected(final String id, final ListBoxSelectionChangedEvent<julietgroupproject.GenerationResult> event)
+    {
         if (event.getSelection().size() > 0) {
             app.showOffGeneration(event.getSelection().get(0).generation);
         }

@@ -38,7 +38,7 @@ public class Block implements Serializable {
         this.hingeType = hingeType;
         this.mass = mass;
         
-        this.friction = 5f;
+        //this.friction = 5f;
     }
     
     // shitty copy - don't use
@@ -66,7 +66,7 @@ public class Block implements Serializable {
         
         
         // Set limb properties
-        g.getControl(RigidBodyControl.class).setFriction(friction);
+        //g.getControl(RigidBodyControl.class).setFriction(friction);
         //g.getControl(RigidBodyControl.class).setMass(mass);
     }
     

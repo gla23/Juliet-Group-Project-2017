@@ -59,6 +59,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -117,7 +118,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private Node ghostRoot;
     private int numLogEntries = 0;
     private boolean isCollisionOccuring = false;
-    private SimulationData showOffRequest = null;
+    private int showOffRequest = -1;
     private boolean runningSingle = false;
     private volatile boolean forceReset = false;
     private float bestSoFar = Float.NEGATIVE_INFINITY;
@@ -126,6 +127,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private Map<String, String> niftyStringFields = new HashMap<>();
     private Map<String, Float> niftyFloatFields = new HashMap<>();
     private Map<String, Boolean> niftyBooleanFields = new HashMap<>();
+    private static DecimalFormat df = new DecimalFormat(".###");
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
@@ -173,9 +175,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     }
                 }
                 niftyLog.selectItemByIndex(niftyLog.itemCount() - 1);
+                showOffRequest = savedAlien.savedEntryCount() - 1;
             }
-
-            if (savedAlien.savedEntryCount() != numLogEntries) {
+            
+            if (savedAlien.savedEntryCount() !=  numLogEntries) {
+                nifty.getScreen("simulation").findNiftyControl("current_gen_message", Label.class).setText("Current generation: " + savedAlien.savedEntryCount());
                 // buildGraph(saveAlien.getLastEntries(50));
                 buildGraph(logEntries);
             }
@@ -184,13 +188,17 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     public synchronized void showOffGeneration(int genNumber) {
         System.out.println(genNumber);
-        if (savedAlien.savedEntryCount() > genNumber && genNumber > 0) {
-            showOffRequest = new SimulationData(savedAlien.getEntries().get(genNumber).bestGenome, AlienEvaluator.simTime);
+
+        if (savedAlien.savedEntryCount() > genNumber && genNumber > 0)
+        {
+            showOffRequest = genNumber;
         }
     }
 
     public synchronized void showBest() {
         bestSoFar = Float.NEGATIVE_INFINITY;
+        
+        nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class).clear();
 
         runningSingle = true;
         if (alien == null || alien.rootBlock.getConnectedLimbs().size() == 0) {
@@ -456,7 +464,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             float bodyHeight = getNiftyFloat("bodyHeight");
             float bodyLength = getNiftyFloat("bodyLength");
             String currentShape = getNiftyString("currentBodyShape");
-            Vector3f pos = startLocation;
+            Vector3f pos = this.startLocation;
             if (this.ghostBody == null || bodyWidth != prevBodyWidth || bodyHeight != prevBodyHeight || bodyLength != prevBodyLength
                     || !currentShape.equals(prevBodyShape) || pos != prevBodyLocation) {
 
@@ -468,6 +476,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 // update body ghost
                 Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", 1.0f);
                 Geometry gb = AlienHelper.assembleBlock(bodyBlock, startLocation);
+                gb.setLocalTranslation(startLocation);
                 gb.removeControl(RigidBodyControl.class);
                 gb.setMaterial(m);
                 GhostControl gc = new GhostControl(CollisionShapeFactory.createMeshShape(gb));
@@ -522,7 +531,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                         }
                     }
                 }
-
+                
                 if (block != null) {
 
                     if (!shiftDown) {
@@ -968,6 +977,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (alien == null || alien.rootBlock.getConnectedLimbs().size() == 0) {
             return false;
         }
+        
+        nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class).clear();
 
         bestSoFar = Float.NEGATIVE_INFINITY;
 
@@ -1019,7 +1030,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (!runningSingle) {
             endTraining();
         }
-        showOffRequest = null;
+        showOffRequest = -1;
         this.stopSimulation();
 
         resetAlien();
@@ -1302,25 +1313,34 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         } else {
             if (editing) {
                 updateGhostLimb();
-            }
-
-            if (!editing) {
+            } else {
                 SimulationData s = null;
-                if (showOffRequest == null && !runningSingle) {
-                    if (savedAlien.savedEntryCount() > 0) {
+                if (showOffRequest == -1)
+                {
+                    if (savedAlien.savedEntryCount() > 0)
+                    {
                         s = new SimulationData(savedAlien.getMostRecent().bestGenome, AlienEvaluator.simTime);
-                    } else {
-                        if (trainer != null) {
+                        setAlienMessage("Running best generation so far"); //shouldn't be run
+                    }
+                    else
+                    {
+                        if (trainer != null)
+                        {
                             s = new SimulationData(trainer.getBestSoFar(), AlienEvaluator.simTime);
+                            setAlienMessage("Running initial generation");
                         }
                     }
-                } else {
-                    s = showOffRequest;
-                    //showOffRequest = null;
+                }
+                else
+                {
+                    if (showOffRequest >= 0 && showOffRequest < savedAlien.savedEntryCount())
+                    {
+                        setAlienMessage("Running generation " + showOffRequest + " with fitness of " + df.format(savedAlien.getEntries().get(showOffRequest).fitness));
+                        s = new SimulationData(savedAlien.getEntries().get(showOffRequest).bestGenome, AlienEvaluator.simTime);
+                    }
                 }
                 if (s != null) {
-                    System.out.println(Thread.currentThread().getId() + ": starting simulation!");
-                    setAlienMessage("Hi");
+                    //System.out.println(Thread.currentThread().getId() + ": starting simulation!");
                     startSimulation(s);
                 } else {
                     if (runningSingle) {
