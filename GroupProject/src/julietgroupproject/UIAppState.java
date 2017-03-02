@@ -134,13 +134,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             ListBox niftyLog = nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class);
             List<GenerationResult> logEntries = savedAlien.getEntries();
 
-
-            //niftyLog.setFocusItemByIndex(logEntries.size() - 1);
-
-            //System.out.println("log");
-
-
-
             if (savedAlien.savedEntryCount() > 0 && bestSoFar != savedAlien.getMostRecent().fitness) {
                 niftyLog.clear();
 
@@ -165,8 +158,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public synchronized void showOffGeneration(int genNumber) {
-        System.out.println(genNumber);
-
         if (savedAlien.savedEntryCount() > genNumber && genNumber > 0)
         {
             showOffRequest = genNumber;
@@ -223,7 +214,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (!editing) {
             Label niftyLabel = nifty.getScreen("simulation").findNiftyControl("alien_message", Label.class);
             niftyLabel.setText(msg);
-            System.out.println(niftyLabel.getText());
         }
     }
 
@@ -238,7 +228,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             float fitness = log.get(i).fitness;
             data.add(fitness);
         }
-        //System.out.println("W:" + element.getWidth() + " H:" + element.getHeight());
         BufferedImage img = DrawGraph.plotGraph(data, element.getWidth(), element.getHeight());
 
         Image i = this.awtLoader.load(img, true);
@@ -253,19 +242,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         numLogEntries = log.size();
     }
 
-    /*
-     public void updateGraph() {
-     //NiftyImage newImage = nifty.getRenderEngine().createImage(nifty.getScreen("simulation"),"Graphs/test1.png", false); // false means don't linear filter the image, true would apply linear filtering
-
-
-     // find the element with it's id
-     Element element = nifty.getScreen("simulation").findElementByName("graphId");
-
-     // change the image with the ImageRenderer
-
-     System.out.println("Updated");
-     }
-     */
     public void setTexture(int textno) {
         textureNo = textno;
         if (alien != null && currentAlienNode != null) {
@@ -397,7 +373,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         physics.getPhysicsSpace().add(ghostControl);
         gl.setMaterial(ghostMaterial);
 
-        //System.out.println("OverlappingCount:" + ghostControl.getOverlappingCount());
         ghostRoot.attachChild(gl);
 
         return gl;
@@ -418,7 +393,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (gl != null) {
             GhostControl gc = gl.getControl(GhostControl.class);
             if (gc != null) {
-                //System.out.println("Overlapping count:" + gc.getOverlappingCount());
                 if (gc.getOverlappingCount() > 0) {
                     gl.setMaterial(ghostMaterial2);
                     return true;
@@ -1220,16 +1194,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
      * Stop simulation and set fitness value.
      */
     protected void stopSimulation() {
-
         this.simInProgress = false;
-        if (this.currentSim != null) {
-            double fitness = this.calcFitness();
-            //this.currentSim.setFitness(fitness);
-            //System.out.println("Stopping simulation! " + this.currentSim.toString());
-        }
-        // turn physics off to save CPU time
-        // don't need this in front end
-        //this.physics.setEnabled(false);
     }
 
     @Override
@@ -1336,7 +1301,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     }
                 }
                 if (s != null) {
-                    //System.out.println(Thread.currentThread().getId() + ": starting simulation!");
                     startSimulation(s);
                 } else {
                     if (runningSingle) {

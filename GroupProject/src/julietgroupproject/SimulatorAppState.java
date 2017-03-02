@@ -243,7 +243,6 @@ public class SimulatorAppState extends AbstractAppState {
     @Override
     public void update(float tpf) {
         if (toKill) {
-            System.out.println("Detatching myself");
             this.stateManager.detach(this);
         }
     }

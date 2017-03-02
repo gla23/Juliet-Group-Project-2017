@@ -45,7 +45,6 @@ public class SlaveSimulator extends SimpleApplication {
     public void simpleUpdate(float tpf) {
         if (!this.stateManager.hasState(simulatorAppState))
         {
-            System.out.println("Stopping myself");
             this.stop();
         }
     }

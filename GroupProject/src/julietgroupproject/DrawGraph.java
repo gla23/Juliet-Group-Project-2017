@@ -76,7 +76,6 @@ public class DrawGraph {
       if (scores.size() < 2) { xScale = (width - 2 * BORDER_GAP) / 2; }
       double yScale = ((double) height - 2 * BORDER_GAP) / (double)(maxIntScore + 1 - minIntScore);
       if (scores.size() < 2) { yScale = (height - 2 * BORDER_GAP) / 2; }
-      //System.out.println("xScale:" + xScale + ", yScale:" + yScale);
 
       List<Point> graphPoints = new ArrayList<>();
       for (int i = 0; i < scores.size(); i++) {
@@ -122,27 +121,5 @@ public class DrawGraph {
       g2.dispose();
       return bi;
    }
-   
-   /*
-   private static void makePanelImage(Component panel)
-    {
-        Dimension size = panel.getSize();
-        BufferedImage image = new BufferedImage(
-                    size.width, size.height
-                              , BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2 = image.createGraphics();
-        panel.paint(g2);
-        try
-        {
-            ImageIO.write(image, "png", new File(file));
-            
-            System.out.println("Panel saved as Image.");
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-*/
 
 }

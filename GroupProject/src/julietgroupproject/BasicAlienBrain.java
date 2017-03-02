@@ -67,16 +67,11 @@ public class BasicAlienBrain extends AlienBrain {
                 j.getBodyB().activate();
                 float v = MAX_VELOCITY * (float) (2 * (nnOutput[i] - 0.5));
                 float p = MAX_POWER;
-                //System.out.println("applying torque to limb " + i + " with v:" + v + " p:" + p);
                 if (Math.abs(v) < MIN_VELOCITY) {
                     // try to stop moving
                     j.enableMotor(true, 0f, 0f);
-                    // debug
-                    //System.out.println("Suspending limb #" + i);
                 } else {
                     j.enableMotor(true, v, p);
-                    // debug
-                    //System.out.println("Moving limb #" + i + " with velocity " + v + ", power " + p);
                 }
             }
     }

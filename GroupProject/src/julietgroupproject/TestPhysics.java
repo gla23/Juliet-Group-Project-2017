@@ -151,7 +151,6 @@ public class TestPhysics {
         MLRegression nn = new BasicNetwork() {
             @Override
             public MLData compute(MLData input) {
-                //System.out.println(Thread.currentThread().getId() + ": data #0:" + input.getData(0));
                 double[] i = input.getData();
                 double[] o = new double[i.length - 1];
                 for (int j = 0; j < o.length; j++) {
@@ -167,7 +166,6 @@ public class TestPhysics {
             }
         };
         int jCount = countJoint(a);
-        //System.out.println("no of joints " + jCount);
         ((BasicNetwork) nn).addLayer(new BasicLayer(null, true, jCount + 1));
         ((BasicNetwork) nn).addLayer(new BasicLayer(new ActivationSigmoid(), false, jCount));
         ((BasicNetwork) nn).getStructure().finalizeStructure();

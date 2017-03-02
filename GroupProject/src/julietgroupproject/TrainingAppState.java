@@ -89,7 +89,6 @@ public class TrainingAppState extends SimulatorAppState {
         if (this.currentSim != null && !this.isFirstSimulation) {
             double fitness = this.calcFitness();
             this.currentSim.setFitness(fitness);
-            //System.out.println("Stopping simulation! " + this.currentSim.toString());
         }
         // turn physics off to save CPU time
         this.physics.setEnabled(false);
@@ -124,7 +123,6 @@ public class TrainingAppState extends SimulatorAppState {
             queue.add(this.currentSim);
         }
         this.currentSim = null;
-        System.out.println(Thread.currentThread().getId() + ": Cleanup for TrainingAppState");
     }
 
     @Override
@@ -150,7 +148,6 @@ public class TrainingAppState extends SimulatorAppState {
                     s = this.queue.poll();
                 }
                 if (s != null) {
-                    //System.out.println(Thread.currentThread().getId() + ": starting simulation!");
                     startSimulation(s);
                 }
             }

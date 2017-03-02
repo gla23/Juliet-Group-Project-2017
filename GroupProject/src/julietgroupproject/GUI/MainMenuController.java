@@ -35,7 +35,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     private SimpleApplication mainApp;
     private AppStateManager stateManager;
     private Nifty nifty;
-    private Screen screen;
     private Tab addLimb;
     private Tab addBody;
     private boolean firstBody = false;
@@ -58,7 +57,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     @Override
     public void bind(Nifty nifty, Screen screen) {
         this.nifty = nifty;
-        this.screen = screen;
     }
 
     public void newBody() {
@@ -164,11 +162,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
                     initialising = true;
                     //loadScrollE.setHeight(200);
-                    System.out.println("Aliens " + Arrays.toString(aliens));
-                    System.out.println("Already Added: " + alreadyAddedAliens.toString());
                     for (int i = 0; i < aliens.length; i++) {
                         if (!alreadyAddedAliens.contains(aliens[i])) {
-                            System.out.println(i);
                             loadScrollE.addItem(aliens[i]);
                         }
                         alreadyAddedAliens.add(aliens[i]);
@@ -178,7 +173,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     initialising = false;
                 } catch (InterruptedException e) {
                 } catch (NullPointerException e2) {
-                    System.out.println("HERE2");
                 }
 
             }
@@ -324,9 +318,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
 
         addLoadValues(aliens);
-
-
-        System.out.println(Arrays.toString(aliens));
     }
 
     public void gotoNameScreen() {
@@ -355,8 +346,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     public void confirmLoad() {
         app.addKeyBindings();
-
-        System.out.println(currentlySelectedLoadAlien);
         //TODO
         if (app.loadAlien(sanitizeAlienName(currentlySelectedLoadAlien))) {
             alienNamed = true;
@@ -364,7 +353,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             nifty.gotoScreen("start");
             if (showArrow) { app.showArrow(); }
             checkPrevSim();
-            screen = nifty.getScreen("start");
             firstBody = true;
             addAlienSpecificOptions();
             addValues();
@@ -400,9 +388,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     public void confirmSave() {
-
-        System.out.println("save confirmed");
-
         app.addKeyBindings();
 
         String name = nifty.getScreen("save_dialog").findNiftyControl("saveTextField", TextField.class).getRealText();
@@ -466,7 +451,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     @NiftyEventSubscriber(id = "shape_selector")
     public void onDropDownLimbSelectionChanged(final String id, final DropDownSelectionChangedEvent<String> event) {
-        System.out.println(id);
         Element getWidth = nifty.getCurrentScreen().findElementByName("limbWidthSlider");
         Element getHeight = nifty.getCurrentScreen().findElementByName("limbHeightSlider");
         Element getLength = nifty.getCurrentScreen().findElementByName("limbLengthSlider");
@@ -576,7 +560,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     @NiftyEventSubscriber(id = "shape_selector_body")
     public void onDropDownBodySelectionChanged(final String id, final DropDownSelectionChangedEvent<String> event) {
-        System.out.println(id);
         Element getWidth = nifty.getCurrentScreen().findElementByName("bodyWidthSlider");
         Element getHeight = nifty.getCurrentScreen().findElementByName("bodyHeightSlider");
         Element getLength = nifty.getCurrentScreen().findElementByName("bodyLengthSlider");
