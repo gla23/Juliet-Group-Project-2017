@@ -7,6 +7,8 @@ package julietgroupproject;
 import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import java.util.Queue;
+import org.encog.ml.MLRegression;
+import org.encog.util.obj.ObjectCloner;
 
 /**
  * An AppState providing useful functionalities for alien training process.
@@ -68,10 +70,11 @@ public class TrainingAppState extends SimulatorAppState {
         this.simTimeLimit = (float) data.getSimTime();
         this.currentAlienNode = instantiateAlien(this.alien, this.startLocation);
         AlienBrain brain;
+        MLRegression nn = (MLRegression) ObjectCloner.deepCopy(data.getToEvaluate());
         if (isFixedTimeStep) {
-            brain = new BasicAlienBrain(data.getToEvaluate(), this.physics.getPhysicsSpace().getAccuracy(), this.physics.getSpeed(), this.fixedTimeStep);
+            brain = new BasicAlienBrain(nn, this.physics.getPhysicsSpace().getAccuracy(), this.physics.getSpeed(), this.fixedTimeStep);
         } else {
-            brain = new BasicAlienBrain(data.getToEvaluate(), this.physics.getPhysicsSpace().getAccuracy(), this.physics.getSpeed());
+            brain = new BasicAlienBrain(nn, this.physics.getPhysicsSpace().getAccuracy(), this.physics.getSpeed());
         }
         this.currentAlienNode.addControl(brain);
         this.simInProgress = true;
