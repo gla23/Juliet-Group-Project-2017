@@ -1274,6 +1274,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         setNiftyField("jointStartRotation", 0.0f);
 
         setNiftyField("currentHingeAxis", "A");
+        
+        setNiftyField("directionArrowCheckBox", true);
     }
 
     public void setNiftyField(String k, boolean v) {

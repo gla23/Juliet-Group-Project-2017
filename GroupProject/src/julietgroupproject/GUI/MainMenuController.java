@@ -120,6 +120,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         if (alienNamed) {
             app.addKeyBindings();
             nifty.gotoScreen("start");
+            if (showArrow) { app.showArrow(); } else { app.hideArrow(); }
             addValues();
             checkPrevSim();
         } else {
@@ -143,9 +144,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         nifty.gotoScreen("start");
         addValues();
         checkPrevSim();
-        if (!showArrow) {
-            showArrow = app.hideArrow();
-        }
     }
 
     public void addLoadValues(final String[] aliens) {
@@ -367,12 +365,13 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             alienNamed = true;
             app.addKeyBindings();
             nifty.gotoScreen("start");
+            if (showArrow) { app.showArrow(); }
             checkPrevSim();
             screen = nifty.getScreen("start");
             firstBody = true;
             addAlienSpecificOptions();
             addValues();
-            showArrow = app.showArrow();
+            //showArrow = app.showArrow();
         } else {
             nifty.gotoScreen("load_fail");
         }
@@ -428,7 +427,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         nifty.gotoScreen("editor_options");
         //Window window = nifty.getCurrentScreen().findNiftyControl("editor_options_window", Window.class);
         addOptionsValues();
-        nifty.getScreen("editor_options").findNiftyControl("directionArrowCheckBox", CheckBox.class).setChecked(showArrow);
+        //nifty.getScreen("editor_options").findNiftyControl("directionArrowCheckBox", CheckBox.class).setChecked(showArrow);
     }
 
     public void attachLimb() {
@@ -564,6 +563,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     @NiftyEventSubscriber(id = "directionArrowCheckBox")
     public void onDirectionArrowChange(final String id, final CheckBoxStateChangedEvent event) {
+        
         showArrow = event.getCheckBox().isChecked();
         if (showArrow) {
             showArrow = app.showArrow();

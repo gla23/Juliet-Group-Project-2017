@@ -57,7 +57,7 @@
                                  <panel id = "arrowPanel" height = "15%" childLayout = "horizontal" >
                                     <control name="label" valign = "center" id = "arrow_label" width = "50%" text="Direction Arrow: (A)"  />
                                     <panel id = "directionArrowPanel" valign = "center" width = "50%" childLayout = "vertical" >
-                                       <control id="directionArrowCheckBox" align = "center" valign = "center" name="checkbox"/>
+                                       <control id="directionArrowCheckBox" align = "center" valign = "center" name="checkbox" checked="true"/>
                                     </panel>
                                  </panel>
                                  <panel id = "gravityPanel" height = "15%" childLayout = "horizontal" >
