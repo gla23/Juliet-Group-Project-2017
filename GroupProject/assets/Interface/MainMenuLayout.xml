@@ -371,8 +371,7 @@
 
                                         <panel id = "panel_new_body_entry_fields" backgroundColour="#33333333" width = "*" height = "90%" childLayout = "vertical" valign ="center">
                                             <control name="label" text="Shape Selector:" height = "9%"/>
-                                            <control id="shape_selector_body" name="dropDown" />
-                                            
+                                            <control id="shape_selector_body" name="dropDown"/>
                                             <control name="label" id = "first_body_label" height = "9%" width = "100%" text="Width:" />
                                             
                                             <control id="bodyWidthSlider" name="horizontalSlider" initial = "2" width="100%" min = "0.5" max = "5.0" stepSize = "0.1" buttonStepSize = "0.3"/>
@@ -471,7 +470,7 @@
                                                             <control id="limbStrengthSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1" buttonStepSize = "0.25"/>
                                                                 
                                                             <control name="label" id = "seventh_label" height = "3%"text="Limb Seperation:"  />
-                                                            <control id="limbSeperationSlider" name="horizontalSlider" initial = "0.5"  width="100%" min = "0.15" max = "3.0" stepSize = "0.1" buttonStepSize = "0.25"/>
+                                                            <control id="limbSeparationSlider" name="horizontalSlider" initial = "0.5"  width="100%" min = "0.15" max = "3.0" stepSize = "0.1" buttonStepSize = "0.25"/>
                                                                 
                                                             <panel id = "symmetricPanel" height = "5%" childLayout = "horizontal" >
                                                                 <control name="label" valign = "center" id = "symmetric_label" width = "70%" text="Symmetric:"  />

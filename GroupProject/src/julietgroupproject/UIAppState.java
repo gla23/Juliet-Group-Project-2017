@@ -20,6 +20,7 @@ import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Quaternion;
@@ -27,11 +28,14 @@ import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.niftygui.NiftyJmeDisplay;
+import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.system.AppSettings;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.debug.Arrow;
+import com.jme3.shader.VarType;
 import com.jme3.system.JmeContext;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture;
@@ -59,8 +63,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
@@ -87,7 +93,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private float verticalAngle = 0;
     private float cameraZoom = 25;
     private boolean smoothCam = false;
-    private String currentShape = "Box";
     private final int SIM_COUNT = 8;
     private static final int DEFAULT_FRAMERATE = 60;
     private List<SlaveSimulator> slaves = new ArrayList<>(SIM_COUNT);
@@ -96,9 +101,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private boolean editing = true;
     private SimulationData currentSim;
     private float simTimeLimit;
-    private String currentHingeAxis = "A";
     private Geometry ghostLimb;
     private Geometry ghostLimb2;
+    private Geometry ghostBody;
+    private float prevBodyWidth = 0.0f;
+    private float prevBodyHeight = 0.0f;
+    private float prevBodyLength = 0.0f;
+    private String prevBodyShape = "Box";
+    private Vector3f prevBodyLocation = Vector3f.ZERO;
     private Geometry delghost;
     private Material ghostMaterial;
     private Material ghostMaterial2;
@@ -111,6 +121,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private boolean runningSingle = false;
     private volatile boolean forceReset = false;
     private float bestSoFar = Float.NEGATIVE_INFINITY;
+    private volatile int textureNo = 0;
+    // nifty fields:
+    private Map<String, String> niftyStringFields = new HashMap<>();
+    private Map<String, Float> niftyFloatFields = new HashMap<>();
+    private Map<String, Boolean> niftyBooleanFields = new HashMap<>();
     int[] jointKeys = { // Used for automatically giving limbs keys
         KeyInput.KEY_T, KeyInput.KEY_Y, // Clockwise and anticlockwise key pair for first limb created
         KeyInput.KEY_U, KeyInput.KEY_I, // and second pair
@@ -119,17 +134,19 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         KeyInput.KEY_V, KeyInput.KEY_B,
         KeyInput.KEY_N, KeyInput.KEY_M};
     private final AWTLoader awtLoader = new AWTLoader();
-    TextureKey graph = new TextureKey("graph",false);
+    TextureKey graph = new TextureKey("graph", false);
     Texture graphTex;
 
     public UIAppState(SavedAlien _alien, double _simSpeed, double _accuracy) {
         super(_alien.body, _simSpeed, _accuracy);
         savedAlien = _alien;
+        this.initialiseNiftyFields();
     }
 
     public UIAppState(SavedAlien _alien, double _simSpeed, double _accuracy, double _fixedTimeStep) {
         super(_alien.body, _simSpeed, _accuracy, _fixedTimeStep);
         savedAlien = _alien;
+        this.initialiseNiftyFields();
     }
 
     public void updateLog() {
@@ -137,49 +154,44 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             ListBox niftyLog = nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class);
             List<GenerationResult> logEntries = savedAlien.getEntries();
 
-            
+
             //niftyLog.setFocusItemByIndex(logEntries.size() - 1);
 
             //System.out.println("log");
 
-            
-            
-            if (savedAlien.savedEntryCount() > 0 && bestSoFar != savedAlien.getMostRecent().fitness)
-            {
+
+
+            if (savedAlien.savedEntryCount() > 0 && bestSoFar != savedAlien.getMostRecent().fitness) {
                 niftyLog.clear();
-                
+
                 bestSoFar = savedAlien.getMostRecent().fitness;
                 float bestFitness = Float.NEGATIVE_INFINITY;
                 for (GenerationResult entry : logEntries) {
-                    if (entry.fitness > bestFitness)
-                    {
+                    if (entry.fitness > bestFitness) {
                         niftyLog.addItem(entry);
                         bestFitness = entry.fitness;
                     }
                 }
                 niftyLog.selectItemByIndex(niftyLog.itemCount() - 1);
             }
-            
-            if (savedAlien.savedEntryCount() !=  numLogEntries) {
+
+            if (savedAlien.savedEntryCount() != numLogEntries) {
                 // buildGraph(saveAlien.getLastEntries(50));
                 buildGraph(logEntries);
             }
         }
     }
-    
-    public synchronized void showOffGeneration(int genNumber)
-    {
+
+    public synchronized void showOffGeneration(int genNumber) {
         System.out.println(genNumber);
-        if (savedAlien.savedEntryCount() > genNumber && genNumber > 0)
-        {
+        if (savedAlien.savedEntryCount() > genNumber && genNumber > 0) {
             showOffRequest = new SimulationData(savedAlien.getEntries().get(genNumber).bestGenome, AlienEvaluator.simTime);
         }
     }
-    
-    public synchronized void showBest()
-    {
+
+    public synchronized void showBest() {
         bestSoFar = Float.NEGATIVE_INFINITY;
-        
+
         runningSingle = true;
         if (alien == null || alien.rootBlock.getConnectedLimbs().size() == 0) {
             return;
@@ -192,14 +204,13 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (currentAlienNode == null) {
             instantiateAlien(alien, Vector3f.ZERO);
         }
-        
+
         showOffGeneration(savedAlien.savedEntryCount() - 1);
-        
+
         editing = false;
     }
-    
-    private synchronized void endSingleSim()
-    {
+
+    private synchronized void endSingleSim() {
         this.stopSimulation();
 
         resetAlien();
@@ -215,11 +226,13 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         nifty.gotoScreen("start");
         myMainMenuController.addValues();
-        if (!showArrow) showArrow = hideArrow();
-        
+        if (!showArrow) {
+            showArrow = hideArrow();
+        }
+
         setGravity(0.0f);
     }
-    
+
     public void setAlienMessage(String msg) {
         if (!editing) {
             Label niftyLabel = nifty.getScreen("simulation").findNiftyControl("alien_message", Label.class);
@@ -227,7 +240,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             System.out.println(niftyLabel.getText());
         }
     }
-  
+
     public void buildGraph(List<GenerationResult> log) {
         List<Float> data = new ArrayList<Float>();
         Element element = nifty.getScreen("simulation").findElementByName("graphId");
@@ -244,10 +257,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         Image i = this.awtLoader.load(img, true);
         this.graphTex.setImage(i);
-        ((DesktopAssetManager)assetManager).deleteFromCache(graph);
+        ((DesktopAssetManager) assetManager).deleteFromCache(graph);
         String newTempTextureName = Long.toString(System.nanoTime());
         this.graph = new TextureKey(newTempTextureName);
-        ((DesktopAssetManager)assetManager).addToCache(graph, graphTex);
+        ((DesktopAssetManager) assetManager).addToCache(graph, graphTex);
         NiftyImage newGraph = nifty.getRenderEngine().createImage(nifty.getScreen("simulation"), newTempTextureName, false);
         element.getRenderer(ImageRenderer.class).setImage(newGraph);
         //updateGraph();
@@ -255,31 +268,31 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     /*
-    public void updateGraph() {
-        //NiftyImage newImage = nifty.getRenderEngine().createImage(nifty.getScreen("simulation"),"Graphs/test1.png", false); // false means don't linear filter the image, true would apply linear filtering
+     public void updateGraph() {
+     //NiftyImage newImage = nifty.getRenderEngine().createImage(nifty.getScreen("simulation"),"Graphs/test1.png", false); // false means don't linear filter the image, true would apply linear filtering
 
 
-        // find the element with it's id
-        Element element = nifty.getScreen("simulation").findElementByName("graphId");
+     // find the element with it's id
+     Element element = nifty.getScreen("simulation").findElementByName("graphId");
 
-        // change the image with the ImageRenderer
+     // change the image with the ImageRenderer
 
-        System.out.println("Updated");
-    }
-    */
-
+     System.out.println("Updated");
+     }
+     */
     public void setTexture(int textno) {
-        System.out.println("Setting texture to " + textno);
-        removeAlien(currentAlienNode);
-        alien.materialCode = textno;
-        instantiateAlien(alien, this.startLocation);
-        setChaseCam(this.currentAlienNode);
-        setupKeys(this.currentAlienNode);
+        textureNo = textno;
+        if (alien != null && currentAlienNode != null) {
+            removeAlien(currentAlienNode);
+            alien.materialCode = textno;
+            instantiateAlien(alien, this.startLocation);
+            setChaseCam(this.currentAlienNode);
+            setupKeys(this.currentAlienNode);
+        }
     }
 
     public int getTextureNo() {
-        System.out.println(alien.getCode());
-        return alien.getCode();
+        return textureNo;
     }
 
     public int getSpeedUpFactor() {
@@ -305,14 +318,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.savedAlien.body = a;
         this.alien = a;
         this.savedAlien.alienChanged();
-    }
-
-    public void setCurrentShape(String shape) {
-        currentShape = shape;
-    }
-
-    public void setCurrentHingeAxis(String axis) {
-        currentHingeAxis = axis;
     }
 
     public void restartAlien() {
@@ -361,53 +366,19 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Geometry gl = AlienHelper.assembleBlock(copy, block.getGeometry().getWorldTranslation());
         ghostRoot.attachChild(gl);
         return gl;
-        
+
     }
 
     public void relocateGhostLimb(Geometry gl, Block block, Vector3f contactPt, Vector3f normal) {
-        //Take the entries from the sliders for limb properties
-        Slider widthField = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
-        Slider heightField = nifty.getCurrentScreen().findNiftyControl("limbHeightSlider", Slider.class);
-        Slider lengthField = nifty.getCurrentScreen().findNiftyControl("limbLengthSlider", Slider.class);
-        Slider weightField = nifty.getCurrentScreen().findNiftyControl("limbWeightSlider", Slider.class);
-        Slider frictionField = nifty.getCurrentScreen().findNiftyControl("limbFrictionSlider", Slider.class);
-        Slider strengthField = nifty.getCurrentScreen().findNiftyControl("limbStrengthSlider", Slider.class);
-        Slider seperationField = nifty.getCurrentScreen().findNiftyControl("limbSeperationSlider", Slider.class);
-        CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
 
-
-        Slider rollSlider = nifty.getCurrentScreen().findNiftyControl("rollSlider", Slider.class);
-        Slider yawSlider = nifty.getCurrentScreen().findNiftyControl("yawSlider", Slider.class);
-        Slider pitchSlider = nifty.getCurrentScreen().findNiftyControl("pitchSlider", Slider.class);
-        Slider jointPosSlider = nifty.getCurrentScreen().findNiftyControl("jointPosSlider", Slider.class);
-        Slider jointRotSlider = nifty.getCurrentScreen().findNiftyControl("jointRotSlider", Slider.class);
-
-        float limbWidth;
-        float limbHeight;
-        float limbLength;
-        float limbSeperation;
+        float limbWidth = getNiftyFloat("limbWidth");
+        float limbHeight = getNiftyFloat("limbHeight");
+        float limbLength = getNiftyFloat("limbLength");
+        float limbSeparation = getNiftyFloat("limbSeparation");
         // currentHingeAxis Will be either "X", "Y", "Z" or "A" for auto
 
-        limbWidth = widthField.getValue();
-        limbHeight = heightField.getValue();
-        limbLength = lengthField.getValue();
-        limbSeperation = seperationField.getValue();
 
-
-
-        //Find hinge and postion vectors given shape and click position
-        //TODO fix this so that is gets the actual distance, and also make that distance correct when it is rotated
-        Vector3f newHingePos = contactPt.add(normal.mult(-0.36f));
-        Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeperation));
-
-        String axisToUse = "ZAxis";
-        if (currentHingeAxis.equals("A")) {
-            if (Math.abs(normal.x) < Math.abs(normal.z)) {
-                axisToUse = "XAxis";
-            }
-        } else {
-            axisToUse = currentHingeAxis;
-        }
+        Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeparation));
 
         //Build the new limb
         Matrix3f rotation = new Matrix3f();
@@ -471,6 +442,50 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             }
         }
         return false;
+    }
+
+    private void updateGhostBody() {
+        if (ghostBody != null && (this.currentAlienNode != null || !editing)) {
+            this.physics.getPhysicsSpace().remove(this.ghostBody.getControl(GhostControl.class));
+            ghostBody.removeFromParent();
+            this.ghostBody = null;
+        } else if (currentAlienNode == null && editing) {
+            int texturecode = textureNo;
+                Material m = this.materials_t[texturecode];
+            float bodyWidth = getNiftyFloat("bodyWidth");
+            float bodyHeight = getNiftyFloat("bodyHeight");
+            float bodyLength = getNiftyFloat("bodyLength");
+            String currentShape = getNiftyString("currentBodyShape");
+            Vector3f pos = startLocation;
+            if (this.ghostBody == null || bodyWidth != prevBodyWidth || bodyHeight != prevBodyHeight || bodyLength != prevBodyLength
+                    || !currentShape.equals(prevBodyShape) || pos != prevBodyLocation) {
+
+                if (this.ghostBody != null)  {
+                    this.physics.getPhysicsSpace().remove(this.ghostBody.getControl(GhostControl.class));
+                    ghostBody.removeFromParent();
+                    this.ghostBody = null;
+                }
+                // update body ghost
+                Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", 1.0f);
+                Geometry gb = AlienHelper.assembleBlock(bodyBlock, startLocation);
+                gb.removeControl(RigidBodyControl.class);
+                gb.setMaterial(m);
+                GhostControl gc = new GhostControl(CollisionShapeFactory.createMeshShape(gb));
+                gb.addControl(gc);
+                this.physics.getPhysicsSpace().add(gc);
+                this.ghostBody = gb;
+                this.ghostRoot.attachChild(gb);
+                //TODO: fix chase cam on ghost body
+                setChaseCam(this.ghostBody);
+            }
+            if (ghostBody.getControl(GhostControl.class).getOverlappingCount() < 1) {
+                ghostBody.setMaterial(m);
+                this.isCollisionOccuring = false;
+            } else {
+                ghostBody.setMaterial(ghostMaterial2);
+                this.isCollisionOccuring = true;
+            }
+        }
     }
 
     public void updateGhostLimb() {
@@ -565,13 +580,13 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     delghost = null;
                 }
             } else {
-            removeGhostLimb(ghostLimb);
-            removeGhostLimb(ghostLimb2);
-            ghostLimb = null;
-            ghostLimb2 = null;
-            removeGhostLimb(delghost);
-            delghost = null;
-        }
+                removeGhostLimb(ghostLimb);
+                removeGhostLimb(ghostLimb2);
+                ghostLimb = null;
+                ghostLimb2 = null;
+                removeGhostLimb(delghost);
+                delghost = null;
+            }
         } else {
             removeGhostLimb(ghostLimb);
             removeGhostLimb(ghostLimb2);
@@ -585,7 +600,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     }
 
-    public void setChaseCam(AlienNode shape) {
+    public void setChaseCam(Spatial shape) {
 
         if (chaseCam != null) {
             horizontalAngle = chaseCam.getHorizontalRotation();
@@ -598,8 +613,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             inputManager.deleteMapping("ChaseCamToggleRotate");
         }
         //toggleSmoothness();
-        chaseCam = new ChaseCamera(cam, shape.geometries.get(0), inputManager);
-
+        if (shape instanceof AlienNode) {
+            chaseCam = new ChaseCamera(cam, ((AlienNode) shape).geometries.get(0), inputManager);
+        } else {
+            chaseCam = new ChaseCamera(cam, shape, inputManager);
+        }
         //toggleSmoothness();
         chaseCam.setSmoothMotion(smoothCam);
         if (smoothCam) {
@@ -626,39 +644,21 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public void createNewBody() {
+        // TODO: make sure createNewBody can fail!
+        //if (this.isCollisionOccuring) { return; }
         savedAlien.alienChanged();
         if (this.currentAlienNode == null) {
 
-            //Take the entries from text fields for limb size, do some error handling
-            Slider widthField = nifty.getCurrentScreen().findNiftyControl("bodyWidthSlider", Slider.class);
-            Slider heightField = nifty.getCurrentScreen().findNiftyControl("bodyHeightSlider", Slider.class);
-            Slider lengthField = nifty.getCurrentScreen().findNiftyControl("bodyLengthSlider", Slider.class);
-            Slider weightField = nifty.getCurrentScreen().findNiftyControl("bodyWeightSlider", Slider.class);
-
-            float bodyWidth;
-            float bodyHeight;
-            float bodyLength;
-            float bodyWeight;
-
-
-            bodyWidth = widthField.getValue();
-
-
-            bodyHeight = heightField.getValue();
-
-
-
-            bodyLength = lengthField.getValue();
-
-            bodyWeight = weightField.getValue();
-
+            float bodyWidth = getNiftyFloat("bodyWidth");
+            float bodyHeight = getNiftyFloat("bodyHeight");
+            float bodyLength = getNiftyFloat("bodyLength");
+            float bodyWeight = getNiftyFloat("bodyWeight");
+            String currentShape = getNiftyString("currentBodyShape");
 
             //Instantiate the new alien
             Vector3f pos = Vector3f.ZERO;
-
-
             Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", bodyWeight);
-            int texturecode = alien != null ? alien.materialCode : 1;
+            int texturecode = alien != null ? alien.materialCode : textureNo;
             setAlien(new Alien(bodyBlock));
             alien.materialCode = texturecode;
             instantiateAlien(alien, startLocation);
@@ -716,61 +716,31 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     // Used by add limb and add ghost limb so the ghost limb ghosts the same block that is going to be created
     public Block createLimb(Block block, Vector3f contactPt, Vector3f normal) {
 
-        //Take the entries from the sliders for limb properties
-        Slider widthField = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
-        Slider heightField = nifty.getCurrentScreen().findNiftyControl("limbHeightSlider", Slider.class);
-        Slider lengthField = nifty.getCurrentScreen().findNiftyControl("limbLengthSlider", Slider.class);
-        Slider weightField = nifty.getCurrentScreen().findNiftyControl("limbWeightSlider", Slider.class);
-        Slider frictionField = nifty.getCurrentScreen().findNiftyControl("limbFrictionSlider", Slider.class);
-        Slider strengthField = nifty.getCurrentScreen().findNiftyControl("limbStrengthSlider", Slider.class);
-        Slider seperationField = nifty.getCurrentScreen().findNiftyControl("limbSeperationSlider", Slider.class);
-        CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
-
-
-        Slider yawSlider = nifty.getCurrentScreen().findNiftyControl("yawSlider", Slider.class);
-        Slider pitchSlider = nifty.getCurrentScreen().findNiftyControl("pitchSlider", Slider.class);
-        Slider rollSlider = nifty.getCurrentScreen().findNiftyControl("rollSlider", Slider.class);
-        Slider jointPosSlider = nifty.getCurrentScreen().findNiftyControl("jointPosSlider", Slider.class);
-        Slider jointRotSlider = nifty.getCurrentScreen().findNiftyControl("jointRotSlider", Slider.class);
-
-        float limbWidth;
-        float limbHeight;
-        float limbLength;
-        float weight;
-        float friction;
-        float strength;
-        float limbSeperation;
-        boolean symmetric;
-        float yaw;
-        float pitch;
-        float roll;
-        float jointPositionFraction;
-        float jointStartRotation;
+        float limbWidth = getNiftyFloat("limbWidth");
+        float limbHeight = getNiftyFloat("limbHeight");
+        float limbLength = getNiftyFloat("limbLength");
+        float weight = getNiftyFloat("limbWeight");
+        float friction = getNiftyFloat("limbFriction");
+        float strength = getNiftyFloat("limbStrength");
+        float limbSeparation = getNiftyFloat("limbSeparation");
+        boolean symmetric = getNiftyBoolean("symmetric");
+        float yaw = getNiftyFloat("limbYaw");
+        float pitch = getNiftyFloat("limbPitch");
+        float roll = getNiftyFloat("limbRoll");
+        float jointPositionFraction = getNiftyFloat("jointPositionFraction");
+        float jointStartRotation = getNiftyFloat("jointStartRotation");
         // currentHingeAxis Will be either "X", "Y", "Z" or "A" for auto
-
-        limbWidth = widthField.getValue();
-        limbHeight = heightField.getValue();
-        limbLength = lengthField.getValue();
-        weight = weightField.getValue();
-        friction = frictionField.getValue();
-        strength = strengthField.getValue();
-        limbSeperation = seperationField.getValue();
-        symmetric = symmetricBox.isChecked();
-        yaw = yawSlider.getValue();
-        pitch = pitchSlider.getValue();
-        roll = rollSlider.getValue();
-        jointPositionFraction = jointPosSlider.getValue();
-        jointStartRotation = jointRotSlider.getValue();
-
+        String currentShape = getNiftyString("currentLimbShape");
+        String currentHingeAxis = getNiftyString("currentHingeAxis");
 
         //Find hinge and postion vectors given shape and click position
         //TODO fix this so that is gets the actual distance, and also make that distance correct when it is rotated
         Vector3f newHingePos;
         Vector3f newPos;
         if (currentShape.equals("Cylinder")) {
-            newPos = contactPt.add(normal.mult(limbWidth + limbSeperation));
+            newPos = contactPt.add(normal.mult(limbWidth + limbSeparation));
         } else {
-            newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeperation));
+            newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeparation));
         }
         //Vector3f 
         newHingePos = contactPt.add(normal.mult(4 * jointPositionFraction));
@@ -1000,7 +970,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
 
         bestSoFar = Float.NEGATIVE_INFINITY;
-        
+
         resetGravity();
 
         showArrow();
@@ -1015,7 +985,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.trainer = new AlienTrainer(savedAlien, simulationQueue);
 
         while (this.slaves.size() < SIM_COUNT) {
-            Alien alienToTrain = (Alien)ObjectCloner.deepCopy(alien);
+            Alien alienToTrain = (Alien) ObjectCloner.deepCopy(alien);
             SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(alienToTrain, this.simulationQueue, 1.0f, this.accuracy, 1f / 60f));
             this.slaves.add(toAdd);
             // speed up by 5 times, 300 = 60 * 5
@@ -1044,11 +1014,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void endTraining() {
         this.trainer.terminateTraining(slaves);
     }
-    
-    public void endSimulation()
-    {
-        if (!runningSingle)
-        {
+
+    public void endSimulation() {
+        if (!runningSingle) {
             endTraining();
         }
         showOffRequest = null;
@@ -1267,6 +1235,58 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.simTimeLimit = 0.0f;
     }
 
+    private void initialiseNiftyFields() {
+        // body panel
+        setNiftyField("currentBodyShape", "Box");
+        setNiftyField("bodyWidth", 2.0f);
+        setNiftyField("bodyLength", 3.0f);
+        setNiftyField("bodyLength", 3.0f);
+        setNiftyField("bodyHeight", 1.0f);
+        setNiftyField("bodyWeight", 1.5f);
+
+        // limb panel
+        setNiftyField("currentLimbShape", "Box");
+        setNiftyField("limbWidth", 1.8f);
+        setNiftyField("limbHeight", 0.4f);
+        setNiftyField("limbLength", 0.4f);
+        setNiftyField("limbWeight", 1.0f);
+        setNiftyField("limbFriction", 1.0f);
+        setNiftyField("limbStrength", 1.0f);
+        setNiftyField("limbSeparation", 0.5f);
+        setNiftyField("symmetric", false);
+        setNiftyField("limbYaw", 0.0f);
+        setNiftyField("limbPitch", 0.0f);
+        setNiftyField("limbRoll", 0.0f);
+        setNiftyField("jointPositionFraction", 0.1f);
+        setNiftyField("jointStartRotation", 0.0f);
+
+        setNiftyField("currentHingeAxis", "A");
+    }
+
+    public void setNiftyField(String k, boolean v) {
+        this.niftyBooleanFields.put(k, v);
+    }
+
+    public void setNiftyField(String k, float v) {
+        this.niftyFloatFields.put(k, v);
+    }
+
+    public void setNiftyField(String k, String v) {
+        this.niftyStringFields.put(k, v);
+    }
+
+    public boolean getNiftyBoolean(String k) {
+        return this.niftyBooleanFields.get(k).booleanValue();
+    }
+
+    public float getNiftyFloat(String k) {
+        return this.niftyFloatFields.get(k).floatValue();
+    }
+
+    public String getNiftyString(String k) {
+        return this.niftyStringFields.get(k);
+    }
+
     @Override
     public void update(float tpf) {
 
@@ -1280,29 +1300,21 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 stopSimulation();
             }
         } else {
-            if (editing)
-            {
+            if (editing) {
                 updateGhostLimb();
             }
-            
+
             if (!editing) {
                 SimulationData s = null;
-                if (showOffRequest == null && !runningSingle)
-                {
-                    if (savedAlien.savedEntryCount() > 0)
-                    {
+                if (showOffRequest == null && !runningSingle) {
+                    if (savedAlien.savedEntryCount() > 0) {
                         s = new SimulationData(savedAlien.getMostRecent().bestGenome, AlienEvaluator.simTime);
-                    }
-                    else
-                    {
-                        if (trainer != null)
-                        {
+                    } else {
+                        if (trainer != null) {
                             s = new SimulationData(trainer.getBestSoFar(), AlienEvaluator.simTime);
                         }
                     }
-                }
-                else
-                {
+                } else {
                     s = showOffRequest;
                     //showOffRequest = null;
                 }
@@ -1310,11 +1322,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     System.out.println(Thread.currentThread().getId() + ": starting simulation!");
                     setAlienMessage("Hi");
                     startSimulation(s);
-                }
-                else
-                {
-                    if (runningSingle)
-                    {
+                } else {
+                    if (runningSingle) {
                         endSingleSim();
                     }
                 }
@@ -1322,6 +1331,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
 
         updateLog();
+        updateGhostBody();
     }
 
     @Override

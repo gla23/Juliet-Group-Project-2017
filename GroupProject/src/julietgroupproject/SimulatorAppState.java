@@ -49,7 +49,7 @@ public class SimulatorAppState extends AbstractAppState {
     protected boolean simInProgress;
     protected boolean isFixedTimeStep;
     // World related
-    protected final Vector3f startLocation = Vector3f.ZERO;
+    protected Vector3f startLocation = new Vector3f(0, 4, 0);
     protected Geometry floorGeometry;
     public final Vector3f standardG;
 
@@ -178,7 +178,11 @@ public class SimulatorAppState extends AbstractAppState {
 
     protected void setupTextures() {
     }
-
+    
+    public SimpleApplication getApp() {
+        return this.app;
+    }
+    
     /**
      * Initialise the scene by creating a floor box.
      */

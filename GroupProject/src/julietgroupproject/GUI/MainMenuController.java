@@ -1,6 +1,7 @@
 package julietgroupproject.GUI;
 
 import com.jme3.app.Application;
+import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import de.lessvoid.nifty.Nifty;
@@ -12,6 +13,7 @@ import de.lessvoid.nifty.controls.DropDown;
 import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
 import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
+import de.lessvoid.nifty.controls.RadioButton;
 import de.lessvoid.nifty.controls.RadioButtonGroupStateChangedEvent;
 import de.lessvoid.nifty.controls.SliderChangedEvent;
 import de.lessvoid.nifty.controls.Tab;
@@ -24,6 +26,7 @@ import de.lessvoid.nifty.screen.ScreenController;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import julietgroupproject.DrawGraph;
@@ -32,6 +35,7 @@ import julietgroupproject.UIAppState;
 public class MainMenuController extends AbstractAppState implements ScreenController {
 
     private UIAppState app;
+    private SimpleApplication mainApp;
     private AppStateManager stateManager;
     private Nifty nifty;
     private Screen screen;
@@ -45,14 +49,13 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     private volatile boolean initialising = false;
     private boolean showArrow = true;
     boolean alienNamed = false;
-
     private String[] aliens;
     private String currentlySelectedLoadAlien = "";
     private ArrayList<String> alreadyAddedAliens = new ArrayList<String>();
 
-
     public MainMenuController(UIAppState App) {
         this.app = App;
+        this.mainApp = app.getApp();
     }
 
     @Override
@@ -60,13 +63,11 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         this.nifty = nifty;
         this.screen = screen;
     }
-    
+
     public void newBody() {
-        setCurrentBodyShape();
         app.createNewBody();
         addAlienSpecificOptions();
     }
-    
 
     public void addAlienSpecificOptions() {
         firstBody = true;
@@ -114,26 +115,23 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     public void hideEditor() {
         nifty.gotoScreen("hidden");
     }
-    
+
     public void showEditor() {
-        if (alienNamed)
-        {
+        if (alienNamed) {
             app.addKeyBindings();
             nifty.gotoScreen("start");
             addValues();
             checkPrevSim();
-        }
-        else
-        {
+        } else {
             nifty.gotoScreen("begin");
             checkPrevSim();
         }
     }
-    
+
     public void checkPrevSim() {
         Button resume = nifty.getScreen("start").findNiftyControl("new_sim", Button.class);
         if (app.savedAlien.pop != null) {
-            
+
             resume.setText("Resume Training");
         } else {
             resume.setText("Start Training");
@@ -145,9 +143,11 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         nifty.gotoScreen("start");
         addValues();
         checkPrevSim();
-        if (!showArrow) showArrow = app.hideArrow();
+        if (!showArrow) {
+            showArrow = app.hideArrow();
+        }
     }
-    
+
     public void addLoadValues(final String[] aliens) {
         Thread thread = new Thread() {
             @Override
@@ -158,8 +158,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     DropDown loadScrollE = null;
                     while (!working) {
                         this.sleep(20);
-                            loadScrollE = nifty.getCurrentScreen().findNiftyControl("alien_selector", DropDown.class);
-                            
+                        loadScrollE = nifty.getCurrentScreen().findNiftyControl("alien_selector", DropDown.class);
+
                         try {
                             loadScrollE.removeItem("");
                             working = true;
@@ -170,8 +170,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     initialising = true;
                     //loadScrollE.setHeight(200);
                     System.out.println("Aliens " + Arrays.toString(aliens));
-                    System.out.println("Already Added: "  + alreadyAddedAliens.toString());
-                    for (int i =0; i<aliens.length; i++) {
+                    System.out.println("Already Added: " + alreadyAddedAliens.toString());
+                    for (int i = 0; i < aliens.length; i++) {
                         if (!alreadyAddedAliens.contains(aliens[i])) {
                             System.out.println(i);
                             loadScrollE.addItem(aliens[i]);
@@ -179,7 +179,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                         alreadyAddedAliens.add(aliens[i]);
                     }
                     loadScrollE.selectItemByIndex(0);
-                    
+
                     initialising = false;
                 } catch (InterruptedException e) {
                 } catch (NullPointerException e2) {
@@ -190,8 +190,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         };
         thread.start();
     }
-   
-    
 
     public void addOptionsValues() {
         Thread thread = new Thread() {
@@ -304,20 +302,16 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         if (app.beginTraining()) {
             nifty.gotoScreen("simulation");
             showArrow = true;
-        }
-        else
+        } else {
             nifty.gotoScreen("simulate_fail");
+        }
     }
-    
-    public void showBest()
-    {
-        if (this.app.savedAlien.savedEntryCount() > 0)
-        {
+
+    public void showBest() {
+        if (this.app.savedAlien.savedEntryCount() > 0) {
             nifty.gotoScreen("simulation");
             this.app.showBest();
-        }
-        else
-        {
+        } else {
             nifty.gotoScreen("show_best_fail");
         }
     }
@@ -327,29 +321,27 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         sanitizedAlienName = rawName.replaceAll("[^A-Za-z0-9 \\-_]", "");
         return sanitizedAlienName;
     }
-    
+
     public void gotoLoadScreen() {
         app.removeKeyBindings();
         nifty.gotoScreen("load_dialog");
-           
-        
+
+
 
         addLoadValues(aliens);
-        
-        
+
+
         System.out.println(Arrays.toString(aliens));
     }
-    
-    public void gotoNameScreen()
-    {
+
+    public void gotoNameScreen() {
         app.removeKeyBindings();
         nifty.gotoScreen("name_dialog");
     }
-    
-    public void confirmName()
-    {
+
+    public void confirmName() {
         app.addKeyBindings();
-        
+
         String name = nifty.getScreen("name_dialog").findNiftyControl("nameTextField", TextField.class).getRealText();
         String sanitizedName = sanitizeAlienName(name);
         if (sanitizedName.length() > 0) {
@@ -360,15 +352,15 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             showArrow = app.showArrow();
         }
     }
-    
-    @NiftyEventSubscriber (id = "alien_selector")
+
+    @NiftyEventSubscriber(id = "alien_selector")
     public void setCurrentLoadAlien(final String id, final DropDownSelectionChangedEvent<String> event) {
         currentlySelectedLoadAlien = event.getSelection();
     }
 
     public void confirmLoad() {
         app.addKeyBindings();
-        
+
         System.out.println(currentlySelectedLoadAlien);
         //TODO
         if (app.loadAlien(sanitizeAlienName(currentlySelectedLoadAlien))) {
@@ -385,38 +377,38 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             nifty.gotoScreen("load_fail");
         }
     }
-   
+
     public void gotoSaveScreen() {
         app.removeKeyBindings();
-        Thread thread = new Thread () {@Override public void run(){
-            boolean worked = false;
-            while(!worked)
-            {
-                try
-                {
-                    nifty.getScreen("save_dialog").findNiftyControl("saveTextField", TextField.class).setText(app.savedAlien.getName());
-                    worked = true;
-                } catch(NullPointerException e)
-                {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                boolean worked = false;
+                while (!worked) {
                     try {
-                        Thread.sleep(20);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(MainMenuController.class.getName()).log(Level.SEVERE, null, ex);
+                        nifty.getScreen("save_dialog").findNiftyControl("saveTextField", TextField.class).setText(app.savedAlien.getName());
+                        worked = true;
+                    } catch (NullPointerException e) {
+                        try {
+                            Thread.sleep(20);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(MainMenuController.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        worked = false;
                     }
-                    worked = false;
                 }
             }
-        }};
+        };
         thread.start();
         nifty.gotoScreen("save_dialog");
     }
 
     public void confirmSave() {
-        
+
         System.out.println("save confirmed");
-        
+
         app.addKeyBindings();
-        
+
         String name = nifty.getScreen("save_dialog").findNiftyControl("saveTextField", TextField.class).getRealText();
         String sanitizedName = sanitizeAlienName(name);
         if (sanitizedName.length() > 0 && app.saveAlien(sanitizedName)) {
@@ -438,18 +430,17 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         addOptionsValues();
         nifty.getScreen("editor_options").findNiftyControl("directionArrowCheckBox", CheckBox.class).setChecked(showArrow);
     }
-    
 
     public void attachLimb() {
         //TODO     
         /*Slider getWidth = nifty.getCurrentScreen().findNiftyControl("limbWidthSlider", Slider.class);
-        getWidth.setValue(5.0f);*/
+         getWidth.setValue(5.0f);*/
         /*CheckBox getAuto = nifty.getCurrentScreen().findNiftyControl("AutoCheckBox", CheckBox.class);
 
-        boolean checked = !getAuto.isChecked();
+         boolean checked = !getAuto.isChecked();
 
-        app.setAttaching(checked);
-        getAuto.setChecked(checked);*/
+         app.setAttaching(checked);
+         getAuto.setChecked(checked);*/
     }
 
     public void setLimbCheckbox() {
@@ -535,7 +526,16 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 thirdLabel.setText("Length:");
                 break;
         }
-
+        String current = event.getSelection();
+        switch (current) {
+            case "Cuboid":
+                current = "Box";
+                break;
+            case "Ellipsoid":
+                current = "Sphere";
+                break;
+        }
+        setFieldSafe("currentLimbShape",current);
     }
 
     @NiftyEventSubscriber(id = "chaseCamCheckBox")
@@ -548,30 +548,11 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     @NiftyEventSubscriber(id = "logger_listbox")
-    public void logItemSelected(final String id, final ListBoxSelectionChangedEvent<julietgroupproject.GenerationResult> event)
-    {
+    public void logItemSelected(final String id, final ListBoxSelectionChangedEvent<julietgroupproject.GenerationResult> event) {
         System.out.println("Callback!" + event.getSelection().size());
-        if (event.getSelection().size() > 0)
+        if (event.getSelection().size() > 0) {
             app.showOffGeneration(event.getSelection().get(0).generation);
-    }
-    
-    @NiftyEventSubscriber(id = "hingeAxisButtons")
-    public void onXChange(final String id, final RadioButtonGroupStateChangedEvent event) {
-        switch (event.getSelectedId()) {
-            case "XCheckBox":
-                app.setCurrentHingeAxis("XAxis");
-                break;
-            case "YCheckBox":
-                app.setCurrentHingeAxis("YAxis");
-                break;
-            case "ZCheckBox":
-                app.setCurrentHingeAxis("ZAxis");
-                break;
-            case "AutoCheckBox":
-                app.setCurrentHingeAxis("A");
-                break;
         }
-
     }
 
     @NiftyEventSubscriber(id = "wireMeshCheckBox")
@@ -579,7 +560,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         app.toggleWireMesh();
         //makeGraph();
     }
-    
+
     @NiftyEventSubscriber(id = "directionArrowCheckBox")
     public void onDirectionArrowChange(final String id, final CheckBoxStateChangedEvent event) {
         showArrow = event.getCheckBox().isChecked();
@@ -616,8 +597,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstLabelE.show();
                 secondLabelE.hide();
                 thirdLabelE.show();
-                firstLabel.setText("Radius:");
-                thirdLabel.setText("Height:");
+                firstLabel.setText("Height:");
+                thirdLabel.setText("Radius:");
                 break;
             case "Ellipsoid":
                 getWidth.show();
@@ -637,8 +618,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 firstLabelE.show();
                 secondLabelE.hide();
                 thirdLabelE.show();
-                firstLabel.setText("Ring Thickness:");
-                thirdLabel.setText("Outer Radius:");
+                firstLabel.setText("Outer Radius:");
+                thirdLabel.setText("Ring Thickness:");
                 break;
             case "Cuboid":
                 getWidth.show();
@@ -653,18 +634,135 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 break;
         }
 
+        String current = event.getSelection();
+        switch (current) {
+            case "Cuboid":
+                current = "Box";
+                break;
+            case "Ellipsoid":
+                current = "Sphere";
+                break;
+        }
+        setFieldSafe("currentBodyShape",current);
+
+    }
+
+    @NiftyEventSubscriber(id = "bodyWidthSlider")
+    public void onBodyWidthSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("bodyWidth", event.getValue());
+    }
+
+    @NiftyEventSubscriber(id = "bodyHeightSlider")
+    public void onBodyHeightSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("bodyHeight", event.getValue());
+    }
+
+    @NiftyEventSubscriber(id = "bodyLengthSlider")
+    public void onBodyLengthSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("bodyLength", event.getValue());
+    }
+
+    @NiftyEventSubscriber(id = "bodyWeightSlider")
+    public void onBodyWeightSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("bodyWeight", event.getValue());
+    }
+
+    @NiftyEventSubscriber(id = "limbWidthSlider")
+    public void onLimbWidthSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("limbWidth", event.getValue());
+    }
+
+    @NiftyEventSubscriber(id = "limbHeightSlider")
+    public void onLimbHeightSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("limbHeight", event.getValue());
+    }
+
+    @NiftyEventSubscriber(id = "limbLengthSlider")
+    public void onLimbLengthSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("limbLength", event.getValue());
+    }
+
+    @NiftyEventSubscriber(id = "limbWeightSlider")
+    public void onLimbWeightSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("limbWeight", event.getValue());
+    }
+
+    @NiftyEventSubscriber(id = "limbFrictionSlider")
+    public void onLimbFrictionSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("limbFriction", event.getValue());
+    }
+
+    @NiftyEventSubscriber(id = "limbStrengthSlider")
+    public void onLimbStrengthSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("limbStrength", event.getValue());
+    }
+
+    @NiftyEventSubscriber(id = "limbSeparationSlider")
+    public void onLimbSeparationSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("limbSeparation", event.getValue());
+    }
+
+    @NiftyEventSubscriber(id = "symmetricCheckBox")
+    public void onSymmetricCheckBoxChanged(final String id, final CheckBoxStateChangedEvent event) {
+        this.setFieldSafe("symmetric", event.isChecked());
+    }
+
+    @NiftyEventSubscriber(id = "hingeAxisButtons")
+    public void onHingeAxisButtonChanged(final String id, final RadioButtonGroupStateChangedEvent event) {
+        String selected;
+        switch (event.getSelectedId()) {
+            case "AutoCheckBox":
+                selected = "A";
+                break;
+            case "XCheckBox":
+                selected = "XAxis";
+                break;
+            case "YCheckBox":
+                selected = "YAxis";
+                break;
+            case "ZCheckBox":
+                selected = "ZAxis";
+                break;
+            default:
+                selected = "A";
+        }
+        this.setFieldSafe("currentHingeAxis", selected);
+    }
+    
+    @NiftyEventSubscriber(id = "yawSlider")
+    public void onLimbYawSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("limbYaw", event.getValue());
+    }
+
+    @NiftyEventSubscriber(id = "pitchSlider")
+    public void onLimbPitchSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("limbPitch", event.getValue());
+    }
+
+    @NiftyEventSubscriber(id = "rollSlider")
+    public void onLimbRollSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("limbRoll", event.getValue());
+    }
+
+    @NiftyEventSubscriber(id = "jointPosSlider")
+    public void onJointPosSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("jointPositionFraction", event.getValue());
+    }
+
+    @NiftyEventSubscriber(id = "jointRotSlider")
+    public void onJointRotSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("jointStartRotation", event.getValue());
     }
 
     @Override
     public void onStartScreen() {
-        aliens = app.getLoadableAliens();     
+        aliens = app.getLoadableAliens();
     }
-    
+
     public void makeGraph(List<Float> data) {
-        
         /*
-        DrawGraph test = new DrawGraph(data, "assets/Graphs/test1.png");
-        test.showIt();*/
+         DrawGraph test = new DrawGraph(data, "assets/Graphs/test1.png");
+         test.showIt();*/
     }
 
     @Override
@@ -675,36 +773,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         app.toggleWireMesh();
     }
 
-    @NiftyEventSubscriber (id = "shape_selector")
-    public void setCurrentLimbShape(final String id, final DropDownSelectionChangedEvent<String> event) {
-        String current = event.getSelection();
-        switch (current) {
-            case "Cuboid":
-                current = "Box";
-                break;
-            case "Ellipsoid":
-                current = "Sphere";
-                break;
-        }
-        app.setCurrentShape(current);
-
-    }
-
-    public void setCurrentBodyShape() {
-        DropDown shapeSelect = nifty.getCurrentScreen().findNiftyControl("shape_selector_body", DropDown.class);
-        String current = (String) shapeSelect.getSelection();
-        switch (current) {
-            case "Cuboid":
-                current = "Box";
-                break;
-            case "Ellipsoid":
-                current = "Sphere";
-                break;
-        }
-        app.setCurrentShape(current);
-
-    }
-
     public void toggleSmoothness() {
         app.toggleSmoothness();
     }
@@ -712,15 +780,42 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     public void resetAlien() {
         app.resetAlien();
         alienNamed = false;
-        
+
         app.removeKeyBindings();
         nifty.gotoScreen("name_dialog");
-        
+
         TabGroup tabs = nifty.getScreen("start").findNiftyControl("limb_body_tabs", TabGroup.class);
         // tabs.addTab(addBody);
         tabs.setSelectedTab(addBody);
 
 
+    }
+
+    private void setFieldSafe(final String fieldName, final String value) {
+        mainApp.enqueue(Executors.callable(new Runnable() {
+            @Override
+            public void run() {
+                app.setNiftyField(fieldName, value);
+            }
+        }));
+    }
+
+    private void setFieldSafe(final String fieldName, final float value) {
+        mainApp.enqueue(Executors.callable(new Runnable() {
+            @Override
+            public void run() {
+                app.setNiftyField(fieldName, value);
+            }
+        }));
+    }
+
+    private void setFieldSafe(final String fieldName, final boolean value) {
+        mainApp.enqueue(Executors.callable(new Runnable() {
+            @Override
+            public void run() {
+                app.setNiftyField(fieldName, value);
+            }
+        }));
     }
 
     @Override

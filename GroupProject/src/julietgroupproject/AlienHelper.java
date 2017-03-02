@@ -49,6 +49,10 @@ public class AlienHelper {
      * @return the assembled Geometry
      */
     public static Geometry assembleBlock(Block block, Vector3f location) {
+        if (block.collisionShapeType.equals("Sphere")) {
+            // fix the rotation matrix
+            block.rotation = new Matrix3f(block.width, 0f, 0f, 0f, block.height, 0f, 0f, 0f, block.length);
+        }
         Geometry g = createLimb(block.collisionShapeType, block.width, block.height, block.length, location, block.mass,block.rotation,block.rotationForYPR);
         block.applyProperties(g);
         return g;
