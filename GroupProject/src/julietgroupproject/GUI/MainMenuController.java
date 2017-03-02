@@ -237,6 +237,13 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                         try {
                             shapeSelect.removeItem("");
                             tabs.getSelectedTabIndex();
+
+                            if (firstBody) {
+                                tabs.setSelectedTab(addLimb);
+                            } else {
+                                tabs.setSelectedTab(addBody);
+                            }
+                            
                             working = true;
                         } catch (NullPointerException e) {
                         }
@@ -251,12 +258,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                     shapeSelect.addItem("Cylinder");
                     shapeSelect.addItem("Torus");
                     shapeSelect.selectItemByIndex(0);
-
-                    if (firstBody) {
-                        tabs.setSelectedTab(addLimb);
-                    } else {
-                        tabs.setSelectedTab(addBody);
-                    }
 
                 } catch (InterruptedException e) {
                 }
