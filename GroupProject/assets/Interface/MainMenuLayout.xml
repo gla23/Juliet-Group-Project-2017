@@ -462,13 +462,13 @@
                                                                                
                                                             <control name="label" id = "forth_label" height = "3%"text="Weight:"  />
                                                             <control id="limbWeightSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1" buttonStepSize = "0.25"/>
-                                                                
+                                                            <!--      
                                                             <control name="label" id = "fifth_label" height = "3%"text="Friction:"  />
                                                             <control id="limbFrictionSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1" buttonStepSize = "0.25"/>
-                                                                
+                                                            
                                                             <control name="label" id = "sixth_label" height = "3%"text="Strength:"  />
                                                             <control id="limbStrengthSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1" buttonStepSize = "0.25"/>
-                                                                
+                                                            -->
                                                             <control name="label" id = "seventh_label" height = "3%"text="Limb Seperation:"  />
                                                             <control id="limbSeparationSlider" name="horizontalSlider" initial = "0.5"  width="100%" min = "0.15" max = "3.0" stepSize = "0.1" buttonStepSize = "0.25"/>
                                                                 
@@ -517,10 +517,7 @@
                                                                 
                                                             <control name="label" id = "eleventh_label" height = "3%" text="Joint Position Fraction:" />
                                                             <control id="jointPosSlider" name="horizontalSlider" initial = "0.1" width="100%" min = "-0.4" max = "1.0" stepSize = "0.1" buttonStepSize = "0.1"/>
-                                                                
-                                                            <control name="label" id = "twelth_label" height = "3%" text="Joint Start Rotation:" />
-                                                            <control id="jointRotSlider" name="horizontalSlider" initial = "0" width="100%" min = "3" max = "3" stepSize = "0.1" buttonStepSize = "0.5"/>
-                                                              
+                                                            
                                                             <!--
                                                             <panel id ="space_taker_2" childLayout = "vertical" height = "8%"/>     
                                                             <control name ="button" label="Save Limb" height = "4%" align = "center" width = "80%" id = "save_limb_button" visibleToMouse="true">
