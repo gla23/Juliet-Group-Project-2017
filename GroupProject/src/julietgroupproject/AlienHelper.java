@@ -7,6 +7,7 @@ package julietgroupproject;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.joints.HingeJoint;
 import com.jme3.bullet.util.CollisionShapeFactory;
+import com.jme3.math.FastMath;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -129,9 +130,7 @@ public class AlienHelper {
             axisB = Vector3f.UNIT_Z;
         }
         HingeJoint joint = new HingeJoint(rigidBodyControlA, rigidBodyControlB, pivotA, pivotB, axisA, axisB);
-        if (hingeType.equals("XAxis")) {
-            //joint.setLimit(0.5f, 1f, 0.5f,0.2f,0.5f);
-        }
+        joint.setLimit(-FastMath.HALF_PI, FastMath.HALF_PI);
         return joint;
     }
 
