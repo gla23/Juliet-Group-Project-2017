@@ -175,7 +175,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     }
                 }
                 niftyLog.selectItemByIndex(niftyLog.itemCount() - 1);
-                showOffRequest = savedAlien.savedEntryCount() - 1;
+                showOffRequest = savedAlien.getEntries().get(savedAlien.savedEntryCount() - 1).generation;
             }
             
             if (savedAlien.savedEntryCount() !=  numLogEntries) {
