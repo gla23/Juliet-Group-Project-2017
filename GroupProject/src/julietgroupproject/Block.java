@@ -10,6 +10,8 @@ import java.util.LinkedList;
 
 public class Block implements Serializable {
 
+    private static final float DEFAULT_FRICTION = 5f;
+    
     private Vector3f pos; // Position of limb relative to parent Block
     private Vector3f hingePos; // Position of hinge connecting this block and the parent, relative to parent
     public float width;
@@ -38,10 +40,10 @@ public class Block implements Serializable {
         this.hingeType = hingeType;
         this.mass = mass;
         
-        this.friction = 5f;
+        this.friction = DEFAULT_FRICTION;
     }
     
-    // shitty copy - don't use
+    // rubbish copy - don't use
     public Block(Block copy) {
         this.pos = copy.pos;
         this.hingePos = copy.hingePos;
