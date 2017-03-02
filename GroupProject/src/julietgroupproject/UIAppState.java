@@ -175,7 +175,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     }
                 }
                 niftyLog.selectItemByIndex(niftyLog.itemCount() - 1);
-                showOffRequest = savedAlien.getEntries().get(savedAlien.savedEntryCount() - 1).generation;
+                showOffRequest = savedAlien.savedEntryCount() - 1;
             }
             
             if (savedAlien.savedEntryCount() !=  numLogEntries) {
@@ -1353,7 +1353,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 {
                     if (showOffRequest >= 0 && showOffRequest < savedAlien.savedEntryCount())
                     {
-                        setAlienMessage("Running generation " + showOffRequest + " with fitness of " + df.format(savedAlien.getEntries().get(showOffRequest).fitness));
+                        setAlienMessage("Running generation " + savedAlien.getEntries().get(showOffRequest).generation + " with fitness of " + df.format(savedAlien.getEntries().get(showOffRequest).fitness));
                         s = new SimulationData(savedAlien.getEntries().get(showOffRequest).bestGenome, AlienEvaluator.simTime);
                     }
                 }

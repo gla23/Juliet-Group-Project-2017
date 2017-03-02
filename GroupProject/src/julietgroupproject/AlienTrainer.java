@@ -46,9 +46,6 @@ public class AlienTrainer extends Thread {
         AlienEvaluator score = new AlienEvaluator(_simTasks);
 
         train = NEATUtil.constructNEATTrainer(this.savedAlien.pop, score);
-        OriginalNEATSpeciation speciation = new OriginalNEATSpeciation();
-        speciation.setCompatibilityThreshold(1);
-        train.setSpeciation(new OriginalNEATSpeciation());
     }
 
     private void resetTraining() {
@@ -70,6 +67,8 @@ public class AlienTrainer extends Thread {
 
         try {
             do {
+                
+                System.out.println(this.savedAlien.pop.flatten().size());
                 
                 this.train.iteration(); //perform the next training iteration.#
                 

@@ -551,7 +551,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     public void logItemSelected(final String id, final ListBoxSelectionChangedEvent<julietgroupproject.GenerationResult> event)
     {
         if (event.getSelection().size() > 0) {
-            app.showOffGeneration(event.getSelection().get(0).generation);
+            app.showOffGeneration(event.getSelection().get(0).generation - 1);
         }
     }
 
