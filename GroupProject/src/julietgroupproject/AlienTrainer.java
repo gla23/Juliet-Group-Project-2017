@@ -72,16 +72,16 @@ public class AlienTrainer extends Thread {
             do {
                 
                 this.train.iteration(); //perform the next training iteration.#
-
-                if (this.train.getIteration() % iterationsBetweenSaves == 0)
-                {
-                    AlienHelper.writeAlien(savedAlien);
-                }
                 
                 int iterationNumber = this.train.getIteration();
                 double populationFitness = this.savedAlien.pop.getBestGenome().getScore();
                     
                 this.savedAlien.addEntry(new GenerationResult(iterationNumber, (float) populationFitness, getBestSoFar()));
+
+                if (this.train.getIteration() % iterationsBetweenSaves == 0)
+                {
+                    AlienHelper.writeAlien(savedAlien);
+                }
             } while (!terminating);
         } finally {
             this.train.finishTraining();
