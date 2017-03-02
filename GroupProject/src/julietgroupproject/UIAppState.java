@@ -512,7 +512,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                         }
                     }
                 }
-
+                
                 if (block != null) {
 
                     if (!shiftDown) {
@@ -1312,7 +1312,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 {
                     if (showOffRequest >= 0 && showOffRequest < savedAlien.savedEntryCount())
                     {
-                        setAlienMessage("Running generation " + (showOffRequest + 1) + " with fitness of " + df.format(savedAlien.getEntries().get(showOffRequest).fitness));
+                        setAlienMessage("Running generation " + showOffRequest + " with fitness of " + df.format(savedAlien.getEntries().get(showOffRequest).fitness));
                         s = new SimulationData(savedAlien.getEntries().get(showOffRequest).bestGenome, AlienEvaluator.simTime);
                     }
                 }
