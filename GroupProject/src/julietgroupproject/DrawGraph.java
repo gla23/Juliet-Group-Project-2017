@@ -2,8 +2,6 @@ package julietgroupproject;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -11,13 +9,9 @@ import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
-import javax.imageio.ImageIO;
-import javax.swing.*;
 
 @SuppressWarnings("serial")
 public class DrawGraph {
@@ -40,7 +34,7 @@ public class DrawGraph {
    
    public static List<Integer> convertToInt(List<Float> fScores) {
 
-       List<Integer> iScores = new ArrayList<Integer>();
+       List<Integer> iScores = new ArrayList<>();
        for (int i = 0; i<fScores.size(); i++){
            float fraction = (fScores.get(i)/MAX_FIT)*MAX_SCORE;
            int rounded = Math.round(fraction);
@@ -84,7 +78,7 @@ public class DrawGraph {
       if (scores.size() < 2) { yScale = (height - 2 * BORDER_GAP) / 2; }
       //System.out.println("xScale:" + xScale + ", yScale:" + yScale);
 
-      List<Point> graphPoints = new ArrayList<Point>();
+      List<Point> graphPoints = new ArrayList<>();
       for (int i = 0; i < scores.size(); i++) {
          int x1 = (int) (i * xScale + BORDER_GAP);
          int y1 = (int) ((maxIntScore - scores.get(i)) * yScale + BORDER_GAP);

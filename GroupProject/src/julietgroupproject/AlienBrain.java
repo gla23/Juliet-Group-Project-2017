@@ -1,11 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package julietgroupproject;
 
-import com.jme3.bullet.control.RigidBodyControl;
-import com.jme3.bullet.joints.HingeJoint;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Spatial;
@@ -15,30 +9,40 @@ import org.encog.ml.data.MLData;
 import org.encog.ml.data.basic.BasicMLData;
 
 /**
- * A controller that controls an alien contained in an AlienNode using neural
+ * A controller that controls an alien contained in an AlienNode using a neural
  * network.
  *
  * @author Sunny
  */
 public abstract class AlienBrain extends AbstractControl {
 
-    protected AlienNode alien;
-    protected MLRegression nn;
-    protected double[] nnInput;
-    private MLData in;
-    private MLData out;
-    protected static final float MAX_VELOCITY = 3f;
-    protected static final float MIN_VELOCITY = 0.1f;
-    protected static final float MAX_POWER = 4f;
+    //movement restrictions:
+    protected static final float MAX_VELOCITY = 3f;    //limits relative movement speed of joints
+    protected static final float MIN_VELOCITY = 0.1f;  //speeds smaller than this are taken as 0
+    protected static final float MAX_POWER = 4f;       //limits torque applied through joints
     
+    //local state:
+    protected AlienNode alien;    //the physical manifestation of the alien being controlled
+    protected MLRegression nn;    //the neural network used to make movement decisions
+    protected double[] nnInput;   //the inputs which will be fed to the neural network next update
+    private MLData in;            //a packed up structure to contain the neural network's input
+    private MLData out;           //a packed up structure to contain the neural network's output
+    
+    //timing information:
     private final boolean isFixedTimestep;
-    private static final double DEFAULT_UPDATE_INTERVAL = 0.5;
-    private double updateInterval = DEFAULT_UPDATE_INTERVAL;
     private final float timeStep;
     private final float accuracy;
     private float speed;
     private int tickCycle;
     private int tick = 0;
+    
+    
+    /*
+     * The UPDATE_INTERVAL is the time (in seconds) between each recalculation of
+     * muscle movements by the neural network.
+     */
+    private static final double DEFAULT_UPDATE_INTERVAL = 0.5;
+    private double updateInterval = DEFAULT_UPDATE_INTERVAL;
 
     public void setUpdateInterval(double _updateInterval) {
         this.updateInterval = _updateInterval;
@@ -117,7 +121,7 @@ public abstract class AlienBrain extends AbstractControl {
         if (nn == null) {
             System.err.println("No neural network set.");
             return;
-        };
+        }
 
         if(this.isFixedTimestep) {
             tpf = this.timeStep;

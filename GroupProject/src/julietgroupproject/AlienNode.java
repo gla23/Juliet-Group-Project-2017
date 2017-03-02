@@ -11,7 +11,6 @@ import java.util.ArrayList;
  * for convenience of interacting with the alien.
  */
 public class AlienNode extends Node {
-    public ArrayList<HingeJoint> joints = new ArrayList<HingeJoint>();
-    public ArrayList<Geometry> geometries = new ArrayList<Geometry>();
-    
+    public ArrayList<HingeJoint> joints = new ArrayList<>();
+    public ArrayList<Geometry> geometries = new ArrayList<>();   
 }

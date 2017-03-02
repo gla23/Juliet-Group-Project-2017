@@ -98,6 +98,7 @@ public class DrawingAppState extends SimulatorAppState {
     /**
      * Additionally add ambient lighting, and add textures to the floor box.
      */
+    @Override
     protected void initialiseWorld() {
 
         AmbientLight light = new AmbientLight();
