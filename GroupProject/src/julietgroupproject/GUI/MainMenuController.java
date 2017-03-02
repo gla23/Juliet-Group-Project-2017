@@ -117,20 +117,8 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             nifty.gotoScreen("start");
             if (showArrow) { app.showArrow(); } else { app.hideArrow(); }
             addValues();
-            checkPrevSim();
         } else {
             nifty.gotoScreen("begin");
-            checkPrevSim();
-        }
-    }
-
-    public void checkPrevSim() {
-        Button resume = nifty.getScreen("start").findNiftyControl("new_sim", Button.class);
-        if (app.savedAlien.pop != null) {
-
-            resume.setText("Resume Training");
-        } else {
-            resume.setText("Start Training");
         }
     }
 
@@ -138,7 +126,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         this.app.endSimulation();
         nifty.gotoScreen("start");
         addValues();
-        checkPrevSim();
     }
 
     public void addLoadValues(final String[] aliens) {
@@ -326,8 +313,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
 
     public void confirmName() {
-        app.addKeyBindings();
-
         String name = nifty.getScreen("name_dialog").findNiftyControl("nameTextField", TextField.class).getRealText();
         String sanitizedName = sanitizeAlienName(name);
         if (sanitizedName.length() > 0) {
@@ -352,7 +337,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             app.addKeyBindings();
             nifty.gotoScreen("start");
             if (showArrow) { app.showArrow(); }
-            checkPrevSim();
             firstBody = true;
             addAlienSpecificOptions();
             addValues();
