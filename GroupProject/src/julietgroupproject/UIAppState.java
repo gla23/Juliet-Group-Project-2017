@@ -453,11 +453,13 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     private void updateGhostBody() {
-        if (ghostBody != null && (this.currentAlienNode != null || !editing)) {
+        boolean actuallyEditing = nifty.getCurrentScreen().getScreenId().equals("start");
+        
+        if (ghostBody != null && (this.currentAlienNode != null || !actuallyEditing)) {
             this.physics.getPhysicsSpace().remove(this.ghostBody.getControl(GhostControl.class));
             ghostBody.removeFromParent();
             this.ghostBody = null;
-        } else if (currentAlienNode == null && editing) {
+        } else if (currentAlienNode == null && actuallyEditing) {
             int texturecode = textureNo;
                 Material m = this.materials_t[texturecode];
             float bodyWidth = getNiftyFloat("bodyWidth");
@@ -1300,6 +1302,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     @Override
     public void update(float tpf) {
+        
+        //PROSSER
+        System.out.println(nifty.getCurrentScreen().getScreenId());
 
         if (simInProgress) {
             if (this.isFixedTimeStep) {
