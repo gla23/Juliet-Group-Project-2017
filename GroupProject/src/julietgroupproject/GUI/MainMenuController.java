@@ -6,7 +6,7 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.NiftyEventSubscriber;
-import de.lessvoid.nifty.controls.Button;
+import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.controls.CheckBoxStateChangedEvent;
 import de.lessvoid.nifty.controls.DropDown;
 import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
@@ -115,7 +115,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         if (alienNamed) {
             app.addKeyBindings();
             nifty.gotoScreen("start");
-            if (showArrow) { app.showArrow(); } else { app.hideArrow(); }
             addValues();
         } else {
             nifty.gotoScreen("begin");
@@ -341,7 +340,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
             firstBody = true;
             addAlienSpecificOptions();
             addValues();
-            //showArrow = app.showArrow();
+            showArrow = app.showArrow();
         } else {
             nifty.gotoScreen("load_fail");
         }
@@ -379,7 +378,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         String sanitizedName = sanitizeAlienName(name);
         if (sanitizedName.length() > 0 && app.saveAlien(sanitizedName)) {
             alienNamed = true;
-            ArrayList<String> aliensTemp = new ArrayList<String>(Arrays.asList(aliens));
+            ArrayList<String> aliensTemp = new ArrayList<>(Arrays.asList(aliens));
             aliensTemp.add(name);
 
             aliensTemp.toArray(aliens);
@@ -394,7 +393,7 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
         nifty.gotoScreen("editor_options");
         //Window window = nifty.getCurrentScreen().findNiftyControl("editor_options_window", Window.class);
         addOptionsValues();
-        //nifty.getScreen("editor_options").findNiftyControl("directionArrowCheckBox", CheckBox.class).setChecked(showArrow);
+        nifty.getScreen("editor_options").findNiftyControl("directionArrowCheckBox", CheckBox.class).setChecked(showArrow);
     }
 
     public void attachLimb() {
@@ -529,7 +528,6 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
 
     @NiftyEventSubscriber(id = "directionArrowCheckBox")
     public void onDirectionArrowChange(final String id, final CheckBoxStateChangedEvent event) {
-        
         showArrow = event.getCheckBox().isChecked();
         if (showArrow) {
             showArrow = app.showArrow();

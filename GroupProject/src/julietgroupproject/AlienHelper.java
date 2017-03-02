@@ -145,6 +145,7 @@ public class AlienHelper {
                 break;
         }
         HingeJoint joint = new HingeJoint(rigidBodyControlA, rigidBodyControlB, pivotA, pivotB, axisA, axisB);
+        // TODO: make joint limit an argument and store it in block
         joint.setLimit(-FastMath.HALF_PI, FastMath.HALF_PI);
         return joint;
     }

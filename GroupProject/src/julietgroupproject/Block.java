@@ -9,6 +9,8 @@ import java.util.LinkedList;
 
 public class Block implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+    
     private static final float DEFAULT_FRICTION = 5f;
     
     private Vector3f pos; // Position of limb relative to parent Block

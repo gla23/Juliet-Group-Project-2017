@@ -945,7 +945,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (alien == null || alien.rootBlock.getConnectedLimbs().size() == 0) {
             return false;
         }
-        
         nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class).clear();
 
         bestSoFar = Float.NEGATIVE_INFINITY;
@@ -960,9 +959,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         this.savedAlien.inputCount = currentAlienNode.joints.size() + 1;
         this.savedAlien.outputCount = currentAlienNode.joints.size();
-
-        this.trainer = new AlienTrainer(savedAlien, simulationQueue);
-
+        
         while (this.slaves.size() < SIM_COUNT) {
             Alien alienToTrain = (Alien) ObjectCloner.deepCopy(alien);
             SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(alienToTrain, this.simulationQueue, 1.0f, this.accuracy, 1f / 60f));
@@ -981,17 +978,17 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             toAdd.setSettings(sett);
             toAdd.start();
         }
-
+        
+        this.trainer = new AlienTrainer(savedAlien, simulationQueue, slaves);
         this.trainer.start();
 
         editing = false;
         //setAlienMessage("Starting training...");
-
         return true;
     }
 
     public void endTraining() {
-        this.trainer.terminateTraining(slaves);
+        this.trainer.terminateTraining();
     }
 
     public void endSimulation() {
@@ -1318,7 +1315,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     @Override
     public void cleanup() {
         if (this.trainer != null) {
-            this.trainer.terminateTraining(slaves);
+            this.trainer.terminateTraining();
         }
         super.cleanup();
     }

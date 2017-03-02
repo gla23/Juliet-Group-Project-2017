@@ -7,24 +7,28 @@ package julietgroupproject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import org.encog.neural.neat.NEATPopulation;
+import org.encog.ml.ea.train.EvolutionaryAlgorithm;
 
 /**
  *
  * @author Peter
  */
+
 public class SavedAlien implements Serializable{
+    
+    private static final long serialVersionUID = 1L;
+    
     public Alien body;
     public int inputCount;
     public int outputCount;
-    public NEATPopulation pop;
+    public EvolutionaryAlgorithm train;
     private List<GenerationResult> generations = new ArrayList<>();
     private transient boolean hasBeenReset = false;
     private String name;
     
     public synchronized void alienChanged()
     {
-        pop = null;
+        train = null;
         generations = new ArrayList<>();
         hasBeenReset = true;
     }

@@ -1,5 +1,6 @@
 package julietgroupproject;
 
+import java.io.Serializable;
 import java.util.Queue;
 import org.encog.ml.CalculateScore;
 import org.encog.ml.MLMethod;
@@ -10,11 +11,12 @@ import org.encog.ml.MLRegression;
  *
  * @author Peter
  */
-public class AlienEvaluator implements CalculateScore {
+public class AlienEvaluator implements CalculateScore, Serializable {
 
     private Queue<SimulationData> simTasks;    //queue shared with simulators to make requests for neural networks to be evaluated.
     public final static double simTime = 20.0; //time for which all simulations are to be run, in in-engine seconds.
 
+    private static final long serialVersionUID = 1L;
     /**
      * Check whether only one score request can be made at a time.
      *
@@ -63,6 +65,10 @@ public class AlienEvaluator implements CalculateScore {
      * requests
      */
     public AlienEvaluator(Queue<SimulationData> _simTasks) {
+        simTasks = _simTasks;
+    }
+    
+    public void setQueue(Queue<SimulationData> _simTasks) {
         simTasks = _simTasks;
     }
 }
