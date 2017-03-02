@@ -303,6 +303,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void removeAlien(AlienNode alienNode) {
         if (alienNode != null) {
             this.physics.getPhysicsSpace().removeAll(alienNode);
+            alienNode.removeFromParent();
         }
     }
 
