@@ -122,7 +122,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private boolean runningSingle = false;
     private volatile boolean forceReset = false;
     private float bestSoFar = Float.NEGATIVE_INFINITY;
-    private volatile int textureNo = 0;
+    private volatile int textureNo = 1;
     // nifty fields:
     private Map<String, String> niftyStringFields = new HashMap<>();
     private Map<String, Float> niftyFloatFields = new HashMap<>();
