@@ -316,7 +316,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public Geometry makeGhostLimb(Block block) {
-
+      
         Block copy = new Block(block);
 
         copy.width += 0.02;
@@ -324,7 +324,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         copy.height += 0.02;
 
         copy.setPosition(copy.getPosition().add(new Vector3f(-0.01f, -0.01f, -0.01f)));
-
         Geometry gl = AlienHelper.assembleBlock(copy, block.getGeometry().getWorldTranslation());
         ghostRoot.attachChild(gl);
         return gl;

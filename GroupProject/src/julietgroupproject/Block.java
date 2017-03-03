@@ -75,6 +75,7 @@ public class Block implements Serializable {
         this.mass = copy.mass;
         this.normal = copy.normal;
         this.rotation = copy.rotation;
+        this.rotationForYPR = copy.rotationForYPR;
     }
     
     public void applyProperties(Geometry g){
