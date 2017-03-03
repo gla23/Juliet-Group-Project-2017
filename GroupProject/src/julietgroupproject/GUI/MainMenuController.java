@@ -13,6 +13,7 @@ import de.lessvoid.nifty.controls.DropDownSelectionChangedEvent;
 import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.controls.ListBoxSelectionChangedEvent;
 import de.lessvoid.nifty.controls.RadioButtonGroupStateChangedEvent;
+import de.lessvoid.nifty.controls.Slider;
 import de.lessvoid.nifty.controls.SliderChangedEvent;
 import de.lessvoid.nifty.controls.Tab;
 import de.lessvoid.nifty.controls.TabGroup;
@@ -691,6 +692,28 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
                 selected = "A";
         }
         this.setFieldSafe("currentHingeAxis", selected);
+    }
+    
+    @NiftyEventSubscriber(id = "jointRestrictionCheckBox")
+    public void onJointRestrictionCheckBoxChanged(final String id, final CheckBoxStateChangedEvent event) {
+        this.setFieldSafe("jointRestrictionCheckBox", event.isChecked());
+        if (event.isChecked()) {
+            nifty.getScreen("start").findNiftyControl("minHingeSlider", Slider.class).enable();
+            nifty.getScreen("start").findNiftyControl("maxHingeSlider", Slider.class).enable();
+        } else {
+            nifty.getScreen("start").findNiftyControl("minHingeSlider", Slider.class).disable();
+            nifty.getScreen("start").findNiftyControl("maxHingeSlider", Slider.class).disable();
+        }
+    }
+        
+    @NiftyEventSubscriber(id = "minHingeSlider")
+    public void onLimbMaxHingeSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("minHingeJoint", event.getValue());
+    }
+    
+    @NiftyEventSubscriber(id = "maxHingeSlider")
+    public void onLimbMinHingeSliderChanged(final String id, final SliderChangedEvent event) {
+        this.setFieldSafe("maxHingeJoint", event.getValue());
     }
     
     @NiftyEventSubscriber(id = "yawSlider")

@@ -24,6 +24,9 @@ public class Block implements Serializable {
     public Matrix3f rotationForYPR = Matrix3f.IDENTITY;
     public String collisionShapeType;
     public String hingeType;
+    public boolean restrictHinges = false;
+    public float hingeMax;
+    public float hingeMin;
     public boolean createdBySymetric = false;
     private LinkedList<Block> connectedLimbs = new LinkedList<Block>(); // List of Blocks that this is the parent of
     private transient Geometry geo;
@@ -40,6 +43,22 @@ public class Block implements Serializable {
         this.collisionShapeType = collisionShapeType;
         this.hingeType = hingeType;
         this.mass = mass;
+        
+        this.friction = DEFAULT_FRICTION;
+    }
+    
+    public Block(Vector3f pos, Vector3f hingePos, float width, float height, float length, String collisionShapeType, String hingeType,float mass, float hingeMax, float hingeMin) {
+        this.pos = pos;
+        this.hingePos = hingePos;
+        this.width = width;
+        this.height = height;
+        this.length = length;
+        this.collisionShapeType = collisionShapeType;
+        this.hingeType = hingeType;
+        this.mass = mass;
+        this.hingeMax = hingeMax;
+        this.hingeMin = hingeMin;
+        this.restrictHinges = true;
         
         this.friction = DEFAULT_FRICTION;
     }

@@ -35,7 +35,7 @@ import java.util.logging.Logger;
 /**
  * Helper class for Alien functionality, such as building a physically
  * instantiated AlienNode from an abstract Alien.
- * 
+ *
  * Also contains functions for saving and loading of aliens.
  *
  * @author George Andersen
@@ -45,7 +45,7 @@ public class AlienHelper {
     //Date related objects for timestamping files
     private static DateFormat dateFormatter = new SimpleDateFormat("yyMMddHHmmss");
     private static Date dateObject = new Date();
-    
+
     /**
      * Assemble a limb geometry from definition in a Block. This is a wrapper
      * function of createLimb.
@@ -79,8 +79,9 @@ public class AlienHelper {
             b.applyProperties(g);
 
             //printVector3f(b.getHingePosition());
-
-            HingeJoint joint = joinHingeJoint(parentGeometry, g, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getHingePosition()), b.hingeType);
+            float hingeMin = b.restrictHinges ? b.hingeMin : 0;
+            float hingeMax = b.restrictHinges ? b.hingeMax : 0;
+            HingeJoint joint = joinHingeJoint(parentGeometry, g, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getHingePosition()), b.hingeType, b.restrictHinges, hingeMin, hingeMax);
             alienNode.attachChild(g);
             alienNode.joints.add(joint);
             alienNode.geometries.add(g);
@@ -119,7 +120,7 @@ public class AlienHelper {
         return limb;
     }
 
-    public static HingeJoint joinHingeJoint(Geometry A, Geometry B, Vector3f connectionPoint, String hingeType) {
+    public static HingeJoint joinHingeJoint(Geometry A, Geometry B, Vector3f connectionPoint, String hingeType, boolean restrictJoint, float hingeMin, float hingeMax) {
         RigidBodyControl rigidBodyControlA = A.getControl(RigidBodyControl.class);
         RigidBodyControl rigidBodyControlB = B.getControl(RigidBodyControl.class);
         Vector3f pivotA = connectionPoint.add(rigidBodyControlA.getPhysicsLocation().mult(-1f));
@@ -145,8 +146,12 @@ public class AlienHelper {
                 break;
         }
         HingeJoint joint = new HingeJoint(rigidBodyControlA, rigidBodyControlB, pivotA, pivotB, axisA, axisB);
-        // TODO: make joint limit an argument and store it in block
-        joint.setLimit(-FastMath.HALF_PI, FastMath.HALF_PI);
+        if (restrictJoint) {
+            System.out.println(restrictJoint);
+            joint.setLimit(hingeMin, hingeMax);
+        }
+        System.out.println(hingeMax);
+        System.out.println(hingeMin);
         return joint;
     }
 
@@ -194,18 +199,17 @@ public class AlienHelper {
         return mesh;
     }
 
-    
     /**
      * Load an alien from disk
-     * 
+     *
      * @param name the name of the alien to be loaded
-     * 
+     *
      * @return the alien with name name, if it exists. Otherwise null
      */
     public static SavedAlien readAlien(String name) {
         //determine filename based on alien name
         File f = new File("aliens/" + name + "/" + name + "_current.sav");
-        
+
         //open the stream to read the alien
         try (ObjectInputStream o = new ObjectInputStream(new FileInputStream(f))) {
             //return the read alien
@@ -219,36 +223,36 @@ public class AlienHelper {
 
     /**
      * Save an alien to disk
-     * 
+     *
      * @param alien the SavedAlien to be saved
-     * 
+     *
      * @return true iff the save was sucessful
      */
     public static boolean writeAlien(SavedAlien alien) {
         if (alien == null) {
             return false;
         }
-        
+
         //determine filename based on alien name
         File f = new File("aliens/" + alien.getName() + "/" + alien.getName() + "_current.sav");
-        
+
         //make the required directory structure
         f.getParentFile().mkdirs();
 
         //backup the existing file if the population was reset.
         if (alien.getHasBeenReset()) {
-            
+
             //loop through all files in this alien's directory
             for (File toRename : f.getParentFile().listFiles()) {
-                
+
                 //check if the file is marked as current
                 if (toRename.getPath().contains(alien.getName() + "_current.sav")) {
-                    
+
                     //create with date in filename to indicate outdated file
                     File target = new File(toRename.getPath()
                             .substring(0, toRename.getPath().length() - 4)
                             + dateFormatter.format(dateObject) + ".sav");
-                    
+
                     //perform the rename operatio
                     toRename.renameTo(target);
                 }

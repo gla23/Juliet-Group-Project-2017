@@ -704,6 +704,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         float yaw = getNiftyFloat("limbYaw");
         float pitch = getNiftyFloat("limbPitch");
         float roll = getNiftyFloat("limbRoll");
+        boolean restrictJoint = getNiftyBoolean("jointRestrictionCheckBox");
         float jointPositionFraction = getNiftyFloat("jointPositionFraction");
         float jointStartRotation = getNiftyFloat("jointStartRotation");
         // currentHingeAxis Will be either "X", "Y", "Z" or "A" for auto
@@ -732,7 +733,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
 
         //Build the new limb
-        Block limb = new Block(newPos, newHingePos, limbWidth, limbHeight, limbLength, currentShape, axisToUse, weight);
+        Block limb;
+        if (restrictJoint) {
+            float minHinge = getNiftyFloat("minHingeJoint");
+            float maxHinge = getNiftyFloat("maxHingeJoint");
+            limb = new Block(newPos, newHingePos, limbWidth, limbHeight, limbLength, currentShape, axisToUse, weight, -minHinge, maxHinge);
+        } else {
+            limb = new Block(newPos, newHingePos, limbWidth, limbHeight, limbLength, currentShape, axisToUse, weight);
+        }
         Matrix3f rotationForNormal = new Matrix3f();
 
 
@@ -1221,6 +1229,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         setNiftyField("limbStrength", 1.0f);
         setNiftyField("limbSeparation", 0.5f);
         setNiftyField("symmetric", false);
+        setNiftyField("jointRestrictionCheckBox", false);
+        setNiftyField("minHingeJoint", 0.785398f);
+        setNiftyField("maxHingeJoint", 0.785398f);
         setNiftyField("limbYaw", 0.0f);
         setNiftyField("limbPitch", 0.0f);
         setNiftyField("limbRoll", 0.0f);
