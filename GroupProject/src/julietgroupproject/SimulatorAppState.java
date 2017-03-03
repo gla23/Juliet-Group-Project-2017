@@ -24,7 +24,7 @@ import com.jme3.scene.shape.Box;
  *
  * @author Sunny
  */
-public class SimulatorAppState extends AbstractAppState {
+public abstract class SimulatorAppState extends AbstractAppState {
 
     // Resources from app
     protected SimpleApplication app;
@@ -176,8 +176,7 @@ public class SimulatorAppState extends AbstractAppState {
         this.rootNode.attachChild(simRoot);
     }
 
-    protected void setupTextures() {
-    }
+    protected abstract void setupTextures();
     
     public SimpleApplication getApp() {
         return this.app;

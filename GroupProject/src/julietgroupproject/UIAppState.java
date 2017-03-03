@@ -511,7 +511,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         if (alien != null && alien.rootBlock != null) {
             // only check collsion with solid objects
-            CollisionResult collision = getCursorRaycastCollision(this.simRoot);
+            CollisionResult collision = getCursorRaycastCollision(this.currentAlienNode);
 
             //If collided then generate new limb at collision point
             if (collision != null) {
@@ -1065,7 +1065,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if ("AddLimb".equals(string) && !bln && !checkRootNull()) {
 
 
-            CollisionResult collision = getCursorRaycastCollision(this.simRoot);
+            CollisionResult collision = getCursorRaycastCollision(this.currentAlienNode);
 
 
             //If collided then generate new limb at collision point

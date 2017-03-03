@@ -192,7 +192,8 @@ public class AlienHelper {
         }
 
         //Update it:
-        vb.setUpdateNeeded();
+        //vb.setUpdateNeeded(); 
+        mesh.updateBound();
         return mesh;
     }
 

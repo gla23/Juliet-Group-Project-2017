@@ -153,4 +153,9 @@ public class TrainingAppState extends SimulatorAppState {
             }
         }
     }
+
+    @Override
+    protected void setupTextures() {
+        // we don't need textures since we are running in background.
+    }
 }
