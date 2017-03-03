@@ -81,7 +81,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private SimulationData currentSim;
     private float simTimeLimit;
     private Geometry ghostLimb;
-    private Geometry ghostLimb2;
+    private Geometry ghostLimbSymmetric;
     private Geometry ghostBody;
     private float prevBodyWidth = 0.0f;
     private float prevBodyHeight = 0.0f;
@@ -148,8 +148,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 niftyLog.selectItemByIndex(niftyLog.itemCount() - 1);
                 showOffRequest = savedAlien.savedEntryCount() - 1;
             }
-            
-            if (savedAlien.savedEntryCount() !=  numLogEntries) {
+
+            if (savedAlien.savedEntryCount() != numLogEntries) {
                 nifty.getScreen("simulation").findNiftyControl("current_gen_message", Label.class).setText("Current generation: " + savedAlien.savedEntryCount());
                 // buildGraph(saveAlien.getLastEntries(50));
                 buildGraph(logEntries);
@@ -158,15 +158,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public synchronized void showOffGeneration(int genNumber) {
-        if (savedAlien.savedEntryCount() > genNumber && genNumber > 0)
-        {
+        if (savedAlien.savedEntryCount() > genNumber && genNumber > 0) {
             showOffRequest = genNumber;
         }
     }
 
     public synchronized void showBest() {
         bestSoFar = Float.NEGATIVE_INFINITY;
-        
+
         nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class).clear();
 
         runningSingle = true;
@@ -316,7 +315,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public Geometry makeGhostLimb(Block block) {
-      
+
         Block copy = new Block(block);
 
         copy.width += 0.02;
@@ -330,26 +329,35 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     }
 
-    public void relocateGhostLimb(Geometry gl, Block block, Vector3f contactPt, Vector3f normal) {
+    public Geometry placeGhostLimb(Geometry gl, Block block, Vector3f contactPt, Vector3f normal) {
 
-        float limbWidth = getNiftyFloat("limbWidth");
-        float limbHeight = getNiftyFloat("limbHeight");
-        float limbLength = getNiftyFloat("limbLength");
-        float limbSeparation = getNiftyFloat("limbSeparation");
-        // currentHingeAxis Will be either "X", "Y", "Z" or "A" for auto
+        if (gl == null)
+        {
+            return addGhostLimb(block, contactPt, normal);
+        }
+        else
+        {
+            float limbWidth = getNiftyFloat("limbWidth");
+            float limbHeight = getNiftyFloat("limbHeight");
+            float limbLength = getNiftyFloat("limbLength");
+            float limbSeparation = getNiftyFloat("limbSeparation");
+            // currentHingeAxis Will be either "X", "Y", "Z" or "A" for auto
 
 
-        Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeparation));
+            Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeparation));
 
-        //Build the new limb
-        Matrix3f rotation = new Matrix3f();
-        rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
+            //Build the new limb
+            Matrix3f rotation = new Matrix3f();
+            rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
 
 
-        //Mesh m = gl.getMesh();
-        //AlienHelper.rotateMesh(rotationForNormal, m);
-        gl.setLocalRotation(rotation);
-        gl.setLocalTranslation(newPos.add(AlienHelper.getGeometryLocation(block.getGeometry())));
+            //Mesh m = gl.getMesh();
+            //AlienHelper.rotateMesh(rotationForNormal, m);
+            gl.setLocalRotation(rotation);
+            gl.setLocalTranslation(newPos.add(AlienHelper.getGeometryLocation(block.getGeometry())));
+            
+            return gl;
+        }
     }
 
     public Geometry addGhostLimb(Block block, Vector3f contactPt, Vector3f normal) {
@@ -405,7 +413,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     private void updateGhostBody() {
         boolean actuallyEditing = nifty.getCurrentScreen().getScreenId().equals("start");
-        
+
         if (ghostBody != null && (this.currentAlienNode != null || !actuallyEditing)) {
             this.physics.getPhysicsSpace().remove(this.ghostBody.getControl(GhostControl.class));
             ghostBody.removeFromParent();
@@ -421,7 +429,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             if (this.ghostBody == null || bodyWidth != prevBodyWidth || bodyHeight != prevBodyHeight || bodyLength != prevBodyLength
                     || !currentShape.equals(prevBodyShape) || pos != prevBodyLocation) {
 
-                if (this.ghostBody != null)  {
+                if (this.ghostBody != null) {
                     this.physics.getPhysicsSpace().remove(this.ghostBody.getControl(GhostControl.class));
                     ghostBody.removeFromParent();
                     this.ghostBody = null;
@@ -449,14 +457,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             }
         }
     }
-    
+
     public void updatePrevBodyValues() {
         float bodyWidth = getNiftyFloat("bodyWidth");
         float bodyHeight = getNiftyFloat("bodyHeight");
         float bodyLength = getNiftyFloat("bodyLength");
         String currentShape = getNiftyString("currentBodyShape");
         Vector3f pos = this.startLocation;
-        
+
         prevBodyWidth = bodyWidth;
         prevBodyHeight = bodyHeight;
         prevBodyLength = bodyLength;
@@ -464,115 +472,89 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         prevBodyLocation = pos;
     }
 
+    private Block findBlockFromCollision(CollisionResult collision) {
+        Geometry geo = collision.getGeometry();
+
+        //Find block assoicated with collision geometry
+        Block block = null;
+
+        LinkedList<Block> q = new LinkedList<>();
+        q.push(alien.rootBlock);
+
+        while (!q.isEmpty()) {
+            Block head = q.pop();
+            if (geo == head.getGeometry()) {
+                block = head;
+                break;
+            } else {
+                for (Block child : head.getConnectedLimbs()) {
+                    q.push(child);
+                }
+            }
+        }
+
+        return block;
+    }
+
     public void updateGhostLimb() {
-        //removeGhostLimb(ghostLimb);
-        //removeGhostLimb(ghostLimb2);
+
+        // remove deletion ghost
+        if (delghost != null) {
+            removeGhostLimb(delghost);
+            delghost = null;
+        }
+        
+        boolean toRemoveGhosts = true;
 
         if (alien != null && alien.rootBlock != null) {
-
             // only check collsion with solid objects
             CollisionResult collision = getCursorRaycastCollision(this.simRoot);
 
             //If collided then generate new limb at collision point
             if (collision != null) {
 
-                Geometry geo = collision.getGeometry();
-                Vector3f colpt = collision.getContactPoint();
-                Vector3f pt = colpt.add(geo.getControl(RigidBodyControl.class).getPhysicsLocation().negate());
-                Vector3f norm = collision.getContactNormal();
+                Block block = findBlockFromCollision(collision);
 
-                //Find block assoicated with collision geometry
-                Block block = null;
-
-                LinkedList<Block> q = new LinkedList<>();
-                q.push(alien.rootBlock);
-
-                while (!q.isEmpty()) {
-                    Block head = q.pop();
-                    if (geo == head.getGeometry()) {
-                        block = head;
-                        break;
-                    } else {
-                        for (Block child : head.getConnectedLimbs()) {
-                            q.push(child);
-                        }
-                    }
-                }
-                
                 if (block != null) {
-
-                    if (!shiftDown) {
-                        // remove deletion ghost
-                        if (delghost != null) {
-                            removeGhostLimb(delghost);
-                            delghost = null;
-                        }
-                        if (ghostLimb == null) {
-                            ghostLimb = addGhostLimb(block, pt, norm);
-                        } else {
-                            relocateGhostLimb(ghostLimb, block, pt, norm);
-                        }
-                        CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
-                        boolean symmetric = symmetricBox.isChecked();
-
-                        if (symmetric) {
-                            switch (block.collisionShapeType) {
-                                case "Box":
-                                    if (ghostLimb2 == null) {
-                                        ghostLimb2 = addGhostLimb(block, pt.subtract(pt.project(collision.getContactNormal()).mult(2.0f)), norm.negate());
-                                    } else {
-                                        relocateGhostLimb(ghostLimb2, block, pt.subtract(pt.project(collision.getContactNormal()).mult(2.0f)), norm.negate());
-                                    }
-                                    break;
-                                default:
-                                    if (ghostLimb2 == null) {
-                                        ghostLimb2 = addGhostLimb(block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)), norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)));
-                                    } else {
-                                        relocateGhostLimb(ghostLimb2, block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)), norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)));
-                                    }
-                                    break;
-
-                            }
-                        }
-                    } else {
-                        // remove adding limb ghosts
-                        removeGhostLimb(ghostLimb);
-                        removeGhostLimb(ghostLimb2);
-                        ghostLimb = null;
-                        ghostLimb2 = null;
-
-                        removeGhostLimb(delghost);
-                        delghost = null;
+                    
+                    if (shiftDown) {
+                        //make new deletion ghost
                         delghost = makeGhostLimb(block);
                         delghost.setMaterial(ghostMaterial2);
+                    } else {
+                        toRemoveGhosts = false;
 
+                        Geometry geo = collision.getGeometry();
+                        Vector3f colpt = collision.getContactPoint();
+                        Vector3f pt = colpt.add(geo.getWorldTranslation().negate());
+                        Vector3f norm = collision.getContactNormal();
+
+                        ghostLimb = placeGhostLimb(ghostLimb, block, pt, norm);
+
+                        if (getNiftyBoolean("symmetric")) {
+                            switch (block.collisionShapeType) {
+                                case "Box":
+                                    ghostLimbSymmetric = placeGhostLimb(ghostLimbSymmetric, block, pt.subtract(pt.project(collision.getContactNormal()).mult(2.0f)), norm.negate());
+                                    break;
+                                default:
+                                    ghostLimbSymmetric = placeGhostLimb(ghostLimbSymmetric, block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)), norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)));
+                                    break;
+                            }
+                        }
                     }
-                } else {
-                    removeGhostLimb(ghostLimb);
-                    removeGhostLimb(ghostLimb2);
-                    ghostLimb = null;
-                    ghostLimb2 = null;
-                    removeGhostLimb(delghost);
-                    delghost = null;
                 }
-            } else {
-                removeGhostLimb(ghostLimb);
-                removeGhostLimb(ghostLimb2);
-                ghostLimb = null;
-                ghostLimb2 = null;
-                removeGhostLimb(delghost);
-                delghost = null;
             }
-        } else {
-            removeGhostLimb(ghostLimb);
-            removeGhostLimb(ghostLimb2);
-            ghostLimb = null;
-            ghostLimb2 = null;
-            removeGhostLimb(delghost);
-            delghost = null;
         }
+
+        if (toRemoveGhosts) {
+            removeGhostLimb(ghostLimb);
+            removeGhostLimb(ghostLimbSymmetric);
+            ghostLimb = null;
+            ghostLimbSymmetric = null;
+        }
+        
         this.isCollisionOccuring = ghostCollisionCheck(ghostLimb);
-        this.isCollisionOccuring |= ghostCollisionCheck(ghostLimb2);
+        this.isCollisionOccuring |= ghostCollisionCheck(ghostLimbSymmetric);
 
     }
 
@@ -792,9 +774,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         // get rid of ghost limbs
         removeGhostLimb(ghostLimb);
-        removeGhostLimb(ghostLimb2);
+        removeGhostLimb(ghostLimbSymmetric);
         ghostLimb = null;
-        ghostLimb2 = null;
+        ghostLimbSymmetric = null;
     }
 
     public boolean resetTraining() {
@@ -966,7 +948,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         this.savedAlien.inputCount = currentAlienNode.joints.size() + 1;
         this.savedAlien.outputCount = currentAlienNode.joints.size();
-        
+
         while (this.slaves.size() < SIM_COUNT) {
             Alien alienToTrain = (Alien) ObjectCloner.deepCopy(alien);
             SlaveSimulator toAdd = new SlaveSimulator(new TrainingAppState(alienToTrain, this.simulationQueue, 1.0f, this.accuracy, 1f / 60f));
@@ -985,7 +967,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             toAdd.setSettings(sett);
             toAdd.start();
         }
-        
+
         this.trainer = new AlienTrainer(savedAlien, simulationQueue, slaves);
         this.trainer.start();
 
@@ -1096,40 +1078,21 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
             //If collided then generate new limb at collision point
             if (collision != null) {
-                Geometry geo = collision.getGeometry();
-                Vector3f colpt = collision.getContactPoint();
-                Vector3f pt = colpt.add(geo.getWorldTranslation().negate());
-                Vector3f norm = collision.getContactNormal();
 
-                //Find block assoicated with collision geometry
-                Block block = null;
-
-                LinkedList<Block> q = new LinkedList<>();
-                q.push(alien.rootBlock);
-
-                while (!q.isEmpty()) {
-                    Block head = q.pop();
-                    if (geo == head.getGeometry()) {
-                        block = head;
-                        break;
-                    } else {
-                        for (Block child : head.getConnectedLimbs()) {
-                            q.push(child);
-                        }
-                    }
-                }
+                Block block = findBlockFromCollision(collision);
 
                 if (block != null) {
 
-                    if (!shiftDown) { // add limb
+
+                    if (!shiftDown) {
+                        Geometry geo = collision.getGeometry();
+                        Vector3f colpt = collision.getContactPoint();
+                        Vector3f pt = colpt.add(geo.getWorldTranslation().negate());
+                        Vector3f norm = collision.getContactNormal();
 
                         addLimb(block, pt, norm);
 
-                        CheckBox symmetricBox = nifty.getCurrentScreen().findNiftyControl("symmetricCheckBox", CheckBox.class);
-                        boolean symmetric = symmetricBox.isChecked();
-
-
-                        if (symmetric) {
+                        if (getNiftyBoolean("symmetric")) {
                             block.createdBySymetric = true;
                             switch (block.collisionShapeType) {
                                 case "Box":
@@ -1238,7 +1201,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         setNiftyField("jointStartRotation", 0.0f);
 
         setNiftyField("currentHingeAxis", "A");
-        
+
         setNiftyField("directionArrowCheckBox", true);
     }
 
@@ -1283,26 +1246,18 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 updateGhostLimb();
             } else {
                 SimulationData s = null;
-                if (showOffRequest == -1)
-                {
-                    if (savedAlien.savedEntryCount() > 0)
-                    {
+                if (showOffRequest == -1) {
+                    if (savedAlien.savedEntryCount() > 0) {
                         s = new SimulationData(savedAlien.getMostRecent().bestGenome, AlienEvaluator.simTime);
                         setAlienMessage("Running best generation so far"); //shouldn't be run
-                    }
-                    else
-                    {
-                        if (trainer != null)
-                        {
+                    } else {
+                        if (trainer != null) {
                             s = new SimulationData(trainer.getBestSoFar(), AlienEvaluator.simTime);
                             setAlienMessage("Running initial generation");
                         }
                     }
-                }
-                else
-                {
-                    if (showOffRequest >= 0 && showOffRequest < savedAlien.savedEntryCount())
-                    {
+                } else {
+                    if (showOffRequest >= 0 && showOffRequest < savedAlien.savedEntryCount()) {
                         setAlienMessage("Running generation " + savedAlien.getEntries().get(showOffRequest).generation + " with fitness of " + df.format(savedAlien.getEntries().get(showOffRequest).fitness));
                         s = new SimulationData(savedAlien.getEntries().get(showOffRequest).bestGenome, AlienEvaluator.simTime);
                     }
