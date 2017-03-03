@@ -4,7 +4,10 @@ import com.jme3.app.Application;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.DesktopAssetManager;
 import com.jme3.asset.TextureKey;
+import com.jme3.bounding.BoundingBox;
+import com.jme3.bounding.BoundingVolume;
 import com.jme3.bullet.control.GhostControl;
+import com.jme3.bullet.control.PhysicsControl;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.collision.CollisionResult;
@@ -28,6 +31,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.VertexBuffer;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
@@ -78,6 +82,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private Queue<SimulationData> simulationQueue = new ConcurrentLinkedQueue<>();
     private AlienTrainer trainer;
     private boolean editing = true;
+    private boolean isCollisionOccuring = false;
     private SimulationData currentSim;
     private float simTimeLimit;
     private Geometry ghostLimb;
@@ -93,7 +98,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private Node additionGhostRoot;
     private Node removalGhostRoot;
     private int numLogEntries = 0;
-    private boolean isCollisionOccuring = false;
     private int showOffRequest = -1;
     private boolean runningSingle = false;
     private volatile boolean forceReset = false;
@@ -449,7 +453,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", 1.0f);
                 // TODO: and this line as well!
                 bodyBlock.setRotation(rotationForNormal);
-                
+
                 Geometry gb = AlienHelper.assembleBlock(bodyBlock, startLocation);
                 gb.setLocalTranslation(startLocation);
                 gb.removeControl(RigidBodyControl.class);
@@ -463,10 +467,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             }
             if (ghostBody.getControl(GhostControl.class).getOverlappingCount() < 1) {
                 ghostBody.setMaterial(m);
-                this.isCollisionOccuring = false;
             } else {
                 ghostBody.setMaterial(redGhostMaterial);
-                this.isCollisionOccuring = true;
             }
         }
     }
@@ -510,60 +512,65 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public void updateGhostLimb() {
-
-        // remove deletion ghost, if exists
+        
         removeRemovalGhostLimbs(removalGhostRoot);
+        if (editing) {
+            // remove deletion ghost, if exists
+            boolean toRemoveGhosts = true;
 
-        boolean toRemoveGhosts = true;
+            if (alien != null && alien.rootBlock != null && !checkRootNull()) {
+                // only check collsion with solid objects
+                CollisionResult collision = getCursorRaycastCollision(this.currentAlienNode);
 
-        if (alien != null && alien.rootBlock != null && !checkRootNull()) {
-            // only check collsion with solid objects
-            CollisionResult collision = getCursorRaycastCollision(this.currentAlienNode);
+                //If collided then generate new limb at collision point
+                if (collision != null) {
 
-            //If collided then generate new limb at collision point
-            if (collision != null) {
+                    Block block = findBlockFromCollision(collision);
 
-                Block block = findBlockFromCollision(collision);
+                    if (block != null) {
 
-                if (block != null) {
+                        if (shiftDown) {
+                            //make new deletion ghost
+                            addRemovalGhostLimb(block);
+                        } else {
+                            toRemoveGhosts = false;
 
-                    if (shiftDown) {
-                        //make new deletion ghost
-                        addRemovalGhostLimb(block);
-                    } else {
-                        toRemoveGhosts = false;
+                            Geometry geo = collision.getGeometry();
+                            Vector3f colpt = collision.getContactPoint();
+                            Vector3f pt = colpt.add(geo.getWorldTranslation().negate());
+                            Vector3f norm = collision.getContactNormal();
 
-                        Geometry geo = collision.getGeometry();
-                        Vector3f colpt = collision.getContactPoint();
-                        Vector3f pt = colpt.add(geo.getWorldTranslation().negate());
-                        Vector3f norm = collision.getContactNormal();
+                            ghostLimb = placeGhostLimb(ghostLimb, block, pt, norm);
 
-                        ghostLimb = placeGhostLimb(ghostLimb, block, pt, norm);
-
-                        if (getNiftyBoolean("symmetric")) {
-                            switch (block.collisionShapeType) {
-                                case "Box":
-                                    ghostLimbSymmetric = placeGhostLimb(ghostLimbSymmetric, block, pt.subtract(pt.project(collision.getContactNormal()).mult(2.0f)), norm.negate());
-                                    break;
-                                default:
-                                    ghostLimbSymmetric = placeGhostLimb(ghostLimbSymmetric, block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)), norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)));
-                                    break;
+                            if (getNiftyBoolean("symmetric")) {
+                                switch (block.collisionShapeType) {
+                                    case "Box":
+                                        ghostLimbSymmetric = placeGhostLimb(ghostLimbSymmetric, block, pt.subtract(pt.project(collision.getContactNormal()).mult(2.0f)), norm.negate());
+                                        break;
+                                    default:
+                                        ghostLimbSymmetric = placeGhostLimb(ghostLimbSymmetric, block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)), norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)));
+                                        break;
+                                }
                             }
                         }
                     }
                 }
             }
-        }
 
-        if (toRemoveGhosts) {
+            if (toRemoveGhosts) {
+                removeAdditionGhostLimbs(additionGhostRoot);
+                ghostLimb = null;
+                ghostLimbSymmetric = null;
+            }
+            this.isCollisionOccuring = ghostCollisionCheck(ghostLimb) |
+                    ghostCollisionCheck(ghostLimbSymmetric);
+            
+        } else {
+            // make sure there is no ghost in simulation
             removeAdditionGhostLimbs(additionGhostRoot);
             ghostLimb = null;
             ghostLimbSymmetric = null;
         }
-
-        this.isCollisionOccuring = ghostCollisionCheck(ghostLimb);
-        this.isCollisionOccuring |= ghostCollisionCheck(ghostLimbSymmetric);
-
     }
 
     public void setChaseCam(Spatial shape) {
@@ -773,9 +780,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void addLimb(Block block, Vector3f contactPt, Vector3f normal) {
         savedAlien.alienChanged();
         // check if valid:
-        if (this.isCollisionOccuring) {
-            return;
-        }
+        // force update physics space
+        if (isCollisionOccuring) { return; }
 
         //Get rid of old alien on screen
         if (this.currentAlienNode != null) {
@@ -1083,18 +1089,18 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         //When right mouse button clicked, fire ray to see if intersects with body
         if ("AddLimb".equals(string) && !bln && !checkRootNull()) {
 
-
+            
             CollisionResult collision = getCursorRaycastCollision(this.currentAlienNode);
 
 
             //If collided then generate new limb at collision point
             if (collision != null) {
-
+                
                 Block block = findBlockFromCollision(collision);
 
                 if (block != null) {
 
-
+                    
                     if (!shiftDown) {
                         Geometry geo = collision.getGeometry();
                         Vector3f colpt = collision.getContactPoint();
