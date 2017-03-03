@@ -425,7 +425,7 @@
                                         
 
 
-                                    <panel id ="panel_new_limb_size_entry" backgroundColour="#33333333" width = "*" height = "70%" childLayout = "vertical">
+                                    <panel id ="panel_new_limb_size_entry" backgroundColour="#33333333" width = "*" height = "80%" childLayout = "vertical">
                                         <control name="label"text="Limb Properties:" height = "10%" width = "100%" valign = "top">
                                             <effect>
                                                 <onActive name="changeFont" font = "Interface/Fonts/Test.fnt"/>
@@ -440,7 +440,7 @@
                                                 <control id="newLimbScrollbar"  name="scrollPanel" style="autoscroll"  horizontal="false" height="100%">
   
 
-                                                    <panel id="myScrollStuff" backgroundColor = "#88888800" width="100%" height = "200%" childLayout="vertical" >
+                                                    <panel id="myScrollStuff" backgroundColor = "#88888800" width="100%" height = "225%" childLayout="vertical" >
                                                         <control name="label" id = "basic_label" height = "3%" text="Basic Options" >
                                                             <effect>
                                                                 <onActive name="changeFont" font = "Interface/Fonts/ArialBold.fnt"/>
@@ -505,17 +505,20 @@
                              
                                                                 </effect>
                                                             </control>
-                                                            <panel id = "limbRestrictionPanel" height = "5%" childLayout = "horizontal" >
-                                                                <control name="label" valign = "center" id = "limb_restriction_label" width = "70%" text="Enable joint restriction:"  />
-                                                                <control id="jointRestrictionCheckBox" valign = "center" name="checkbox" />
+                                                            <panel id = "limbRestrictionPanel" height = "5%" childLayout = "vertical" >
+                                                                <control name="label" valign = "center" id = "limb_restriction_label" width = "*" text="Enable joint restriction:"  />
+                                                                <control id="jointRestrictionCheckBox" align="center" valign = "center" name="checkbox" checked="true" />
                                                             </panel>
-                                                                                                                            
-                                                            <control name="label" id = "minHinge_label" height = "3%" text="Minimum angle:" />
-                                                            <control id="minHingeSlider" name="horizontalSlider" enabled="false" initial = "0.785398" width="100%" min = "0.0" max = "1.570796" stepSize = "0.261799" buttonStepSize = "0.261799"/>
+                                                            <control name="label" id="new_line_1" height = "1%" text=""/>
+                                                            <control name="label" id = "minHinge_label" height = "3%" text="Negative limit:" />
+                                                            <control id="minHingeSlider" name="horizontalSlider" initial = "0.785398" width="100%" min = "0.0" max = "1.570796" stepSize = "0.261799" buttonStepSize = "0.261799"/>
+                                                            <control name="label" id = "min_limit_label" height = "3%" text="0                        pi/2" />
                                                                 
-                                                            <control name="label" id = "maxHinge_label" height = "3%" text="Maximum angle:" />
-                                                            <control id="maxHingeSlider" name="horizontalSlider" enabled="false" initial = "0.785398" width="100%" min = "0.0" max = "1.570796" stepSize = "0.261799" buttonStepSize = "0.261799"/>
+                                                            <control name="label" id = "maxHinge_label" height = "3%" text="Positive limit:" />
+                                                            <control id="maxHingeSlider" name="horizontalSlider" initial = "0.785398" width="100%" min = "0.0" max = "1.570796" stepSize = "0.261799" buttonStepSize = "0.261799"/>
+                                                            <control name="label" id = "max_limit_label" height = "3%" text="0                        pi/2" />
                                                                 
+                                                            <control name="label" id="new_line_2" height = "1%" text=""/>
                                                             <control name="label" id = "eigth_label" height = "3%" text="Yaw:" />
                                                             <control id="yawSlider" name="horizontalSlider" initial = "0.0" width="100%" min = "-1.571" max = "1.571" stepSize = "0.2" buttonStepSize = "0.5"/>
                                                                 
