@@ -21,7 +21,7 @@ public class Block implements Serializable {
     public float mass;
     public float friction;
     public Matrix3f rotation = Matrix3f.IDENTITY;
-    public Matrix3f rotationForYPR = Matrix3f.IDENTITY;
+    public Matrix3f rotationForYRP = Matrix3f.IDENTITY;
     public String collisionShapeType;
     public String hingeType;
     public boolean restrictHinges = false;
@@ -75,7 +75,7 @@ public class Block implements Serializable {
         this.mass = copy.mass;
         this.normal = copy.normal;
         this.rotation = copy.rotation;
-        this.rotationForYPR = copy.rotationForYPR;
+        this.rotationForYRP = copy.rotationForYRP;
     }
     
     public void applyProperties(Geometry g){

@@ -55,11 +55,7 @@ public class AlienHelper {
      * @return the assembled Geometry
      */
     public static Geometry assembleBlock(Block block, Vector3f location) {
-        if (block.collisionShapeType.equals("Sphere")) {
-            // fix the rotation matrix
-            block.rotation = new Matrix3f(block.width, 0f, 0f, 0f, block.height, 0f, 0f, 0f, block.length);
-        }
-        Geometry g = createLimb(block.collisionShapeType, block.width, block.height, block.length, location, block.mass, block.rotation, block.rotationForYPR);
+        Geometry g = createLimb(block.collisionShapeType, block.width, block.height, block.length, location, block.mass, block.rotation, block.rotationForYRP);
         block.applyProperties(g);
         return g;
     }
@@ -75,7 +71,7 @@ public class AlienHelper {
      */
     public static void recursivelyAddBlocks(Block rootBlock, Block parentBlock, Geometry parentGeometry, AlienNode alienNode) {
         for (Block b : parentBlock.getConnectedLimbs()) {
-            Geometry g = createLimb(b.collisionShapeType, b.width, b.height, b.length, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getPosition()), b.mass, b.rotation, b.rotationForYPR);
+            Geometry g = createLimb(b.collisionShapeType, b.width, b.height, b.length, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getPosition()), b.mass, b.rotation, b.rotationForYRP);
             b.applyProperties(g);
 
             //printVector3f(b.getHingePosition());
@@ -192,7 +188,6 @@ public class AlienHelper {
         }
 
         //Update it:
-        //vb.setUpdateNeeded(); 
         mesh.updateBound();
         return mesh;
     }

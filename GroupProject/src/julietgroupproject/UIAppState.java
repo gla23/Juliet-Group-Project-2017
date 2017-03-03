@@ -323,42 +323,35 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Geometry gl = AlienHelper.assembleBlock(copy, block.getGeometry().getWorldTranslation());
         gl.setMaterial(redGhostMaterial);
         removalGhostRoot.attachChild(gl);
-        
-        for (Block child : block.getConnectedLimbs())
-        {
+
+        for (Block child : block.getConnectedLimbs()) {
             addRemovalGhostLimb(child);
         }
     }
 
     public Geometry placeGhostLimb(Geometry gl, Block block, Vector3f contactPt, Vector3f normal) {
 
-        if (gl == null)
-        {
-            return addAdditionGhostLimb(block, contactPt, normal);
+        if (gl == null) {
+            gl = addAdditionGhostLimb(block, contactPt, normal);
         }
-        else
-        {
-            float limbWidth = getNiftyFloat("limbWidth");
-            float limbHeight = getNiftyFloat("limbHeight");
-            float limbLength = getNiftyFloat("limbLength");
-            float limbSeparation = getNiftyFloat("limbSeparation");
-            // currentHingeAxis Will be either "X", "Y", "Z" or "A" for auto
+
+        float limbWidth = getNiftyFloat("limbWidth");
+        float limbHeight = getNiftyFloat("limbHeight");
+        float limbLength = getNiftyFloat("limbLength");
+        float limbSeparation = getNiftyFloat("limbSeparation");
+        // currentHingeAxis Will be either "X", "Y", "Z" or "A" for auto
 
 
-            Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeparation));
+        Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeparation));
 
-            //Build the new limb
-            Matrix3f rotation = new Matrix3f();
-            rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
+        //Build the new limb
+        Matrix3f rotation = new Matrix3f();
+        rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
 
+        gl.setLocalRotation(rotation);
+        gl.setLocalTranslation(newPos.add(AlienHelper.getGeometryLocation(block.getGeometry())));
 
-            //Mesh m = gl.getMesh();
-            //AlienHelper.rotateMesh(rotationForNormal, m);
-            gl.setLocalRotation(rotation);
-            gl.setLocalTranslation(newPos.add(AlienHelper.getGeometryLocation(block.getGeometry())));
-            
-            return gl;
-        }
+        return gl;
     }
 
     public Geometry addAdditionGhostLimb(Block block, Vector3f contactPt, Vector3f normal) {
@@ -368,9 +361,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Geometry gl = AlienHelper.assembleBlock(limb, limb.getPosition().add(AlienHelper.getGeometryLocation(block.getGeometry())));
         Matrix3f rotation = new Matrix3f();
         rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
+
         Mesh m = gl.getMesh();
         AlienHelper.transformMesh(rotation.invert(), Matrix3f.IDENTITY, Vector3f.ZERO, m);
-        gl.setLocalRotation(rotation);
 
         // check for collision
 
@@ -387,8 +380,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public void removeAdditionGhostLimbs(Node ghostRoot) {
-        for (Spatial ghost : ghostRoot.getChildren())
-        {
+        for (Spatial ghost : ghostRoot.getChildren()) {
             if (ghost != null) {
                 GhostControl gc = ghost.getControl(GhostControl.class);
                 if (gc != null) {
@@ -398,7 +390,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             }
         }
     }
-    
+
     public void removeRemovalGhostLimbs(Node ghostRoot) {
         ghostRoot.detachAllChildren();
     }
@@ -442,7 +434,22 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     this.ghostBody = null;
                 }
                 // update body ghost
+                // TODO: can someone please factor the following piece of code out!
+                Matrix3f rotationForNormal = new Matrix3f();
+                Vector3f normal = Vector3f.UNIT_X;
+
+                if (currentShape.equals("Cylinder")) {
+                    rotationForNormal.fromStartEndVectors(Vector3f.UNIT_Z, normal);
+                } else {
+                    rotationForNormal.fromStartEndVectors(Vector3f.UNIT_X, normal);
+                }
+                if (currentShape.equals("Sphere")) {
+                    rotationForNormal = rotationForNormal.mult(new Matrix3f(bodyWidth, 0f, 0f, 0f, bodyHeight, 0f, 0f, 0f, bodyLength));
+                }
                 Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", 1.0f);
+                // TODO: and this line as well!
+                bodyBlock.setRotation(rotationForNormal);
+                
                 Geometry gb = AlienHelper.assembleBlock(bodyBlock, startLocation);
                 gb.setLocalTranslation(startLocation);
                 gb.removeControl(RigidBodyControl.class);
@@ -506,10 +513,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         // remove deletion ghost, if exists
         removeRemovalGhostLimbs(removalGhostRoot);
-        
+
         boolean toRemoveGhosts = true;
 
-        if (alien != null && alien.rootBlock != null) {
+        if (alien != null && alien.rootBlock != null && !checkRootNull()) {
             // only check collsion with solid objects
             CollisionResult collision = getCursorRaycastCollision(this.currentAlienNode);
 
@@ -519,7 +526,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 Block block = findBlockFromCollision(collision);
 
                 if (block != null) {
-                    
+
                     if (shiftDown) {
                         //make new deletion ghost
                         addRemovalGhostLimb(block);
@@ -553,7 +560,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             ghostLimb = null;
             ghostLimbSymmetric = null;
         }
-        
+
         this.isCollisionOccuring = ghostCollisionCheck(ghostLimb);
         this.isCollisionOccuring |= ghostCollisionCheck(ghostLimbSymmetric);
 
@@ -613,10 +620,22 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             float bodyLength = getNiftyFloat("bodyLength");
             float bodyWeight = getNiftyFloat("bodyWeight");
             String currentShape = getNiftyString("currentBodyShape");
+            Vector3f pos = this.startLocation;
 
-            //Instantiate the new alien
-            Vector3f pos = Vector3f.ZERO;
+            Matrix3f rotationForNormal = new Matrix3f();
+            Vector3f normal = Vector3f.UNIT_X;
+
+            if (currentShape.equals("Cylinder")) {
+                rotationForNormal.fromStartEndVectors(Vector3f.UNIT_Z, normal);
+            } else {
+                rotationForNormal.fromStartEndVectors(Vector3f.UNIT_X, normal);
+            }
+            if (currentShape.equals("Sphere")) {
+                rotationForNormal = rotationForNormal.mult(new Matrix3f(bodyWidth, 0f, 0f, 0f, bodyHeight, 0f, 0f, 0f, bodyLength));
+            }
+
             Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", bodyWeight);
+            bodyBlock.setRotation(rotationForNormal);
             int texturecode = alien != null ? alien.materialCode : textureNo;
             setAlien(new Alien(bodyBlock));
             alien.materialCode = texturecode;
@@ -738,12 +757,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         // Apply yaw pitch roll rotation
         float[] angles = new float[3];
         angles[0] = yaw;
-        angles[1] = pitch;
-        angles[2] = roll;
-        Matrix3f rotationForYPR = new Quaternion(angles).toRotationMatrix();
+        angles[1] = roll;
+        angles[2] = pitch;
+        Matrix3f rotationForYRP = new Quaternion(angles).toRotationMatrix();
 
         limb.rotation = rotationForNormal;
-        limb.rotationForYPR = rotationForYPR;
+        limb.rotationForYRP = rotationForYRP;
         // Stores the normal the limb was created at in the limb for future use
         limb.setNormal(normal);
 
@@ -851,7 +870,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         // setup ghost root node
         this.additionGhostRoot = new Node("addition ghost root");
         this.rootNode.attachChild(additionGhostRoot);
-        
+
         this.removalGhostRoot = new Node("removal ghost root");
         this.rootNode.attachChild(removalGhostRoot);
 
@@ -1098,7 +1117,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     } else { // delete limb
 
                         removeLimb(block);
-                        
+
                         // remove deletion ghost
                         removeRemovalGhostLimbs(removalGhostRoot);
                     }

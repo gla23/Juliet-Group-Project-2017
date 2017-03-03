@@ -625,7 +625,7 @@
             </panel>
          
             <panel id="simulation_logger" width="20%" valign="top" align="left" height="60%" childLayout="vertical" backgroundColor="#aaaaaa00">
-                <control id="logger_listbox" name="listBox" vertical="optional" horizontal="off" displayItems="20" selectionMode="Enabled" color="#aaaaaa33">
+                <control id="logger_listbox" name="listBox" vertical="optional" horizontal="off" displayItems="20" selectionMode="Single" color="#aaaaaa33">
                     <effect>
                         <onActive name="fade" start="#ff" end="55" length="1"/>
                     </effect>
