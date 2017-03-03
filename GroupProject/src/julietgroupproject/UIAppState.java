@@ -88,12 +88,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private float prevBodyLength = 0.0f;
     private String prevBodyShape = "Box";
     private Vector3f prevBodyLocation = Vector3f.ZERO;
-    private Geometry delghost;
-    private Material ghostMaterial;
-    private Material ghostMaterial2;
     private int speedUpFactor = 1000;
     private boolean shiftDown = false;
-    private Node ghostRoot;
+    private Node additionGhostRoot;
+    private Node removalGhostRoot;
     private int numLogEntries = 0;
     private boolean isCollisionOccuring = false;
     private int showOffRequest = -1;
@@ -314,8 +312,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         System.out.println(vec);
     }
 
-    public Geometry makeGhostLimb(Block block) {
-
+    public void addRemovalGhostLimb(Block block) {
         Block copy = new Block(block);
 
         copy.width += 0.02;
@@ -324,16 +321,20 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         copy.setPosition(copy.getPosition().add(new Vector3f(-0.01f, -0.01f, -0.01f)));
         Geometry gl = AlienHelper.assembleBlock(copy, block.getGeometry().getWorldTranslation());
-        ghostRoot.attachChild(gl);
-        return gl;
-
+        gl.setMaterial(redGhostMaterial);
+        removalGhostRoot.attachChild(gl);
+        
+        for (Block child : block.getConnectedLimbs())
+        {
+            addRemovalGhostLimb(child);
+        }
     }
 
     public Geometry placeGhostLimb(Geometry gl, Block block, Vector3f contactPt, Vector3f normal) {
 
         if (gl == null)
         {
-            return addGhostLimb(block, contactPt, normal);
+            return addAdditionGhostLimb(block, contactPt, normal);
         }
         else
         {
@@ -360,7 +361,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
     }
 
-    public Geometry addGhostLimb(Block block, Vector3f contactPt, Vector3f normal) {
+    public Geometry addAdditionGhostLimb(Block block, Vector3f contactPt, Vector3f normal) {
 
         Block limb = createLimb(block, contactPt, normal);
 
@@ -378,22 +379,28 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         gl.addControl(ghostControl);
 
         physics.getPhysicsSpace().add(ghostControl);
-        gl.setMaterial(ghostMaterial);
+        gl.setMaterial(greenGhostMaterial);
 
-        ghostRoot.attachChild(gl);
+        additionGhostRoot.attachChild(gl);
 
         return gl;
     }
 
-    public void removeGhostLimb(Geometry gl) {
-        if (gl != null) {
-            GhostControl gc = gl.getControl(GhostControl.class);
-            if (gc != null) {
-                this.physics.getPhysicsSpace().remove(gc);
+    public void removeAdditionGhostLimbs(Node ghostRoot) {
+        for (Spatial ghost : ghostRoot.getChildren())
+        {
+            if (ghost != null) {
+                GhostControl gc = ghost.getControl(GhostControl.class);
+                if (gc != null) {
+                    this.physics.getPhysicsSpace().remove(gc);
+                }
+                ghost.removeFromParent();
             }
-            gl.removeFromParent();
         }
-
+    }
+    
+    public void removeRemovalGhostLimbs(Node ghostRoot) {
+        ghostRoot.detachAllChildren();
     }
 
     private boolean ghostCollisionCheck(Geometry gl) {
@@ -401,10 +408,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             GhostControl gc = gl.getControl(GhostControl.class);
             if (gc != null) {
                 if (gc.getOverlappingCount() > 0) {
-                    gl.setMaterial(ghostMaterial2);
+                    gl.setMaterial(redGhostMaterial);
                     return true;
                 } else {
-                    gl.setMaterial(ghostMaterial);
+                    gl.setMaterial(greenGhostMaterial);
                 }
             }
         }
@@ -444,15 +451,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 gb.addControl(gc);
                 this.physics.getPhysicsSpace().add(gc);
                 this.ghostBody = gb;
-                this.ghostRoot.attachChild(gb);
-                //TODO: fix chase cam on ghost body
+                this.rootNode.attachChild(gb);
                 setChaseCam(this.ghostBody);
             }
             if (ghostBody.getControl(GhostControl.class).getOverlappingCount() < 1) {
                 ghostBody.setMaterial(m);
                 this.isCollisionOccuring = false;
             } else {
-                ghostBody.setMaterial(ghostMaterial2);
+                ghostBody.setMaterial(redGhostMaterial);
                 this.isCollisionOccuring = true;
             }
         }
@@ -498,11 +504,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     public void updateGhostLimb() {
 
-        // remove deletion ghost
-        if (delghost != null) {
-            removeGhostLimb(delghost);
-            delghost = null;
-        }
+        // remove deletion ghost, if exists
+        removeRemovalGhostLimbs(removalGhostRoot);
         
         boolean toRemoveGhosts = true;
 
@@ -519,8 +522,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     
                     if (shiftDown) {
                         //make new deletion ghost
-                        delghost = makeGhostLimb(block);
-                        delghost.setMaterial(ghostMaterial2);
+                        addRemovalGhostLimb(block);
                     } else {
                         toRemoveGhosts = false;
 
@@ -547,8 +549,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
 
         if (toRemoveGhosts) {
-            removeGhostLimb(ghostLimb);
-            removeGhostLimb(ghostLimbSymmetric);
+            removeAdditionGhostLimbs(additionGhostRoot);
             ghostLimb = null;
             ghostLimbSymmetric = null;
         }
@@ -773,8 +774,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         setupKeys(this.currentAlienNode);
 
         // get rid of ghost limbs
-        removeGhostLimb(ghostLimb);
-        removeGhostLimb(ghostLimbSymmetric);
+        removeAdditionGhostLimbs(additionGhostRoot);
         ghostLimb = null;
         ghostLimbSymmetric = null;
     }
@@ -848,20 +848,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         addKeyBindings();
 
-        ghostMaterial = new Material(assetManager,
-                "Common/MatDefs/Misc/Unshaded.j3md");
-        //ghostMaterial.setTexture("ColorMap", 
-        //    assetManager.loadTexture("Textures/ColoredTex/Monkey.png"));
-        ghostMaterial.setColor("Color", new ColorRGBA(0.32f, 0.85f, 0.5f, 1f));
-
-        //ghostMaterial.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-
-        ghostMaterial2 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        ghostMaterial2.setColor("Color", new ColorRGBA(0.85f, 0.32f, 0.32f, 1f));
-
         // setup ghost root node
-        this.ghostRoot = new Node("ghost root");
-        this.rootNode.attachChild(ghostRoot);
+        this.additionGhostRoot = new Node("addition ghost root");
+        this.rootNode.attachChild(additionGhostRoot);
+        
+        this.removalGhostRoot = new Node("removal ghost root");
+        this.rootNode.attachChild(removalGhostRoot);
 
         // load default graph texture
         graphTex = new Texture2D();
@@ -1106,11 +1098,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                     } else { // delete limb
 
                         removeLimb(block);
+                        
                         // remove deletion ghost
-                        if (delghost != null) {
-                            removeGhostLimb(delghost);
-                            delghost = null;
-                        }
+                        removeRemovalGhostLimbs(removalGhostRoot);
                     }
                 }
             }

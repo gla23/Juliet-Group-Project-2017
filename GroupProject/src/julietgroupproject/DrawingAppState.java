@@ -54,22 +54,21 @@ public class DrawingAppState extends SimulatorAppState {
     protected Material alienMaterial4;
     protected Material grassMaterial;
     protected Material skyMaterial;
-    
     protected Material alienTransparentMaterial1;
     protected Material alienTransparentMaterial2;
     protected Material alienTransparentMaterial3;
     protected Material alienTransparentMaterial4;
-    
+    protected Material greenGhostMaterial;
+    protected Material redGhostMaterial;
     protected Material[] materials;
     protected Material[] materials_t;
-    
     private Geometry arrowGeometry;
     protected boolean showArrow = false;
 
     public DrawingAppState(Alien _alien, double _simSpeed, double _accuracy) {
         super(_alien, _simSpeed, _accuracy);
     }
-    
+
     public DrawingAppState(Alien _alien, double _simSpeed, double _accuracy, double _fixedTimeStep) {
         super(_alien, _simSpeed, _accuracy, _fixedTimeStep);
     }
@@ -78,13 +77,13 @@ public class DrawingAppState extends SimulatorAppState {
     public void reset() {
         boolean arrow = this.showArrow;
         super.reset();
-        if (arrow) { 
+        if (arrow) {
             showArrow();
         } else {
             hideArrow();
         }
     }
-    
+
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
@@ -159,17 +158,17 @@ public class DrawingAppState extends SimulatorAppState {
         alienTexture2.setWrap(Texture.WrapMode.Repeat);
         alienMaterial2 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         alienMaterial2.setTexture("ColorMap", alienTexture2);
-        
+
         alienTexture3 = assetManager.loadTexture("Textures/alien3.jpg");
         alienTexture3.setWrap(Texture.WrapMode.Repeat);
         alienMaterial3 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         alienMaterial3.setTexture("ColorMap", alienTexture3);
-        
+
         alienTexture4 = assetManager.loadTexture("Textures/alien4.jpg");
         alienTexture4.setWrap(Texture.WrapMode.Repeat);
         alienMaterial4 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         alienMaterial4.setTexture("ColorMap", alienTexture4);
-        
+
         alienTransparentTexture1 = assetManager.loadTexture("Textures/alien1_t.png");
         alienTransparentTexture1.setWrap(Texture.WrapMode.Repeat);
         alienTransparentMaterial1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
@@ -181,22 +180,30 @@ public class DrawingAppState extends SimulatorAppState {
         alienTransparentMaterial2 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         alienTransparentMaterial2.setTexture("ColorMap", alienTransparentTexture2);
         alienTransparentMaterial2.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-        
+
         alienTransparentTexture3 = assetManager.loadTexture("Textures/alien3_t.png");
         alienTransparentTexture3.setWrap(Texture.WrapMode.Repeat);
         alienTransparentMaterial3 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         alienTransparentMaterial3.setTexture("ColorMap", alienTransparentTexture3);
         alienTransparentMaterial3.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-        
+
         alienTransparentTexture4 = assetManager.loadTexture("Textures/alien4_t.png");
         alienTransparentTexture4.setWrap(Texture.WrapMode.Repeat);
         alienTransparentMaterial4 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         alienTransparentMaterial4.setTexture("ColorMap", alienTransparentTexture4);
         alienTransparentMaterial4.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
-        
-        materials = new Material[]{alienMaterial1,alienMaterial2,alienMaterial3,alienMaterial4};
-       materials_t = new Material[]{alienTransparentMaterial1,alienTransparentMaterial2,alienTransparentMaterial3,alienTransparentMaterial4};
+
+        materials = new Material[]{alienMaterial1, alienMaterial2, alienMaterial3, alienMaterial4};
+        materials_t = new Material[]{alienTransparentMaterial1, alienTransparentMaterial2, alienTransparentMaterial3, alienTransparentMaterial4};
+
+        greenGhostMaterial = new Material(assetManager,
+                "Common/MatDefs/Misc/Unshaded.j3md");
+        greenGhostMaterial.setColor("Color", new ColorRGBA(0.32f, 0.85f, 0.5f, 1f));
+
+        redGhostMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        redGhostMaterial.setColor("Color", new ColorRGBA(0.85f, 0.32f, 0.32f, 1f));
     }
+
     /**
      * Spawn a new alien at a specified location with textures.
      */
@@ -210,7 +217,7 @@ public class DrawingAppState extends SimulatorAppState {
 
         return node;
     }
-    
+
     private void createArrow() {
         Arrow directionArrow = new Arrow(new Vector3f(7, 0, 0));
         directionArrow.setLineWidth(5);
@@ -226,7 +233,9 @@ public class DrawingAppState extends SimulatorAppState {
     }
 
     public boolean showArrow() {
-        if (arrowGeometry == null) createArrow();
+        if (arrowGeometry == null) {
+            createArrow();
+        }
         if (!simRoot.hasChild(arrowGeometry)) {
             simRoot.attachChild(arrowGeometry);
             showArrow = true;
@@ -235,7 +244,9 @@ public class DrawingAppState extends SimulatorAppState {
     }
 
     public boolean hideArrow() {
-        if (arrowGeometry == null) createArrow();
+        if (arrowGeometry == null) {
+            createArrow();
+        }
         if (simRoot.hasChild(arrowGeometry)) {
             simRoot.detachChild(arrowGeometry);
             showArrow = false;
