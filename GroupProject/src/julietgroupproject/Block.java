@@ -47,7 +47,7 @@ public class Block implements Serializable {
         this.friction = DEFAULT_FRICTION;
     }
     
-    public Block(Vector3f pos, Vector3f hingePos, float width, float height, float length, String collisionShapeType, String hingeType,float mass, float hingeMax, float hingeMin) {
+    public Block(Vector3f pos, Vector3f hingePos, float width, float height, float length, String collisionShapeType, String hingeType,float mass, float hingeMin, float hingeMax) {
         this.pos = pos;
         this.hingePos = hingePos;
         this.width = width;

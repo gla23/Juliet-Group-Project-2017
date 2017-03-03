@@ -79,8 +79,8 @@ public class AlienHelper {
             b.applyProperties(g);
 
             //printVector3f(b.getHingePosition());
-            float hingeMin = b.restrictHinges ? b.hingeMin : 0;
-            float hingeMax = b.restrictHinges ? b.hingeMax : 0;
+            float hingeMin = b.hingeMin;
+            float hingeMax = b.hingeMax;
             HingeJoint joint = joinHingeJoint(parentGeometry, g, parentGeometry.getControl(RigidBodyControl.class).getPhysicsLocation().add(b.getHingePosition()), b.hingeType, b.restrictHinges, hingeMin, hingeMax);
             alienNode.attachChild(g);
             alienNode.joints.add(joint);
@@ -147,11 +147,8 @@ public class AlienHelper {
         }
         HingeJoint joint = new HingeJoint(rigidBodyControlA, rigidBodyControlB, pivotA, pivotB, axisA, axisB);
         if (restrictJoint) {
-            System.out.println(restrictJoint);
             joint.setLimit(hingeMin, hingeMax);
         }
-        System.out.println(hingeMax);
-        System.out.println(hingeMin);
         return joint;
     }
 

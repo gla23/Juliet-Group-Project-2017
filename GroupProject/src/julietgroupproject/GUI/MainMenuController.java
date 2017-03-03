@@ -707,12 +707,12 @@ public class MainMenuController extends AbstractAppState implements ScreenContro
     }
         
     @NiftyEventSubscriber(id = "minHingeSlider")
-    public void onLimbMaxHingeSliderChanged(final String id, final SliderChangedEvent event) {
+    public void onLimbMinHingeSliderChanged(final String id, final SliderChangedEvent event) {
         this.setFieldSafe("minHingeJoint", event.getValue());
     }
     
     @NiftyEventSubscriber(id = "maxHingeSlider")
-    public void onLimbMinHingeSliderChanged(final String id, final SliderChangedEvent event) {
+    public void onLimbMaxHingeSliderChanged(final String id, final SliderChangedEvent event) {
         this.setFieldSafe("maxHingeJoint", event.getValue());
     }
     
