@@ -57,7 +57,6 @@ public class AdvancedAlienBrain extends AlienBrain {
             } else {
                 in = ((double) (j.getHingeAngle() - j.getLowerLimit())) / ((double)(j.getUpperLimit() - j.getLowerLimit()));
             }
-            System.out.println("input value #" + i + ": " + in);
             if (in < 0.0) {
                 in = 0.0;
             }
@@ -75,7 +74,7 @@ public class AdvancedAlienBrain extends AlienBrain {
         nnInput[nnInput.length - 3] = ypr[1];
         nnInput[nnInput.length - 2] = ypr[2];
         // sine wave input
-        nnInput[nnInput.length - 1] = FastMath.sin(tick * 2);
+        nnInput[nnInput.length - 1] = FastMath.sin((float)(tick / 20.0));
     }
     
     @Override
