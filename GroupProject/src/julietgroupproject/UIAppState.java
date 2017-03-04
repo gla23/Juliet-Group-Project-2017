@@ -741,14 +741,11 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         String currentHingeAxis = getNiftyString("currentHingeAxis");
 
         //Find hinge and postion vectors given shape and click position
-        //TODO fix this so that is gets the actual distance, and also make that distance correct when it is rotated
         Vector3f newHingePos;
         Vector3f newPos;
         newPos = contactPt.add(normal.mult(limbWidth + limbSeparation));
-        //newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeparation));
-        
-        //Vector3f 
         newHingePos = contactPt.add(normal.mult(4 * jointPositionFraction));
+        
         // Work out which hinge axis would make sense for auto hinge axis
         String axisToUse = "ZAxis";
         if (currentHingeAxis.equals("A")) {
