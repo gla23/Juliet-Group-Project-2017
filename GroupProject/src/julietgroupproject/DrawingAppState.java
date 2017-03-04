@@ -238,7 +238,6 @@ public class DrawingAppState extends SimulatorAppState {
         }
         if (!simRoot.hasChild(arrowGeometry)) {
             simRoot.attachChild(arrowGeometry);
-            showArrow = true;
         }
         return showArrow;
     }
@@ -249,7 +248,6 @@ public class DrawingAppState extends SimulatorAppState {
         }
         if (simRoot.hasChild(arrowGeometry)) {
             simRoot.detachChild(arrowGeometry);
-            showArrow = false;
         }
         return showArrow;
     }

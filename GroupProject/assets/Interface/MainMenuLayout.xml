@@ -4,7 +4,7 @@
        xsi:schemaLocation="http://nifty-gui.sourceforge.net/nifty.xsd http://nifty-gui.sourceforge.net/nifty.xsd">
     <useStyles filename="nifty-default-styles.xml" />
     <useControls filename="nifty-default-controls.xml" />
-     <screen id="begin" controller="julietgroupproject.GUI.MainMenuController">
+     <screen id="begin" controller="julietgroupproject.GUI.BeginController">
          <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
             
                 <panel id="button_panel"  height = "7%" width = "30%" childLayout="horizontal">
@@ -29,7 +29,7 @@
            
         </layer>
     </screen>
-    <screen id="editor_options" controller="julietgroupproject.GUI.MainMenuController">
+    <screen id="editor_options" controller="julietgroupproject.GUI.EditorOptionsController">
          <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
             
                 <panel id="options_panel" childLayout="horizontal">
@@ -51,13 +51,13 @@
                                  <panel id = "wireMeshPanel" height = "15%" childLayout = "horizontal" >
                                     <control name="label" valign = "center" id = "wireMesh_label" width = "50%" text="Wire Mesh:(Q)"  />
                                     <panel id = "wireMeshCheckPanel" valign = "center" width = "50%" childLayout = "vertical" >
-                                       <control id="wireMeshCheckBox" align = "center" valign = "center" name="checkbox" />
+                                       <control id="wireMeshCheckBox" checked="false" align = "center" valign = "center" name="checkbox" />
                                     </panel>
                                  </panel>
                                  <panel id = "arrowPanel" height = "15%" childLayout = "horizontal" >
                                     <control name="label" valign = "center" id = "arrow_label" width = "50%" text="Direction Arrow: (A)"  />
                                     <panel id = "directionArrowPanel" valign = "center" width = "50%" childLayout = "vertical" >
-                                       <control id="directionArrowCheckBox" align = "center" valign = "center" name="checkbox" checked="true"/>
+                                       <control id="directionArrowCheckBox" align = "center" valign = "center" name="checkbox" checked="false"/>
                                     </panel>
                                  </panel>
                                  <panel id = "gravityPanel" height = "15%" childLayout = "horizontal" >
@@ -88,7 +88,7 @@
         </layer>
     </screen>
     
-    <screen id="save_dialog" controller="julietgroupproject.GUI.MainMenuController">
+    <screen id="save_dialog" controller="julietgroupproject.GUI.SaveDialogController">
          <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
             
                 <panel id="save_panel" childLayout="horizontal">
@@ -109,7 +109,7 @@
                                      <interact onClick="confirmSave()"/>
                                  </control>
                                  <control name ="button" label="Cancel"  width = "*" id = "returnToEditor" visibleToMouse="true">
-                                     <interact onClick="showEditor()"/>
+                                     <interact onClick="cancel()"/>
                                  </control>
                              </panel>    
                          </panel>
@@ -120,7 +120,7 @@
         </layer>
     </screen>
 	
-	<screen id="name_dialog" controller="julietgroupproject.GUI.MainMenuController">
+	<screen id="name_dialog" controller="julietgroupproject.GUI.NameDialogController">
          <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
             
                 <panel id="name_panel" childLayout="horizontal">
@@ -149,7 +149,7 @@
         </layer>
     </screen>
 
-    <screen id="load_dialog" controller="julietgroupproject.GUI.MainMenuController">
+    <screen id="load_dialog" controller="julietgroupproject.GUI.LoadDialogController">
          <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
             
                 <panel id="load_panel" childLayout="horizontal">
@@ -174,7 +174,7 @@
                                    <interact onClick="confirmLoad()"/>
                                 </control>
                                 <control name ="button" label="Cancel"  width = "*" id = "returnToEditor" visibleToMouse="true">
-                                   <interact onClick="showEditor()"/>
+                                   <interact onClick="cancelLoad()"/>
                                 </control>
                             </panel>    
                          </panel>
@@ -185,7 +185,7 @@
         </layer>
     </screen>   
 
-    <screen id="save_success" controller="julietgroupproject.GUI.MainMenuController">
+    <screen id="save_success" controller="julietgroupproject.GUI.MessageController">
      <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
             <panel id="save_success_panel" childLayout="horizontal">
                 <effect>
@@ -207,7 +207,7 @@
         </layer>
     </screen>     
             
-    <screen id="save_fail" controller="julietgroupproject.GUI.MainMenuController">
+    <screen id="save_fail" controller="julietgroupproject.GUI.MessageController">
      <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
             <panel id="save_fail_panel" childLayout="horizontal">
                 <effect>
@@ -229,7 +229,7 @@
         </layer>
     </screen>    
             
-    <screen id="show_best_fail" controller="julietgroupproject.GUI.MainMenuController">
+    <screen id="show_best_fail" controller="julietgroupproject.GUI.MessageController">
      <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
             <panel id="show_best_fail_panel" childLayout="horizontal">
                 <effect>
@@ -251,7 +251,7 @@
         </layer>
     </screen>   
 	
-	<screen id="simulate_fail" controller="julietgroupproject.GUI.MainMenuController">
+	<screen id="simulate_fail" controller="julietgroupproject.GUI.MessageController">
      <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
             <panel id="simulate_fail_panel" childLayout="horizontal">
                 <effect>
@@ -273,7 +273,7 @@
         </layer>
     </screen>    
 
-    <screen id="load_fail" controller="julietgroupproject.GUI.MainMenuController">
+    <screen id="load_fail" controller="julietgroupproject.GUI.LoadFailDialogController">
      <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
             <panel id="load_fail_panel" childLayout="horizontal">
                 <effect>
@@ -287,7 +287,7 @@
                         </panel>
                         <panel id = "return_load_fail_panel" childLayout = "center"  valign = "center" height = "25%" width = "100%">
                             <control name ="button" label="OK"  width = "33%" id = "returnToEditor" visibleToMouse="true">
-                               <interact onClick="showEditor()"/>
+                               <interact onClick="showLoadScreen()"/>
                             </control>
                         </panel>    
                      </panel>
@@ -296,7 +296,7 @@
         </layer>
     </screen>     
         
-    <screen id="training_reset_fail" controller="julietgroupproject.GUI.MainMenuController">
+    <screen id="training_reset_fail" controller="julietgroupproject.GUI.MessageController">
      <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
             <panel id="training_reset_fail_panel" childLayout="horizontal">
                 <effect>
@@ -319,7 +319,7 @@
         </layer>
     </screen>
    
-    <screen id="training_reset_success" controller="julietgroupproject.GUI.MainMenuController">
+    <screen id="training_reset_success" controller="julietgroupproject.GUI.MessageController">
      <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
             <panel id="training_reset_success_panel" childLayout="horizontal">
                 <effect>
@@ -341,7 +341,7 @@
         </layer>
     </screen>
                                                    
-    <screen id="start" controller="julietgroupproject.GUI.MainMenuController">
+    <screen id="editor" controller="julietgroupproject.GUI.EditorController">
         <layer id="foreground" childLayout="center">
             
             <panel id="panel_background" width = "100%" height="100%" childLayout="vertical">
@@ -371,7 +371,7 @@
 
                                         <panel id = "panel_new_body_entry_fields" backgroundColour="#33333333" width = "*" height = "90%" childLayout = "vertical" valign ="center">
                                             <control name="label" text="Shape Selector:" height = "9%"/>
-                                            <control id="shape_selector_body" name="dropDown"/>
+                                            <control id="body_shape_selector" name="dropDown"/>
                                             <control name="label" id = "first_body_label" height = "9%" width = "100%" text="Width:" />
                                             
                                             <control id="bodyWidthSlider" name="horizontalSlider" initial = "2" width="100%" min = "0.5" max = "5.0" stepSize = "0.1" buttonStepSize = "0.3"/>
@@ -448,7 +448,7 @@
                                                             </effect>
                                                         </control>
                                                         <control name="label" height = "3%"text="Shape Selector:" />
-                                                        <control id="shape_selector" name="dropDown" />
+                                                        <control id="limb_shape_selector" name="dropDown" />
                                                         <panel id = "rect_options"  childLayout = "vertical" >
                                                                 
                                                             <control name="label" id = "first_label" height = "3%" text="Select  Width:" />
@@ -574,7 +574,7 @@
                                 <interact onClick="editorOptions()"/>
                             </control>
                             <control name ="button" label="New Alien" height = "*" width = "*" id = "new_alien" visibleToMouse="true">
-                                <interact onClick="resetAlien()"/>
+                                <interact onClick="newAlien()"/>
                             </control>
                             <control name ="button" label="Restart Alien" height = "*" width = "*"  id = "restartAlienButtonMain" visibleToMouse="true">
                                 <interact onClick="restartAlien()"/>
@@ -605,7 +605,7 @@
             </panel> <!-- End of whole screen panel-->
         </layer>
     </screen>
-    <screen id="hidden" controller="julietgroupproject.GUI.MainMenuController" childLayout="right">
+    <screen id="hidden" controller="julietgroupproject.GUI.HiddenController" childLayout="right">
         <layer id="hidden_layer" childLayout="center" width = "100%" >
             <panel id = "hidden_center" width= "100%" valign = "bottom" height = "5%" childLayout = "vertical">
                 <control name = "button" label = "Show Editor" id = "show_editor" height = "100%" align = "right"  width = "11%"
@@ -616,7 +616,7 @@
             
         </layer>
     </screen>
-    <screen id="simulation" controller="julietgroupproject.GUI.MainMenuController" childLayout="right">
+    <screen id="simulation" controller="julietgroupproject.GUI.SimulationController" childLayout="right">
         <layer id="simluation_layer" childLayout="center" width="100%" >
 
             <panel id="alien_message_box" width="20%" valign="bottom" align="center" height="5%" childLayout="vertical" backgroundColor="#00000088">

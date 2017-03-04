@@ -113,32 +113,33 @@ public class AlienTrainer extends Thread {
         // to do the serialisation/deserialisation in memory.
         // TODO: fix this hack to remove the one-off overhead
         this.savedAlien.train = (EvolutionaryAlgorithm) ObjectCloner.deepCopy(this.savedAlien.train);
+        EvolutionaryAlgorithm trainer = this.savedAlien.train;
         
         // Score function (AlienEvaluator) is also stored in serialised trainer,
         //but the reference to queue needs update everytime we start/restart training.
-        ((AlienEvaluator) (this.savedAlien.train.getScoreFunction())).setQueue(simTasks);
+        ((AlienEvaluator) (trainer.getScoreFunction())).setQueue(simTasks);
         try {
             //loop until a stop is requested by calling terminateTraining
             do {
                 //get fitnesses for the next generation
-                this.savedAlien.train.iteration();
+                trainer.iteration();
 
                 //get information about the generation's performance
 
                 //store information about the generation's performance
                 this.savedAlien.addEntry(new GenerationResult(
-                        this.savedAlien.train.getIteration(),
-                        (float) this.savedAlien.train.getPopulation().getBestGenome().getScore(),
+                        trainer.getIteration(),
+                        (float) trainer.getPopulation().getBestGenome().getScore(),
                         getBestSoFar()));
 
                 //save if generation number a multiple of the save interval
-                if (this.savedAlien.train.getIteration() % ITERATIONS_BETWEEN_SAVES == 0) {
+                if (trainer.getIteration() % ITERATIONS_BETWEEN_SAVES == 0) {
                     AlienHelper.writeAlien(savedAlien);
                 }
             } while (!terminating);
         } finally {
             //signal to Encog to close its threads and stop requesting fitnesses
-            this.savedAlien.train.finishTraining();
+            trainer.finishTraining();
 
             //write out current population state to file.
             AlienHelper.writeAlien(savedAlien);

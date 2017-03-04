@@ -22,13 +22,17 @@ import com.jme3.util.BufferUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.FloatBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -192,6 +196,23 @@ public class AlienHelper {
         return mesh;
     }
 
+    public static String sanitiseAlienName(String rawName) {
+        String sanitisedAlienName;
+        sanitisedAlienName = rawName.replaceAll("[^A-Za-z0-9 \\-_]", "");
+        return sanitisedAlienName.trim();
+    }
+    
+     public static List<String> getLoadableAliens() {
+        File file = new File("aliens");
+        List<String> directories = Arrays.asList(file.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        }));
+        return directories;
+    }
+    
     /**
      * Load an alien from disk
      *
