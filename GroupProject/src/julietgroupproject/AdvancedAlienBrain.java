@@ -6,6 +6,7 @@ package julietgroupproject;
 
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.joints.HingeJoint;
+import com.jme3.math.FastMath;
 import static julietgroupproject.AlienBrain.MAX_VELOCITY;
 
 /**
@@ -33,7 +34,7 @@ public class AdvancedAlienBrain extends AlienBrain {
     public AdvancedAlienBrain(float _accuracy, float _speed, float _timeStep) {
         super(_accuracy,_speed,_timeStep);
     }
-    
+   
     /**
      * Fetch physical information into the double array nnInput.
      */
@@ -66,14 +67,15 @@ public class AdvancedAlienBrain extends AlienBrain {
             nnInput[2 * i] = in;
             nnInput[2 * i + 1] = (double)j.getBodyA().getAngularVelocity().lengthSquared();
         }
+        
+        // orientation input
+        float[] ypr = this.alien.geometries.get(0).getControl(RigidBodyControl.class).getPhysicsRotation().toAngles(null);
 
-        double bearing = this.alien.geometries.get(0).getControl(RigidBodyControl.class).getPhysicsRotation().toAngles(null)[2];
-
-        nnInput[nnInput.length - 1] = (bearing + Math.PI) / (2.0 * Math.PI);
-
-        if ((bearing + Math.PI) / (2.0 * Math.PI) < 0.0 || (bearing + Math.PI) / (2.0 * Math.PI) > 1.0) {
-            throw new RuntimeException("Angle normalisation incorrect");
-        }
+        nnInput[nnInput.length - 4] = ypr[0];
+        nnInput[nnInput.length - 3] = ypr[1];
+        nnInput[nnInput.length - 2] = ypr[2];
+        // sine wave input
+        nnInput[nnInput.length - 1] = FastMath.sin(tick * 2);
     }
     
     @Override
@@ -95,7 +97,7 @@ public class AdvancedAlienBrain extends AlienBrain {
 
     @Override
     public int getInputCount(AlienNode a) {
-        return a.joints.size() * 2 + 1;
+        return a.joints.size() * 2 + 4;
     }
 
     @Override

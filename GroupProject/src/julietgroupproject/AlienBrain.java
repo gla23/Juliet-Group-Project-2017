@@ -33,7 +33,7 @@ public abstract class AlienBrain extends AbstractControl implements Serializable
     private transient final float accuracy;
     private transient float speed;
     private transient int tickCycle;
-    private transient int tick = 0;
+    protected transient int tick = 0;
     /*
      * The updateInterval is the time (in seconds) between each recalculation of
      * muscle movements by the neural network.
