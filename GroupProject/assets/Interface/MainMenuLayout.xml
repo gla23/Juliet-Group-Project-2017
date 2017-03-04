@@ -511,13 +511,13 @@
 
                                                     <panel id = "space_taker" height = "1.5%"/>
 
-                                                    <control name="label" id = "eigth_label" height = "1.5%" text="Yaw:" />
+                                                    <control name="label" id = "eigth_label" height = "2.2%" text="Yaw:" />
                                                     <control id="yawSlider" name="horizontalSlider" initial = "0.0" width="100%" min = "-1.571" max = "1.571" stepSize = "0.2" buttonStepSize = "0.5"/>
 
-                                                    <control name="label" id = "ninth_label" height = "1.5%" text="Pitch:" />
+                                                    <control name="label" id = "ninth_label" height = "2.2%" text="Pitch:" />
                                                     <control id="pitchSlider" name="horizontalSlider" initial = "0.0" width="100%" min = "-1.571" max = "1.571" stepSize = "0.2" buttonStepSize = "0.5"/>
 
-                                                    <control name="label" id = "tenth_label" height = "1.5%" text="Roll:" />
+                                                    <control name="label" id = "tenth_label" height = "2.2%" text="Roll:" />
                                                     <control id="rollSlider" name="horizontalSlider" initial = "0.0" width="100%" min = "-1.571" max = "1.571" stepSize = "0.2" buttonStepSize = "0.5"/>
 
                                                     <control name="label" id="new_line_1" height = "2%" text=""/>    
