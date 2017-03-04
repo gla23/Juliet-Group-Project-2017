@@ -343,9 +343,8 @@
                                                    
     <screen id="editor" controller="julietgroupproject.GUI.EditorController">
         <layer id="foreground" childLayout="center">
-            
             <panel id="panel_background" width = "100%" height="100%" childLayout="vertical">
-                <effect >
+                <effect>
                              <onActive name="fade" start ="#00" end = "ff" length = "1500" post = "true" />
                              <!--<onActive name="colorPulsate" />-->
                              <!--<onEndScreen name="fade" start ="#ff" end = "00" length = "1500" />-->
@@ -354,293 +353,280 @@
                 </effect>
                 
                 <panel id="panel_middle" width="*" height="100%"  childLayout="horizontal">
-                <panel id = "panel_middle_left"  width= "15%" height = "*" childLayout = "vertical">
+                    <panel id = "panel_middle_left"  width= "15%" height = "*" childLayout = "vertical">
                         <control id="limb_body_tabs" name="tabGroup" buttonWidth="50%" buttonHeight="50px">
                             <control id="add_body_tab" name="tab" caption="Body">
                                 <!--content of tab_1-->
                                 <panel id = "add_body_panel"  width= "100%" height = "100%" childLayout = "vertical">
                                     <panel id = "spare_space_top" backgroundColour = "#33333333" height = "7%" />
-                                        <panel id ="panel_new_body_size_entry" backgroundColour="#33333300" width = "*" height = "50%" childLayout = "vertical">
-                                            <control name="label"text="Body Properties:" width = "100%" height = "10%" valign = "top">
-                                                <effect>
-                                                    <onActive name="changeFont" font = "Interface/Fonts/Test.fnt"/>
-                             
-                                                </effect>
-                                            
-                                            </control>    
+                                    <panel id ="panel_new_body_size_entry" backgroundColour="#33333300" width = "*" height = "50%" childLayout = "vertical">
+                                        <control name="label"text="Body Properties:" width = "100%" height = "10%" valign = "top">
+                                            <effect>
+                                                <onActive name="changeFont" font = "Interface/Fonts/Test.fnt"/>
 
-                                            <panel id = "panel_new_body_entry_fields" backgroundColour="#33333333" width = "*" height = "90%" childLayout = "vertical" valign ="center">
-                                                <control name="label" text="Shape Selector:" height = "12%"/>
-                                                <control id="body_shape_selector" name="dropDown"/>
-                                                <control name="label" id = "first_body_label" height = "9%" width = "100%" text="Width:" />
-
-                                                <control id="bodyWidthSlider" name="horizontalSlider" initial = "2" width="100%" min = "0.5" max = "5.0" stepSize = "0.1" buttonStepSize = "0.3"/>
-
-
-
-                                                <control name="label" id = "third_body_label"text="Length:" height = "9%" width = "100%" />
-                                                <control id="bodyLengthSlider" name="horizontalSlider" initial = "3"  width="100%" min = "0.5" max = "5.0" stepSize = "0.1" buttonStepSize = "0.3"/>
-                                                <control name="label" id = "second_body_label" width = "100%"  height = "9%" text="Height:" />
-                                                <control id="bodyHeightSlider" name="horizontalSlider" initial = "1"width="100%" min = "0.5" max = "5.0" stepSize = "0.1" buttonStepSize = "0.3"/>
-                                                <control name="label" height = "9%" text="Weight:" />
-                                                <control id="bodyWeightSlider" name="horizontalSlider" initial = "1.5"  width="100%" min = "0.5" max = "5.0" stepSize = "0.1" buttonStepSize = "0.2"/>
-
-
-
-
-                                                <panel id= "space" height = "10%" />
-                                                    <control id = "newBodyButton" name = "button" label = "Build New Body" valign = "bottom" align = "center" width = "*">
-                                                    <interact onClick="newBody()"/>
-                                                </control>
-
-
-                                            </panel>
-                                    </panel>
-                                    <panel id="panel_editor_options"  width="*" height="20%" childLayout="vertical">
-                                        
-                                        
-                                        
-                                     </panel>
-                                    <!--<control name="label" text="Random Limb Generator:" height = "5%"/>
-                                    <control name="button" label="Add Limb" id="add_limb_button"  width = "*" align="center" valign="bottom" 
-                                            visibleToMouse="true" > 
-                                            <interact onClick="addLimb()"/>
-                                            <effect >
-                                                
-                                                <onCustom customKey = "fadeOut" name = "fade" start = "#ff" end = "#00"  length = "1500" neverStopRendering = "true"/>
-                                                <onCustom customKey = "fadeIn" name = "fade" start = "#00" end = "#ff"  length = "1500" neverStopRendering = "true"/>
-                            
                                             </effect>
-                                    </control>-->
-                                </panel>
-                            </control>
-                            <control id="add_limb_tab" name="tab" caption="Limb">
-                                <panel id = "add_limb_panel" width = "100%" height = "100%" childLayout = "vertical">
-                                    <panel id = "panel_top" backgroundColour = "#33333333" height = "0%" />
-                                        <panel id ="panel_new_limb_size_entry" backgroundColour="#33333333" width = "200" height = "102%" childLayout = "vertical">
-                                            <control name="label"text="Limb Properties:" height = "4%" width = "100%" valign = "top">
-                                                <effect>
-                                                    <onActive name="changeFont" font = "Interface/Fonts/Test.fnt"/>
 
-                                                    </effect>
-                                            </control>    
+                                        </control>    
 
-                                        <control id="limb_prop_tabs" name="tabGroup"  buttonHeight="50px">
-                                                
-                                            <control id="new_limb_tab" name="tab"  caption="New">
-                                                    
-                                                <control id="newLimbScrollbar"  name="scrollPanel" style="autoscroll"  horizontal="false" height="100%">
-  
+                                        <panel id = "panel_new_body_entry_fields" backgroundColour="#33333333" width = "*" height = "90%" childLayout = "vertical" valign ="center">
+                                            <control name="label" text="Shape Selector:" height = "12%"/>
+                                            <control id="body_shape_selector" name="dropDown"/>
+                                            <control name="label" id = "first_body_label" height = "9%" width = "100%" text="Width:" />
 
-                                                    <panel id="myScrollStuff" backgroundColor = "#88888800" width="100%" height = "110%" childLayout="vertical" >
-                                                        <control name="label" id = "basic_label" height = "4%" text="Limb Options" >
-                                                            <effect>
-                                                                <onActive name="changeFont" font = "Interface/Fonts/ArialBold.fnt"/>
-                             
-                                                            </effect>
-                                                        </control>
-                                                        
-                                                        
-                                                        
-                                                        <control name="label" height = "4%" text="Shape Selector:" />
-                                                        <control id="limb_shape_selector" name="dropDown" />
-                                                        <panel id = "rect_options"  childLayout = "vertical" >
-
-                                                        <panel id = "space_taker" height = "1.5%"/>
-                                                        
-                                                        <control name="label" id = "first_label" height = "2.5%" text="Select  Length:" />
-                                                        <control id="limbWidthSlider" name="horizontalSlider" initial = "1.8" width="100%" min = "0.3" max = "5.0" stepSize = "0.1" buttonStepSize = "0.5"/>
-
-                                                        <control name="label" id = "third_label" height = "2.5%"text="Select  Width:" />
-                                                        <control id="limbLengthSlider" name="horizontalSlider" initial = "0.4" width="100%" min = "0.3" max = "5.0" stepSize = "0.1" buttonStepSize = "0.5"/>
-
-                                                        <control name="label" id = "second_label" height = "2.5%"text="Select  Height:" />
-                                                        <control id="limbHeightSlider" name="horizontalSlider" initial = "0.4" width="100%" min = "0.3" max = "5.0" stepSize = "0.1" buttonStepSize = "0.5"/>     
-
-                                                        <control name="label" id = "forth_label" height = "2.5%"text="Weight:"  />
-                                                        <control id="limbWeightSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1" buttonStepSize = "0.25"/>
-
-                                                        <control name="label" id = "seventh_label" height = "2.7%"text="Limb Seperation:"  />
-                                                        <control id="limbSeparationSlider" name="horizontalSlider" initial = "0.5"  width="100%" min = "0.15" max = "3.0" stepSize = "0.1" buttonStepSize = "0.25"/>
-
-                                                        <panel id = "symmetricPanel" height = "5%" childLayout = "horizontal" >
-                                                            <control name="label" valign = "center" id = "symmetric_label" width = "70%" text="Symmetric:"  />
-                                                            <control id="symmetricCheckBox" valign = "center" name="checkbox" />
-                                                        </panel>
-
-                                                        <panel id = "hingeAxisPanel" height = "11%" childLayout = "vertical">
-                                                            <control id="hingeAxisButtons" name="radioButtonGroup"/>
-                                                            <control name="label" valign = "center" id = "hinge_axis_label" width = "100%" height = "30%" text="Hinge Axis:"/>
-
-                                                            <panel id = "AutoAxisPanel" height = "25%" childLayout = "horizontal" >
-                                                                <control name="label" valign = "center" id = "AutoAxisLabel" width = "70%" text="Auto:"  />
-                                                                <control id="AutoCheckBox" checked = "true" valign = "center" name="radioButton" group="hingeAxisButtons"/>
-                                                            </panel>
-                                                            <panel id = "XAxisPanel" height = "25%" childLayout = "horizontal" >
-                                                                <control name="label" valign = "center" id = "XAxisLabel" width = "70%" text="X:"  />
-                                                                <control id="XCheckBox"  valign = "center" name="radioButton" group="hingeAxisButtons" />
-                                                            </panel>
-                                                            <panel id = "YAxisPanel" height = "25%" childLayout = "horizontal" >
-                                                                <control name="label" valign = "center" id = "YAxisLabel" width = "70%" text="Y:"  />
-                                                                <control id="YCheckBox" valign = "center" name="radioButton" group="hingeAxisButtons"/>
-                                                            </panel>
-                                                            <panel id = "ZAxisPanel" height = "25%" childLayout = "horizontal" >
-                                                                <control name="label" valign = "center" id = "ZAxisLabel" width = "70%" text="Z:"  />
-                                                                <control id="ZCheckBox" valign = "center" name="radioButton" group="hingeAxisButtons"/>
-                                                            </panel>
-                                                        </panel>
-
-                                                        <panel id = "space_taker" height = "5%"/>
-                                                        <control name="label" id = "advanced_label" height = "4.5%" text="Advanced Options" >
-                                                            <effect>
-                                                                <onActive name="changeFont" font = "Interface/Fonts/ArialBold.fnt"/>
-                                                            </effect>
-                                                        </control>
-
-                                                        <panel id = "limbRestrictionPanel" height = "2.5%" childLayout = "vertical" >
-                                                            <control name="label" valign = "center" id = "limb_restriction_label" width = "*" text="Enable joint restriction:"  />
-                                                            <control id="jointRestrictionCheckBox" align="center" valign = "center" name="checkbox" checked="true" />
-                                                        </panel>
-
-                                                        <control name="label" id="space_taker" height = "4.5%" text=""/>
-                                                        
-                                                        <control name="label" id = "minHinge_label" height = "2%" text="Negative limit:" />
-                                                        <control id="minHingeSlider" name="horizontalSlider" initial = "0.785398" width="100%" min = "0.0" max = "1.570796" stepSize = "0.261799" buttonStepSize = "0.261799"/>
-                                                        <control name="label" id = "min_limit_label" height = "1%" text="0                            pi/2" />
+                                            <control id="bodyWidthSlider" name="horizontalSlider" initial = "2" width="100%" min = "0.5" max = "5.0" stepSize = "0.1" buttonStepSize = "0.3"/>
 
 
-                                                        <control name="label" id = "maxHinge_label" height = "2%" text="Positive limit:" />
-                                                        <control id="maxHingeSlider" name="horizontalSlider" initial = "0.785398" width="100%" min = "0.0" max = "1.570796" stepSize = "0.261799" buttonStepSize = "0.261799"/>
-                                                        <control name="label" id = "max_limit_label" height = "1%" text="0                            pi/2" />
 
-                                                        <panel id = "space_taker" height = "1.5%"/>
-                                                        
-                                                        <control name="label" id = "eigth_label" height = "1.5%" text="Yaw:" />
-                                                        <control id="yawSlider" name="horizontalSlider" initial = "0.0" width="100%" min = "-1.571" max = "1.571" stepSize = "0.2" buttonStepSize = "0.5"/>
+                                            <control name="label" id = "third_body_label"text="Length:" height = "9%" width = "100%" />
+                                            <control id="bodyLengthSlider" name="horizontalSlider" initial = "3"  width="100%" min = "0.5" max = "5.0" stepSize = "0.1" buttonStepSize = "0.3"/>
+                                            <control name="label" id = "second_body_label" width = "100%"  height = "9%" text="Height:" />
+                                            <control id="bodyHeightSlider" name="horizontalSlider" initial = "1"width="100%" min = "0.5" max = "5.0" stepSize = "0.1" buttonStepSize = "0.3"/>
+                                            <control name="label" height = "9%" text="Weight:" />
+                                            <control id="bodyWeightSlider" name="horizontalSlider" initial = "1.5"  width="100%" min = "0.5" max = "5.0" stepSize = "0.1" buttonStepSize = "0.2"/>
 
-                                                        <control name="label" id = "ninth_label" height = "1.5%" text="Pitch:" />
-                                                        <control id="pitchSlider" name="horizontalSlider" initial = "0.0" width="100%" min = "-1.571" max = "1.571" stepSize = "0.2" buttonStepSize = "0.5"/>
 
-                                                        <control name="label" id = "tenth_label" height = "1.5%" text="Roll:" />
-                                                        <control id="rollSlider" name="horizontalSlider" initial = "0.0" width="100%" min = "-1.571" max = "1.571" stepSize = "0.2" buttonStepSize = "0.5"/>
 
-                                                        <control name="label" id="new_line_1" height = "2%" text=""/>    
 
-                                                        <control name="label" id = "eleventh_label" height = "2%" text="Joint Position Fraction:" />
-                                                        <control id="jointPosSlider" name="horizontalSlider" initial = "0.1" width="100%" min = "-0.4" max = "1.0" stepSize = "0.1" buttonStepSize = "0.1"/>
-
-                                                        <!--
-                                                        <panel id ="space_taker_2" childLayout = "vertical" height = "8%"/>     
-                                                        <control name ="button" label="Save Limb" height = "4%" align = "center" width = "80%" id = "save_limb_button" visibleToMouse="true">
-                                                            <interact onClick="saveLimb()"/>
-                                                        </control>-->
-                                                    </panel>     
-
-                                                </panel>
-
-                                                </control>
+                                            <panel id= "space" height = "10%" />
+                                                <control id = "newBodyButton" name = "button" label = "Build New Body" valign = "bottom" align = "center" width = "*">
+                                                <interact onClick="newBody()"/>
                                             </control>
 
-                                        <!--
-                                        <control id="saved_limb_tab" name="tab" caption="Saved">
-                                            <control id="savedLimbScrollbar" style="autoscroll"  name="scrollPanel" horizontal="false" height="100%"> 
 
-
-
-
-                                                </control>
-                                            </control>-->
-                                        
-                                        </control>
-                                    </panel>
-                                    <panel id = "space_taker" height = "5%"/>
-                                    <!--<control name ="button" label="Attach Limb" height = "5%" align = "center" width = "80%" id = "attach_limb_button" visibleToMouse="true">
-                                        <interact onClick="attachLimb()"/>
-                                    </control>-->
+                                        </panel>
                                 </panel>
-                            </control>
+                                <panel id="panel_editor_options"  width="*" height="20%" childLayout="vertical">
+                                </panel>
+                                <!--<control name="label" text="Random Limb Generator:" height = "5%"/>
+                                <control name="button" label="Add Limb" id="add_limb_button"  width = "*" align="center" valign="bottom" 
+                                        visibleToMouse="true" > 
+                                        <interact onClick="addLimb()"/>
+                                        <effect >
+
+                                            <onCustom customKey = "fadeOut" name = "fade" start = "#ff" end = "#00"  length = "1500" neverStopRendering = "true"/>
+                                            <onCustom customKey = "fadeIn" name = "fade" start = "#00" end = "#ff"  length = "1500" neverStopRendering = "true"/>
+
+                                        </effect>
+                                </control>-->
+                            </panel>
                         </control>
-                    </panel> <!-- End of left panel-->
-                    <panel id = "panel_middle_right" width= "85%" height = "100%" childLayout = "horizontal" valign = "bottom">
-                        
-                        <panel id = "panel_middle_right_bottom" width = "100%" valign = "bottom" height = "5%" backgroundColor = "#33333333" childLayout = "horizontal">
-                            <control name ="button" label="Editor Options" height = "*" width = "*" id = "editor_options" visibleToMouse="true">
-                                <interact onClick="editorOptions()"/>
-                            </control>
-                            <control name ="button" label="New Alien" height = "*" width = "*" id = "new_alien" visibleToMouse="true">
-                                <interact onClick="newAlien()"/>
-                            </control>
-                            <control name ="button" label="Restart Alien" height = "*" width = "*"  id = "restartAlienButtonMain" visibleToMouse="true">
-                                <interact onClick="restartAlien()"/>
-                            </control>
-                            <control name ="button" label="Save Alien" height = "*" width = "*" id = "save_alien" visibleToMouse="true">
-                                <interact onClick="gotoSaveScreen()"/>
-                            </control>
-                            <control name ="button" label="Load Alien" height = "*" width = "*" id = "load_alien" visibleToMouse="true">
-                                <interact onClick="gotoLoadScreen()"/>
-                            </control>
-                            <control name ="button" label="Train Alien" height = "*" width = "*" id = "new_sim" visibleToMouse="true">
-                                <interact onClick="startTraining()"/>
-                            </control>
-                            <control name ="button" label="Show Best" height = "*" width = "*" id = "best_sim" visibleToMouse="true">
-                                <interact onClick="showBest()"/>
-                            </control>
-                            <control name ="button" label="Reset Training" height = "*" width = "*" id = "reset_sim" visibleToMouse="true">
-                                <interact onClick="resetTraining()"/>
-                            </control>
-                            <control name ="button" label="Hide Editor" height = "*" width = "*" id = "hide_editor" visibleToMouse="true">
-                                <interact onClick="hideEditor()"/>
-                            </control>
-                        </panel>
+                        <control id="add_limb_tab" name="tab" caption="Limb">
+                            <panel id = "add_limb_panel" width = "100%" height = "100%" childLayout = "vertical">
+                                <panel id = "panel_top" backgroundColour = "#33333333" height = "0%" />
+                                <panel id ="panel_new_limb_size_entry" backgroundColour="#33333333" width = "200" height = "102%" childLayout = "vertical">
+                                    <control name="label"text="Limb Properties:" height = "4%" width = "100%" valign = "top">
+                                        <effect>
+                                            <onActive name="changeFont" font = "Interface/Fonts/Test.fnt"/>
+
+                                            </effect>
+                                    </control>    
+                                <!--
+                                <control id="limb_prop_tabs" name="tabGroup"  buttonHeight="50px">
+
+                                    <control id="new_limb_tab" name="tab"  caption="New">
+
+                                        <control id="newLimbScrollbar"  name="scrollPanel" style="autoscroll"  horizontal="false" height="100%">
+
+
+                                            <panel id="myScrollStuff" backgroundColor = "#88888800" width="100%" height = "110%" childLayout="vertical" >
+                                                <control name="label" id = "basic_label" height = "4%" text="Limb Options" >
+                                                    <effect>
+                                                        <onActive name="changeFont" font = "Interface/Fonts/ArialBold.fnt"/>
+
+                                                    </effect>
+                                                </control>
+
+                                                -->
+
+                                                <control name="label" height = "4%" text="Shape Selector:" />
+                                                <control id="limb_shape_selector" name="dropDown" />
+                                                <panel id = "rect_options"  childLayout = "vertical" >
+                                                    <!-- vertical -->
+                                                    <panel id = "space_taker" height = "1.5%"/>
+
+                                                    <control name="label" id = "first_label" height = "2.5%" text="Select  Length:" />
+                                                    <control id="limbWidthSlider" name="horizontalSlider" initial = "1.8" width="100%" min = "0.3" max = "5.0" stepSize = "0.1" buttonStepSize = "0.5"/>
+
+                                                    <control name="label" id = "third_label" height = "2.5%"text="Select  Width:" />
+                                                    <control id="limbLengthSlider" name="horizontalSlider" initial = "0.4" width="100%" min = "0.3" max = "5.0" stepSize = "0.1" buttonStepSize = "0.5"/>
+
+                                                    <control name="label" id = "second_label" height = "2.5%"text="Select  Height:" />
+                                                    <control id="limbHeightSlider" name="horizontalSlider" initial = "0.4" width="100%" min = "0.3" max = "5.0" stepSize = "0.1" buttonStepSize = "0.5"/>     
+
+                                                    <control name="label" id = "forth_label" height = "2.5%"text="Weight:"  />
+                                                    <control id="limbWeightSlider" name="horizontalSlider" initial = "1"  width="100%" min = "0.2" max = "3" stepSize = "0.1" buttonStepSize = "0.25"/>
+
+                                                    <control name="label" id = "seventh_label" height = "2.7%"text="Limb Seperation:"  />
+                                                    <control id="limbSeparationSlider" name="horizontalSlider" initial = "0.5"  width="100%" min = "0.15" max = "3.0" stepSize = "0.1" buttonStepSize = "0.25"/>
+
+                                                    <panel id = "symmetricPanel" height = "5%" childLayout = "horizontal" >
+                                                        <control name="label" valign = "center" id = "symmetric_label" width = "70%" text="Symmetric:"  />
+                                                        <control id="symmetricCheckBox" valign = "center" name="checkbox" />
+                                                    </panel>
+
+                                                    <panel id = "hingeAxisPanel" height = "11%" childLayout = "vertical">
+                                                        <control id="hingeAxisButtons" name="radioButtonGroup"/>
+                                                        <control name="label" valign = "center" id = "hinge_axis_label" width = "100%" height = "30%" text="Hinge Axis:"/>
+
+                                                        <panel id = "AutoAxisPanel" height = "25%" childLayout = "horizontal" >
+                                                            <control name="label" valign = "center" id = "AutoAxisLabel" width = "70%" text="Auto:"  />
+                                                            <control id="AutoCheckBox" checked = "true" valign = "center" name="radioButton" group="hingeAxisButtons"/>
+                                                        </panel>
+                                                        <panel id = "XAxisPanel" height = "25%" childLayout = "horizontal" >
+                                                            <control name="label" valign = "center" id = "XAxisLabel" width = "70%" text="X:"  />
+                                                            <control id="XCheckBox"  valign = "center" name="radioButton" group="hingeAxisButtons" />
+                                                        </panel>
+                                                        <panel id = "YAxisPanel" height = "25%" childLayout = "horizontal" >
+                                                            <control name="label" valign = "center" id = "YAxisLabel" width = "70%" text="Y:"  />
+                                                            <control id="YCheckBox" valign = "center" name="radioButton" group="hingeAxisButtons"/>
+                                                        </panel>
+                                                        <panel id = "ZAxisPanel" height = "25%" childLayout = "horizontal" >
+                                                            <control name="label" valign = "center" id = "ZAxisLabel" width = "70%" text="Z:"  />
+                                                            <control id="ZCheckBox" valign = "center" name="radioButton" group="hingeAxisButtons"/>
+                                                        </panel>
+                                                    </panel>
+
+                                                    <panel id = "space_taker" height = "5%"/>
+                                                    <control name="label" id = "advanced_label" height = "4.5%" text="      Advanced Options      " >
+                                                        <effect>
+                                                            <onActive name="changeFont" font = "Interface/Fonts/ArialBold.fnt"/>
+                                                        </effect>
+                                                    </control>
+
+                                                    <panel id = "limbRestrictionPanel" height = "2.5%" childLayout = "vertical" >
+                                                        <control name="label" valign = "center" id = "limb_restriction_label" width = "*" text="Enable joint restriction:"  />
+                                                        <control id="jointRestrictionCheckBox" align="center" valign = "center" name="checkbox" checked="true" />
+                                                    </panel>
+
+                                                    <control name="label" id="space_taker" height = "4.5%" text=""/>
+
+                                                    <control name="label" id = "minHinge_label" height = "2%" text="Negative limit:" />
+                                                    <control id="minHingeSlider" name="horizontalSlider" initial = "0.785398" width="100%" min = "0.0" max = "1.570796" stepSize = "0.261799" buttonStepSize = "0.261799"/>
+                                                    <control name="label" id = "min_limit_label" height = "2%" text="   0                            pi/2   " />
+
+
+                                                    <control name="label" id = "maxHinge_label" height = "2%" text="Positive limit:" />
+                                                    <control id="maxHingeSlider" name="horizontalSlider" initial = "0.785398" width="100%" min = "0.0" max = "1.570796" stepSize = "0.261799" buttonStepSize = "0.261799"/>
+                                                    <control name="label" id = "max_limit_label" height = "2%" text="   0                            pi/2   " />
+
+                                                    <panel id = "space_taker" height = "1.5%"/>
+
+                                                    <control name="label" id = "eigth_label" height = "1.5%" text="Yaw:" />
+                                                    <control id="yawSlider" name="horizontalSlider" initial = "0.0" width="100%" min = "-1.571" max = "1.571" stepSize = "0.2" buttonStepSize = "0.5"/>
+
+                                                    <control name="label" id = "ninth_label" height = "1.5%" text="Pitch:" />
+                                                    <control id="pitchSlider" name="horizontalSlider" initial = "0.0" width="100%" min = "-1.571" max = "1.571" stepSize = "0.2" buttonStepSize = "0.5"/>
+
+                                                    <control name="label" id = "tenth_label" height = "1.5%" text="Roll:" />
+                                                    <control id="rollSlider" name="horizontalSlider" initial = "0.0" width="100%" min = "-1.571" max = "1.571" stepSize = "0.2" buttonStepSize = "0.5"/>
+
+                                                    <control name="label" id="new_line_1" height = "2%" text=""/>    
+
+                                                    <control name="label" id = "eleventh_label" height = "2%" text="Joint Position Fraction:" />
+                                                    <control id="jointPosSlider" name="horizontalSlider" initial = "0.1" width="100%" min = "-0.4" max = "1.0" stepSize = "0.1" buttonStepSize = "0.1"/>
+
+
+                                                </panel>     
+                                                <!--
+                                        </panel>
+
+                                        </control>
+                                    </control>
+
+
+                                    </control>
+                                    -->
+                                </panel>
+                                <panel id = "space_taker" height = "5%"/>
+                                <!--<control name ="button" label="Attach Limb" height = "5%" align = "center" width = "80%" id = "attach_limb_button" visibleToMouse="true">
+                                    <interact onClick="attachLimb()"/>
+                                </control>-->
+
+
+                            </panel>
+                        </control>
+                    </control>
+                </panel> <!-- End of left panel-->
+                <panel id = "panel_middle_right" width= "85%" height = "100%" childLayout = "horizontal" valign = "bottom">
+
+                    <panel id = "panel_middle_right_bottom" width = "100%" valign = "bottom" height = "5%" backgroundColor = "#33333333" childLayout = "horizontal">
+                        <control name ="button" label="Editor Options" height = "*" width = "*" id = "editor_options" visibleToMouse="true">
+                            <interact onClick="editorOptions()"/>
+                        </control>
+                        <control name ="button" label="New Alien" height = "*" width = "*" id = "new_alien" visibleToMouse="true">
+                            <interact onClick="newAlien()"/>
+                        </control>
+                        <control name ="button" label="Restart Alien" height = "*" width = "*"  id = "restartAlienButtonMain" visibleToMouse="true">
+                            <interact onClick="restartAlien()"/>
+                        </control>
+                        <control name ="button" label="Save Alien" height = "*" width = "*" id = "save_alien" visibleToMouse="true">
+                            <interact onClick="gotoSaveScreen()"/>
+                        </control>
+                        <control name ="button" label="Load Alien" height = "*" width = "*" id = "load_alien" visibleToMouse="true">
+                            <interact onClick="gotoLoadScreen()"/>
+                        </control>
+                        <control name ="button" label="Train Alien" height = "*" width = "*" id = "new_sim" visibleToMouse="true">
+                            <interact onClick="startTraining()"/>
+                        </control>
+                        <control name ="button" label="Show Best" height = "*" width = "*" id = "best_sim" visibleToMouse="true">
+                            <interact onClick="showBest()"/>
+                        </control>
+                        <control name ="button" label="Reset Training" height = "*" width = "*" id = "reset_sim" visibleToMouse="true">
+                            <interact onClick="resetTraining()"/>
+                        </control>
+                        <control name ="button" label="Hide Editor" height = "*" width = "*" id = "hide_editor" visibleToMouse="true">
+                            <interact onClick="hideEditor()"/>
+                        </control>
                     </panel>
-                    
-                </panel> <!--End of middle section-->
-                
-            </panel> <!-- End of whole screen panel-->
-        </layer>
-    </screen>
-    <screen id="hidden" controller="julietgroupproject.GUI.HiddenController" childLayout="right">
-        <layer id="hidden_layer" childLayout="center" width = "100%" >
-            <panel id = "hidden_center" width= "100%" valign = "bottom" height = "5%" childLayout = "vertical">
-                <control name = "button" label = "Show Editor" id = "show_editor" height = "100%" align = "right"  width = "11%"
-                         visibleToMouse = "true" >
-                    <interact onClick="showEditor()"/>
-                </control>
-            </panel>
-            
-        </layer>
-    </screen>
-    <screen id="simulation" controller="julietgroupproject.GUI.SimulationController" childLayout="right">
-        <layer id="simluation_layer" childLayout="center" width="100%" >
+                </panel>
 
-            <panel id="alien_message_box" width="20%" valign="bottom" align="center" height="5%" childLayout="vertical" backgroundColor="#00000088">
-                <control id="alien_message" width="100%" height="100%" name="label" text="" color="ffffffff">
-                </control> 
-            </panel>
-         
-            <panel id="simulation_logger" width="20%" valign="top" align="left" height="60%" childLayout="vertical" backgroundColor="#aaaaaa00">
-                <control id="logger_listbox" name="listBox" vertical="optional" horizontal="off" displayItems="20" selectionMode="Single" color="#aaaaaa33">
-                    <effect>
-                        <onActive name="fade" start="#ff" end="55" length="1"/>
-                    </effect>
-                </control>
-                <control id="current_gen_message" width="100%" height="*" name="label" text="" color="ffffffff">
-                </control>
-            </panel>
+            </panel> <!--End of middle section-->
 
-            <panel id = "simulation_graph" width= "40%" valign = "top" align="right" height = "20%" childLayout = "vertical" backgroundColor="#aaaaaa00">
-                <!--image id="graphId" width = "100%"  height ="100%" filename="Textures/blank.png" /-->
-                <!-- put the image we show before any graph is generated in
-                assets/Textures/blank.png or whatever -->
-                <image id="graphId" width = "100%"  height ="100%" />
-            </panel>
+        </panel> <!-- End of whole screen panel-->
+    </layer>
+</screen>
+<screen id="hidden" controller="julietgroupproject.GUI.HiddenController" childLayout="right">
+    <layer id="hidden_layer" childLayout="center" width = "100%" >
+        <panel id = "hidden_center" width= "100%" valign = "bottom" height = "5%" childLayout = "vertical">
+            <control name = "button" label = "Show Editor" id = "show_editor" height = "100%" align = "right"  width = "11%"
+                     visibleToMouse = "true" >
+                <interact onClick="showEditor()"/>
+            </control>
+        </panel>
 
-            <panel id="simulation_button" width="100%" valign="bottom" height="5%" childLayout="vertical">
-                <control name="button" label="Stop Simulation" id="stop_simulation" height="100%" align="right"  width="13%"
-                         visibleToMouse="true" >
-                    <interact onClick="stopSimulation()"/>
-                </control>
-            </panel>
-        </layer>
-    </screen>
+    </layer>
+</screen>
+<screen id="simulation" controller="julietgroupproject.GUI.SimulationController" childLayout="right">
+    <layer id="simluation_layer" childLayout="center" width="100%" >
+
+        <panel id="alien_message_box" width="20%" valign="bottom" align="center" height="5%" childLayout="vertical" backgroundColor="#00000088">
+            <control id="alien_message" width="100%" height="100%" name="label" text="" color="ffffffff">
+            </control> 
+        </panel>
+
+        <panel id="simulation_logger" width="20%" valign="top" align="left" height="60%" childLayout="vertical" backgroundColor="#aaaaaa00">
+            <control id="logger_listbox" name="listBox" vertical="optional" horizontal="off" displayItems="20" selectionMode="Single" color="#aaaaaa33">
+                <effect>
+                    <onActive name="fade" start="#ff" end="55" length="1"/>
+                </effect>
+            </control>
+            <control id="current_gen_message" width="100%" height="*" name="label" text="" color="ffffffff">
+            </control>
+        </panel>
+
+        <panel id = "simulation_graph" width= "40%" valign = "top" align="right" height = "20%" childLayout = "vertical" backgroundColor="#aaaaaa00">
+            <!--image id="graphId" width = "100%"  height ="100%" filename="Textures/blank.png" /-->
+            <!-- put the image we show before any graph is generated in
+            assets/Textures/blank.png or whatever -->
+            <image id="graphId" width = "100%"  height ="100%" />
+        </panel>
+
+        <panel id="simulation_button" width="100%" valign="bottom" height="5%" childLayout="vertical">
+            <control name="button" label="Stop Simulation" id="stop_simulation" height="100%" align="right"  width="13%"
+                     visibleToMouse="true" >
+                <interact onClick="stopSimulation()"/>
+            </control>
+        </panel>
+    </layer>
+</screen>
 </nifty>
