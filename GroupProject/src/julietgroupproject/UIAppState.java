@@ -41,6 +41,8 @@ import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.controls.ListBox;
+import de.lessvoid.nifty.controls.Tab;
+import de.lessvoid.nifty.controls.TabGroup;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.ImageRenderer;
 import de.lessvoid.nifty.render.NiftyImage;
@@ -55,14 +57,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import julietgroupproject.GUI.MainMenuController;
+import java.util.concurrent.Executors;
+import julietgroupproject.GUI.*;
 import org.encog.ml.MLRegression;
 import org.encog.util.obj.ObjectCloner;
 
 public class UIAppState extends DrawingAppState implements ActionListener {
 
     boolean runningPhysics = true;
-    private MainMenuController myMainMenuController;
+    private EditorController editorController;
     float limbPower = 0.8f;
     float limbTargetVolcity = 2f;
     float time;
@@ -70,12 +73,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     float minSphereDimension = 0.4f;
     public SavedAlien savedAlien;
     private Nifty nifty;
-    private boolean wireMesh = true;
+    private boolean wireMesh = false;
     private ChaseCamera chaseCam;
     private float horizontalAngle = 0;
     private float verticalAngle = 0;
     private float cameraZoom = 25;
-    private boolean smoothCam = false;
+    private boolean smoothCamera = false;
     private final int SIM_COUNT = 8;
     private static final int DEFAULT_FRAMERATE = 60;
     private List<SlaveSimulator> slaves = new ArrayList<>(SIM_COUNT);
@@ -188,29 +191,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         editing = false;
     }
 
-    private synchronized void endSingleSim() {
-        this.stopSimulation();
-
-        resetAlien();
-
-        instantiateAlien(alien, startLocation);
-        setChaseCam(this.currentAlienNode);
-        setupKeys(this.currentAlienNode);
-
-        restartAlien();
-
-        editing = true;
-        runningSingle = false;
-
-        nifty.gotoScreen("start");
-        myMainMenuController.addValues();
-        if (!showArrow) {
-            showArrow = hideArrow();
-        }
-
-        setGravity(0.0f);
-    }
-
     public void setAlienMessage(String msg) {
         if (!editing) {
             Label niftyLabel = nifty.getScreen("simulation").findNiftyControl("alien_message", Label.class);
@@ -296,19 +276,66 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         physics.getPhysicsSpace().setGravity(new Vector3f(0, -newGrav, 0));
         restartAlien();
     }
-
+    
+    /**
+     * Called when user press New Alien or ? TODO
+     */
     public void resetAlien() {
+        
         reset();
+        String oldName = this.savedAlien.getName();
+        this.savedAlien = new SavedAlien();
+        this.savedAlien.setName(oldName);
+        this.savedAlien.alienChanged();
     }
 
-    public void toggleSmoothness() {
-        smoothCam = !smoothCam;
-        chaseCam.setSmoothMotion(smoothCam);
+    public void toggleSmoothCamera() {
+        setSmoothCamera(!smoothCamera);
     }
 
     public void toggleWireMesh() {
+        setWireMesh(!wireMesh);
+    }
+    
+    public void toggleArrow()
+    {
+        setArrow(!showArrow);
+    }
+    
+    public void setWireMesh(boolean b)
+    {
+        wireMesh = b;
         physics.setDebugEnabled(wireMesh);
-        wireMesh = !wireMesh;
+    }
+    
+    public void setArrow (boolean b)
+    {
+        showArrow = b;
+        if (showArrow)
+            showArrow();
+        else
+            hideArrow();
+    }
+    
+    public void setSmoothCamera(boolean b)
+    {
+        smoothCamera = b;
+        chaseCam.setSmoothMotion(smoothCamera);
+    }
+    
+    public boolean getWireMeshOn()
+    {
+        return wireMesh;
+    }
+    
+    public boolean getSmoothCameraOn()
+    {
+        return smoothCamera;
+    }
+    
+    public boolean getArrowOn()
+    {
+        return showArrow;
     }
 
     //Method for easily printing out vectors for debugging
@@ -415,7 +442,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     private void updateGhostBody() {
-        boolean actuallyEditing = nifty.getCurrentScreen().getScreenId().equals("start");
+        boolean actuallyEditing = nifty.getCurrentScreen().getScreenId().equals("editor") || nifty.getCurrentScreen().getScreenId().equals("hidden");
 
         if (ghostBody != null && (this.currentAlienNode != null || !actuallyEditing)) {
             this.physics.getPhysicsSpace().remove(this.ghostBody.getControl(GhostControl.class));
@@ -512,7 +539,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public void updateGhostLimb() {
-        
+
         removeRemovalGhostLimbs(removalGhostRoot);
         if (editing) {
             // remove deletion ghost, if exists
@@ -562,9 +589,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 ghostLimb = null;
                 ghostLimbSymmetric = null;
             }
-            this.isCollisionOccuring = ghostCollisionCheck(ghostLimb) |
-                    ghostCollisionCheck(ghostLimbSymmetric);
-            
+            this.isCollisionOccuring = ghostCollisionCheck(ghostLimb)
+                    | ghostCollisionCheck(ghostLimbSymmetric);
+
         } else {
             // make sure there is no ghost in simulation
             removeAdditionGhostLimbs(additionGhostRoot);
@@ -592,8 +619,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             chaseCam = new ChaseCamera(cam, shape, inputManager);
         }
         //toggleSmoothness();
-        chaseCam.setSmoothMotion(smoothCam);
-        if (smoothCam) {
+        chaseCam.setSmoothMotion(smoothCamera);
+        if (smoothCamera) {
             chaseCam.setDefaultDistance(20.6f);
         } else {
             chaseCam.setDefaultDistance(cameraZoom);
@@ -653,14 +680,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     }
 
-    public void toggleArrow() {
-        if (!showArrow) {
-            showArrow();
-        } else {
-            hideArrow();
-        }
-    }
-
     // Returns closest collision result after casting ray from cursor
     private CollisionResult getCursorRaycastCollision() {
         return getCursorRaycastCollision(this.rootNode);
@@ -690,6 +709,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (block != null) {
             if (block == alien.rootBlock) {
                 resetAlien();
+                nifty.getScreen("editor").findNiftyControl("limb_body_tabs", TabGroup.class).setSelectedTab(
+                        nifty.getScreen("editor").findNiftyControl("add_body_tab", Tab.class));
             } else {
                 alien.rootBlock.removeDescendantBlock(block);
                 restartAlien();
@@ -781,7 +802,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         savedAlien.alienChanged();
         // check if valid:
         // force update physics space
-        if (isCollisionOccuring) { return; }
+        if (isCollisionOccuring) {
+            return;
+        }
 
         //Get rid of old alien on screen
         if (this.currentAlienNode != null) {
@@ -805,27 +828,23 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public boolean resetTraining() {
-        savedAlien.alienChanged();
-        return true;
-    }
-
-    public String[] getLoadableAliens() {
-        File file = new File("aliens");
-        String[] directories = file.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File current, String name) {
-                return new File(current, name).isDirectory();
-            }
-        });
-        return directories;
+        if (this.trainer == null || !this.trainer.getIsRunning())
+        {
+            savedAlien.alienChanged();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public boolean loadAlien(String name) {
         SavedAlien a = AlienHelper.readAlien(name);
         if (a != null && a.body != null) {
+            resetAlien();
             alien = a.body;
             this.savedAlien = a;
-            resetAlien();
             instantiateAlien(alien, startLocation);
             setChaseCam(this.currentAlienNode);
             setupKeys(this.currentAlienNode);
@@ -853,25 +872,27 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         // disable gravity initially
         setGravity(0.0f);
 
-        myMainMenuController = new MainMenuController(this);
-
-        stateManager.attach(myMainMenuController);
+        editorController = new EditorController(this);
 
         //Set up nifty
         NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, guiViewPort);
 
         nifty = niftyDisplay.getNifty();
 
-
         guiViewPort.addProcessor(niftyDisplay);
-        nifty.fromXml("Interface/MainMenuLayout.xml", "begin", myMainMenuController);
-        //nifty.setDebugOptionPanelColors(true); //un-comment this line to use DebugPanelColors and make sure Nifty is running correctly.
-
-        //flyCam.setDragToRotate(true); //detaches camera from mouse unless you click/drag.a
+        nifty.fromXml("Interface/MainMenuLayout.xml", "begin",
+                editorController,
+                new BeginController(this),
+                new EditorOptionsController(this),
+                new HiddenController(this),
+                new LoadDialogController(this),
+                new LoadFailDialogController(this),
+                new MessageController(this),
+                new NameDialogController(this),
+                new SaveDialogController(this),
+                new SimulationController(this));
 
         flyCam.setEnabled(false);
-
-        addKeyBindings();
 
         // setup ghost root node
         this.additionGhostRoot = new Node("addition ghost root");
@@ -948,8 +969,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public boolean beginTraining() {
-        if (alien == null || alien.rootBlock.getConnectedLimbs().size() == 0) {
-            return false;
+        if (alien == null || alien.rootBlock.getConnectedLimbs().size() == 0 || (this.trainer != null && this.trainer.getIsRunning())) {
+            return false; //TODO edit error message for case where training still going on in background.
         }
         nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class).clear();
 
@@ -1004,7 +1025,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         showOffRequest = -1;
         this.stopSimulation();
 
-        resetAlien();
+        reset();
 
         instantiateAlien(alien, startLocation);
         setChaseCam(this.currentAlienNode);
@@ -1050,34 +1071,31 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
         if ("ToggleMesh".equals(string)) {
             if (!bln) {
-                CheckBox mesh = nifty.getScreen("editor_options").findNiftyControl("wireMeshCheckBox", CheckBox.class);
-                mesh.setChecked(!mesh.isChecked());
+                toggleWireMesh();
             }
         }
 
         if ("ToggleArrow".equals(string)) {
             if (!bln) {
-                CheckBox arrow = nifty.getScreen("editor_options").findNiftyControl("directionArrowCheckBox", CheckBox.class);
-                arrow.setChecked(!arrow.isChecked());
+                toggleArrow();
             }
         }
 
         if ("ToggleSmooth".equals(string)) {
             if (!bln) {
-                CheckBox chasecam = nifty.getScreen("editor_options").findNiftyControl("chaseCamCheckBox", CheckBox.class);
-                chasecam.setChecked(!chasecam.isChecked());
+                toggleSmoothCamera();
             }
         }
 
         if ("GoToEditor".equals(string)) {
             if (!bln) {
-                myMainMenuController.editorOptions();
+                editorController.editorOptions();
             }
         }
 
         if ("Pulsate".equals(string)) {
             if (!bln) {
-                myMainMenuController.pulsateToggle();
+                editorController.pulsateToggle();
             }
         }
 
@@ -1089,18 +1107,18 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         //When right mouse button clicked, fire ray to see if intersects with body
         if ("AddLimb".equals(string) && !bln && !checkRootNull()) {
 
-            
+
             CollisionResult collision = getCursorRaycastCollision(this.currentAlienNode);
 
 
             //If collided then generate new limb at collision point
             if (collision != null) {
-                
+
                 Block block = findBlockFromCollision(collision);
 
                 if (block != null) {
 
-                    
+
                     if (!shiftDown) {
                         Geometry geo = collision.getGeometry();
                         Vector3f colpt = collision.getContactPoint();
@@ -1267,7 +1285,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                         setAlienMessage("Running best generation so far"); //shouldn't be run
                     } else {
                         if (trainer != null) {
-                            s = new SimulationData(trainer.getBestSoFar(), AlienEvaluator.simTime);
+                            s = new SimulationData(AlienTrainer.getBestSoFar(this.savedAlien.train), AlienEvaluator.simTime);
                             setAlienMessage("Running initial generation");
                         }
                     }
@@ -1279,10 +1297,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 }
                 if (s != null) {
                     startSimulation(s);
-                } else {
-                    if (runningSingle) {
-                        endSingleSim();
-                    }
                 }
             }
         }
@@ -1290,6 +1304,33 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         updateLog();
         updateGhostBody();
         updatePrevBodyValues();
+    }
+
+    public void setFieldSafe(final String fieldName, final String value) {
+        app.enqueue(Executors.callable(new Runnable() {
+            @Override
+            public void run() {
+                setNiftyField(fieldName, value);
+            }
+        }));
+    }
+
+    public void setFieldSafe(final String fieldName, final float value) {
+        app.enqueue(Executors.callable(new Runnable() {
+            @Override
+            public void run() {
+                setNiftyField(fieldName, value);
+            }
+        }));
+    }
+
+    public void setFieldSafe(final String fieldName, final boolean value) {
+        app.enqueue(Executors.callable(new Runnable() {
+            @Override
+            public void run() {
+                setNiftyField(fieldName, value);
+            }
+        }));
     }
 
     @Override

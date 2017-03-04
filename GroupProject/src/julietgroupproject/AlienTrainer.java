@@ -16,41 +16,35 @@ import org.encog.util.obj.ObjectCloner;
 public class AlienTrainer extends Thread {
 
     //configurable constants
-    
     /**
      * population size to use.
      */
     private final static int POPULATION = 30;
-    
     /**
      * number of generations to perform before automatically saving.
      */
     private final static int ITERATIONS_BETWEEN_SAVES = 5; //
-    
     //local state
-    
     /**
      * the alien we are training to walk, contains the trainer itself.
      */
     private SavedAlien savedAlien;
-    
     /**
      * list of slaves to kill when we have terminated.
      */
     private final List<SlaveSimulator> slaves;
-
     //volatile state (can be modified concurrently):
-    
     /**
      * flag to indicate we should stop training after current generation.
      */
     private volatile boolean terminating = false;
-    
     /**
-     * the ConcurrentLinkedQueue containing simulation tasks, copying to AlienEvalutor.
+     * the ConcurrentLinkedQueue containing simulation tasks, copying to
+     * AlienEvalutor.
      */
     private Queue<SimulationData> simTasks;
-    
+    private volatile boolean isRunning;
+
     /**
      * Create a new trainer to train an alien to walk
      *
@@ -58,9 +52,6 @@ public class AlienTrainer extends Thread {
      * @param _simTasks a queue onto which neural networks can be placed which
      * causes them to then be simulated and have their fitness evaluated
      */
-
-    
-
     public AlienTrainer(SavedAlien _savedAlien, Queue<SimulationData> _simTasks, List<SlaveSimulator> _slaves) {
 
         savedAlien = _savedAlien;
@@ -94,51 +85,58 @@ public class AlienTrainer extends Thread {
 
     /**
      * Get the best neural network trained so far
-     * 
+     *
+     * @param train trainer to get best genome from
      * @return best neural network so far
      */
-    public MLRegression getBestSoFar() {
-        return (MLRegression) this.savedAlien.train.getCODEC().decode(this.savedAlien.train.getBestGenome());
+    public static MLRegression getBestSoFar(EvolutionaryAlgorithm train) {
+        if (train != null) {
+            return (MLRegression) train.getCODEC().decode(train.getBestGenome());
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void run() {
-        
+
         // Remove stale TaskExecutors and other threading related transient fields
         // in trainer by serialising then deserialising.
         // the ObjectCloner uses ByteArrayInputStream/ByteArrayOutputStream
         // to do the serialisation/deserialisation in memory.
         // TODO: fix this hack to remove the one-off overhead
+        isRunning = true;
         this.savedAlien.train = (EvolutionaryAlgorithm) ObjectCloner.deepCopy(this.savedAlien.train);
-        
+        EvolutionaryAlgorithm trainer = this.savedAlien.train;
+
         // Score function (AlienEvaluator) is also stored in serialised trainer,
         //but the reference to queue needs update everytime we start/restart training.
-        ((AlienEvaluator) (this.savedAlien.train.getScoreFunction())).setQueue(simTasks);
+        ((AlienEvaluator) (trainer.getScoreFunction())).setQueue(simTasks);
         try {
             //loop until a stop is requested by calling terminateTraining
             do {
                 //get fitnesses for the next generation
-                this.savedAlien.train.iteration();
+                trainer.iteration();
 
                 //get information about the generation's performance
 
                 //store information about the generation's performance
                 this.savedAlien.addEntry(new GenerationResult(
-                        this.savedAlien.train.getIteration(),
-                        (float) this.savedAlien.train.getPopulation().getBestGenome().getScore(),
-                        getBestSoFar()));
+                        trainer.getIteration(),
+                        (float) trainer.getPopulation().getBestGenome().getScore(),
+                        getBestSoFar(trainer)));
 
                 //save if generation number a multiple of the save interval
-                if (this.savedAlien.train.getIteration() % ITERATIONS_BETWEEN_SAVES == 0) {
+                if (trainer.getIteration() % ITERATIONS_BETWEEN_SAVES == 0) {
                     AlienHelper.writeAlien(savedAlien);
                 }
             } while (!terminating);
         } finally {
             //signal to Encog to close its threads and stop requesting fitnesses
-            this.savedAlien.train.finishTraining();
+            trainer.finishTraining();
 
             //write out current population state to file.
             AlienHelper.writeAlien(savedAlien);
@@ -150,6 +148,7 @@ public class AlienTrainer extends Thread {
                 }
                 slaves.clear();
             }
+            isRunning = false;
         }
     }
 
@@ -157,8 +156,12 @@ public class AlienTrainer extends Thread {
      * Ask the trainer to stop after the current generation.
      */
     public void terminateTraining() {
-        
+
         //signal to stop after current generation completed
         terminating = true;
+    }
+
+    public boolean getIsRunning() {
+        return isRunning;
     }
 }
