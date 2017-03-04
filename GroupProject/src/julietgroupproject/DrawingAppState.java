@@ -226,10 +226,6 @@ public class DrawingAppState extends SimulatorAppState {
         arrowMaterial.setColor("Color", ColorRGBA.Blue);
         arrowGeometry.setMaterial(arrowMaterial);
         arrowGeometry.setLocalTranslation(0, -3.5f, 0);
-        RigidBodyControl r = new RigidBodyControl();
-        arrowGeometry.addControl(r);
-        // Remove arrow from physics
-        physics.getPhysicsSpace().removeCollisionObject(r);
     }
 
     public boolean showArrow() {
