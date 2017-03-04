@@ -40,10 +40,18 @@ public class LearnToBeAnAlien extends SimpleApplication {
         //display settings
         AppSettings settings = new AppSettings(true);
         settings.setTitle("Learn To Be An Alien");
-        settings.put("Width", 1920*4/5);
-        settings.put("Height",1080*4/5);
+        
+        if (true) {
+            settings.put("Width", 1920*4/5);
+            settings.put("Height",1080*4/5);
+            settings.setFullscreen(false);
+        }else{
+            settings.put("Width", 1920);
+            settings.put("Height",1080);
+            settings.setFullscreen(true);
+        }
+        
         settings.setFrameRate(FRAMERATE);
-        settings.setFullscreen(false);
         app.setSettings(settings);
         
         //start the application

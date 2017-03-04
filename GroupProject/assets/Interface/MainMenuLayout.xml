@@ -410,33 +410,33 @@
                                 </control>-->
                             </panel>
                         </control>
-                        <control id="add_limb_tab" name="tab" caption="Limb">
+                        <control id="add_limb_tab" name="tab" caption="Limb" height = "100%">
                             <panel id = "add_limb_panel" width = "100%" height = "100%" childLayout = "vertical">
-                                <panel id = "panel_top" backgroundColour = "#33333333" height = "0%" />
-                                <panel id ="panel_new_limb_size_entry" backgroundColour="#33333333" width = "200" height = "102%" childLayout = "vertical">
+                                <panel id ="panel_top" backgroundColour = "#33333333" height = "0%" />
+                                <panel id ="panel_new_limb_size_entry" backgroundColour="#33333333" width = "100%" height = "100%" childLayout = "vertical">
                                     <control name="label"text="Limb Properties:" height = "4%" width = "100%" valign = "top">
                                         <effect>
                                             <onActive name="changeFont" font = "Interface/Fonts/Test.fnt"/>
 
                                             </effect>
                                     </control>    
-                                <!--
+                                <!-- here 2 or 3 rows 
                                 <control id="limb_prop_tabs" name="tabGroup"  buttonHeight="50px">
 
                                     <control id="new_limb_tab" name="tab"  caption="New">
-
+                                        
                                         <control id="newLimbScrollbar"  name="scrollPanel" style="autoscroll"  horizontal="false" height="100%">
-
-
-                                            <panel id="myScrollStuff" backgroundColor = "#88888800" width="100%" height = "110%" childLayout="vertical" >
-                                                <control name="label" id = "basic_label" height = "4%" text="Limb Options" >
+                                        -->
+                                            
+                                            <panel id="myScrollStuff" backgroundColor = "#88888800" width="100%" height = "90%" childLayout="vertical" >
+                                                <control name="label" id = "basic_label" height = "4%" text="       Limb Options       " >
                                                     <effect>
                                                         <onActive name="changeFont" font = "Interface/Fonts/ArialBold.fnt"/>
 
                                                     </effect>
                                                 </control>
 
-                                                -->
+                                                
 
                                                 <control name="label" height = "4%" text="Shape Selector:" />
                                                 <control id="limb_shape_selector" name="dropDown" />
@@ -527,15 +527,16 @@
 
 
                                                 </panel>     
-                                                <!--
+                                                
                                         </panel>
-
+                                        <!--
                                         </control>
+                                         
                                     </control>
 
 
                                     </control>
-                                    -->
+                                    back 2 or 3 rows-->
                                 </panel>
                                 <panel id = "space_taker" height = "5%"/>
                                 <!--<control name ="button" label="Attach Limb" height = "5%" align = "center" width = "80%" id = "attach_limb_button" visibleToMouse="true">
