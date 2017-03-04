@@ -276,12 +276,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         physics.getPhysicsSpace().setGravity(new Vector3f(0, -newGrav, 0));
         restartAlien();
     }
-    
+
     /**
      * Called when user press New Alien or ? TODO
      */
     public void resetAlien() {
-        
+
         reset();
         String oldName = this.savedAlien.getName();
         this.savedAlien = new SavedAlien();
@@ -296,45 +296,39 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public void toggleWireMesh() {
         setWireMesh(!wireMesh);
     }
-    
-    public void toggleArrow()
-    {
+
+    public void toggleArrow() {
         setArrow(!showArrow);
     }
-    
-    public void setWireMesh(boolean b)
-    {
+
+    public void setWireMesh(boolean b) {
         wireMesh = b;
         physics.setDebugEnabled(wireMesh);
     }
-    
-    public void setArrow (boolean b)
-    {
+
+    public void setArrow(boolean b) {
         showArrow = b;
-        if (showArrow)
+        if (showArrow) {
             showArrow();
-        else
+        } else {
             hideArrow();
+        }
     }
-    
-    public void setSmoothCamera(boolean b)
-    {
+
+    public void setSmoothCamera(boolean b) {
         smoothCamera = b;
         chaseCam.setSmoothMotion(smoothCamera);
     }
-    
-    public boolean getWireMeshOn()
-    {
+
+    public boolean getWireMeshOn() {
         return wireMesh;
     }
-    
-    public boolean getSmoothCameraOn()
-    {
+
+    public boolean getSmoothCameraOn() {
         return smoothCamera;
     }
-    
-    public boolean getArrowOn()
-    {
+
+    public boolean getArrowOn() {
         return showArrow;
     }
 
@@ -351,6 +345,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         copy.height += 0.02;
 
         copy.setPosition(copy.getPosition().add(new Vector3f(-0.01f, -0.01f, -0.01f)));
+
         Geometry gl = AlienHelper.assembleBlock(copy, block.getGeometry().getWorldTranslation());
         gl.setMaterial(redGhostMaterial);
         removalGhostRoot.attachChild(gl);
@@ -367,8 +362,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
 
         float limbWidth = getNiftyFloat("limbWidth");
-        float limbHeight = getNiftyFloat("limbHeight");
-        float limbLength = getNiftyFloat("limbLength");
+        float yaw = getNiftyFloat("limbYaw");
+        float pitch = getNiftyFloat("limbPitch");
+        float roll = getNiftyFloat("limbRoll");
         float limbSeparation = getNiftyFloat("limbSeparation");
         // currentHingeAxis Will be either "X", "Y", "Z" or "A" for auto
 
@@ -466,20 +462,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 }
                 // update body ghost
                 // TODO: can someone please factor the following piece of code out!
-                Matrix3f rotationForNormal = new Matrix3f();
-                Vector3f normal = Vector3f.UNIT_X;
-
-                if (currentShape.equals("Cylinder")) {
-                    rotationForNormal.fromStartEndVectors(Vector3f.UNIT_Z, normal);
-                } else {
-                    rotationForNormal.fromStartEndVectors(Vector3f.UNIT_X, normal);
-                }
-                if (currentShape.equals("Sphere")) {
-                    rotationForNormal = rotationForNormal.mult(new Matrix3f(bodyWidth, 0f, 0f, 0f, bodyHeight, 0f, 0f, 0f, bodyLength));
-                }
                 Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", 1.0f);
-                // TODO: and this line as well!
-                bodyBlock.setRotation(rotationForNormal);
 
                 Geometry gb = AlienHelper.assembleBlock(bodyBlock, startLocation);
                 gb.setLocalTranslation(startLocation);
@@ -656,20 +639,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             String currentShape = getNiftyString("currentBodyShape");
             Vector3f pos = this.startLocation;
 
-            Matrix3f rotationForNormal = new Matrix3f();
-            Vector3f normal = Vector3f.UNIT_X;
-
-            if (currentShape.equals("Cylinder")) {
-                rotationForNormal.fromStartEndVectors(Vector3f.UNIT_Z, normal);
-            } else {
-                rotationForNormal.fromStartEndVectors(Vector3f.UNIT_X, normal);
-            }
-            if (currentShape.equals("Sphere")) {
-                rotationForNormal = rotationForNormal.mult(new Matrix3f(bodyWidth, 0f, 0f, 0f, bodyHeight, 0f, 0f, 0f, bodyLength));
-            }
-
             Block bodyBlock = new Block(pos, pos.mult(0.5f), bodyWidth, bodyHeight, bodyLength, currentShape, "ZAxis", bodyWeight);
-            bodyBlock.setRotation(rotationForNormal);
             int texturecode = alien != null ? alien.materialCode : textureNo;
             setAlien(new Alien(bodyBlock));
             alien.materialCode = texturecode;
@@ -745,7 +715,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         Vector3f newPos;
         newPos = contactPt.add(normal.mult(limbWidth + limbSeparation));
         newHingePos = contactPt.add(normal.mult(4 * jointPositionFraction));
-        
+
         // Work out which hinge axis would make sense for auto hinge axis
         String axisToUse = "ZAxis";
         if (currentHingeAxis.equals("A")) {
@@ -772,9 +742,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             rotationForNormal.fromStartEndVectors(new Vector3f(0, 0, 1), normal);
         } else {
             rotationForNormal.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
-        }
-        if (currentShape.equals("Sphere")) {
-            rotationForNormal = rotationForNormal.mult(new Matrix3f(limbWidth, 0f, 0f, 0f, limbHeight, 0f, 0f, 0f, limbLength));
         }
 
         // Apply yaw pitch roll rotation
@@ -808,7 +775,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         Block limb = createLimb(block, contactPt, normal);
 
-
         //Add new limb to alien and instantiate
         block.addLimb(limb);
 
@@ -823,13 +789,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public boolean resetTraining() {
-        if (this.trainer == null || !this.trainer.getIsRunning())
-        {
+        if (this.trainer == null || !this.trainer.getIsRunning()) {
             savedAlien.alienChanged();
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
@@ -978,7 +941,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (currentAlienNode == null) {
             instantiateAlien(alien, Vector3f.ZERO);
         }
-        
+
         AlienBrain tmpBrain = new BasicAlienBrain();
         this.savedAlien.inputCount = tmpBrain.getInputCount(currentAlienNode);
         this.savedAlien.outputCount = tmpBrain.getOutputCount(currentAlienNode);
