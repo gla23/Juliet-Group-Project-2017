@@ -102,6 +102,8 @@ public class AlienHelper {
                 break;
             case "Sphere":
                 mesh = new Sphere(40, 40, 1f);
+                Matrix3f rotationForShapeTransform = new Matrix3f(width, 0f, 0f, 0f, height, 0f, 0f, 0f, length);
+                transformMesh(rotationForShapeTransform, Matrix3f.IDENTITY, moveOriginOfRotation, mesh);
                 break;
             default:
                 mesh = new Box(width, height, length);
