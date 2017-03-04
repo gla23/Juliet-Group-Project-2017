@@ -983,9 +983,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (currentAlienNode == null) {
             instantiateAlien(alien, Vector3f.ZERO);
         }
-
-        this.savedAlien.inputCount = currentAlienNode.joints.size() + 1;
-        this.savedAlien.outputCount = currentAlienNode.joints.size();
+        
+        AlienBrain tmpBrain = new BasicAlienBrain();
+        this.savedAlien.inputCount = tmpBrain.getInputCount(currentAlienNode);
+        this.savedAlien.outputCount = tmpBrain.getOutputCount(currentAlienNode);
 
         while (this.slaves.size() < SIM_COUNT) {
             Alien alienToTrain = (Alien) ObjectCloner.deepCopy(alien);
@@ -1182,11 +1183,15 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         this.currentAlienNode = instantiateAlien(this.alien, this.startLocation);
         setChaseCam(currentAlienNode);
         MLRegression nn = (MLRegression) ObjectCloner.deepCopy(data.getToEvaluate());
+        AlienBrain b;
         if (this.isFixedTimeStep) {
-            this.currentAlienNode.addControl(new BasicAlienBrain(nn, physics.getPhysicsSpace().getAccuracy(), physics.getSpeed(), this.fixedTimeStep));
+            b = new BasicAlienBrain(physics.getPhysicsSpace().getAccuracy(), physics.getSpeed(), this.fixedTimeStep);
+            b.setNN(nn);
         } else {
-            this.currentAlienNode.addControl(new BasicAlienBrain(nn, physics.getPhysicsSpace().getAccuracy(), physics.getSpeed()));
+            b = new BasicAlienBrain(physics.getPhysicsSpace().getAccuracy(), physics.getSpeed());
+            b.setNN(nn);
         }
+        this.currentAlienNode.addControl(b);
         this.simInProgress = true;
     }
 

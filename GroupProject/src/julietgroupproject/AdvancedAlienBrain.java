@@ -12,25 +12,25 @@ import static julietgroupproject.AlienBrain.MAX_VELOCITY;
  *
  * @author Sunny
  */
-public class BasicAlienBrain extends AlienBrain {
+public class AdvancedAlienBrain extends AlienBrain {
     
     /**
      * {@inheritDoc}
      */
-    public BasicAlienBrain() {
+    public AdvancedAlienBrain() {
         super();
     }
     
-    public BasicAlienBrain(float _accuracy, float _speed, double _updateInterval) {
+    public AdvancedAlienBrain(float _accuracy, float _speed, double _updateInterval) {
         super(_accuracy,_speed,_updateInterval);
     }
-    public BasicAlienBrain(float _accuracy, float _speed) {
+    public AdvancedAlienBrain(float _accuracy, float _speed) {
         super(_accuracy,_speed);
     }
-    public BasicAlienBrain(float _accuracy, float _speed, float _timeStep, double _updateInterval) {
+    public AdvancedAlienBrain(float _accuracy, float _speed, float _timeStep, double _updateInterval) {
         super(_accuracy,_speed,_timeStep,_updateInterval);
     }
-    public BasicAlienBrain(float _accuracy, float _speed, float _timeStep) {
+    public AdvancedAlienBrain(float _accuracy, float _speed, float _timeStep) {
         super(_accuracy,_speed,_timeStep);
     }
     
@@ -39,21 +39,32 @@ public class BasicAlienBrain extends AlienBrain {
      */
     @Override
     protected void updateInput() {
-        for (int i = 0; i < nnInput.length - 1; i++) { //TODO class to describe input categories
+        for (int i = 0; i < this.alien.joints.size(); i++) { //TODO class to describe input categories
 
             // normalise input to range from 0 to 1
             // Angles are in radians. 0 indicates no
             // rotation, positive and negative values
             // denote clockwise and anticlockwise rotations
             // (PS: I'm not sure about which is which though)
-            double in = ((double) this.alien.joints.get(i).getHingeAngle()) / (2.0 * Math.PI) + 0.5;
+            double in;
+            HingeJoint j = this.alien.joints.get(i);
+            // check hinge limit and linearly map angle values
+            // to doubles in 0.0~1.0
+            if (j.getUpperLimit() < j.getLowerLimit()) {
+                //no limit at all
+                in = ((double) j.getHingeAngle()) / (2.0 * Math.PI) + 0.5;
+            } else {
+                in = ((double) (j.getHingeAngle() - j.getLowerLimit())) / ((double)(j.getUpperLimit() - j.getLowerLimit()));
+            }
+            System.out.println("input value #" + i + ": " + in);
             if (in < 0.0) {
                 in = 0.0;
             }
             if (in > 1.0) {
                 in = 1.0;
             }
-            nnInput[i] = in;
+            nnInput[2 * i] = in;
+            nnInput[2 * i + 1] = (double)j.getBodyA().getAngularVelocity().lengthSquared();
         }
 
         double bearing = this.alien.geometries.get(0).getControl(RigidBodyControl.class).getPhysicsRotation().toAngles(null)[2];
