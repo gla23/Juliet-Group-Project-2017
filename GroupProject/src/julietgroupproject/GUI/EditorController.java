@@ -55,10 +55,12 @@ public class EditorController implements ScreenController {
         this.screen = screen;
         
         addValues();
+        app.setArrow(true);
     }
 
     public void newBody() {
         app.createNewBody();
+        tabs.setSelectedTab(addLimb);
     }
 
     public void hideEditor() {
@@ -89,8 +91,6 @@ public class EditorController implements ScreenController {
         limbShapeSelect.addItem("Cylinder");
         limbShapeSelect.addItem("Torus");
         limbShapeSelect.selectItemByIndex(0);
-        
-        //TODO determine correct tab
     }
 
     public void resetTraining() {
@@ -416,6 +416,14 @@ public class EditorController implements ScreenController {
     @Override
     public void onStartScreen() {
         app.addKeyBindings();
+        if (app.savedAlien.body == null)
+        {
+            tabs.setSelectedTab(addBody);
+        }
+        else
+        {
+            tabs.setSelectedTab(addLimb);
+        }
     }
 
     @Override
@@ -429,21 +437,5 @@ public class EditorController implements ScreenController {
         nifty.gotoScreen("name_dialog");
 
         tabs.setSelectedTab(addBody);
-    }
-    
-    public void setSelectedTab(String tab)
-    {
-        switch(tab)
-        {
-            case "addBody":
-                tabs.setSelectedTab(addBody);
-                break;
-            case "addLimb":
-                tabs.setSelectedTab(addLimb);
-                break;
-            default:
-                tabs.setSelectedTab(addBody);
-                break;
-        }
     }
 }

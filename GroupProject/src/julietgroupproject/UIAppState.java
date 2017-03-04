@@ -41,6 +41,8 @@ import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.controls.CheckBox;
 import de.lessvoid.nifty.controls.Label;
 import de.lessvoid.nifty.controls.ListBox;
+import de.lessvoid.nifty.controls.Tab;
+import de.lessvoid.nifty.controls.TabGroup;
 import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.ImageRenderer;
 import de.lessvoid.nifty.render.NiftyImage;
@@ -71,7 +73,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     float minSphereDimension = 0.4f;
     public SavedAlien savedAlien;
     private Nifty nifty;
-    private boolean wireMesh = true;
+    private boolean wireMesh = false;
     private ChaseCamera chaseCam;
     private float horizontalAngle = 0;
     private float verticalAngle = 0;
@@ -274,9 +276,17 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         physics.getPhysicsSpace().setGravity(new Vector3f(0, -newGrav, 0));
         restartAlien();
     }
-
+    
+    /**
+     * Called when user press New Alien or ? TODO
+     */
     public void resetAlien() {
+        
         reset();
+        String oldName = this.savedAlien.getName();
+        this.savedAlien = new SavedAlien();
+        this.savedAlien.setName(oldName);
+        this.savedAlien.alienChanged();
     }
 
     public void toggleSmoothCamera() {
@@ -432,7 +442,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     private void updateGhostBody() {
-        boolean actuallyEditing = nifty.getCurrentScreen().getScreenId().equals("editor");
+        boolean actuallyEditing = nifty.getCurrentScreen().getScreenId().equals("editor") || nifty.getCurrentScreen().getScreenId().equals("hidden");
 
         if (ghostBody != null && (this.currentAlienNode != null || !actuallyEditing)) {
             this.physics.getPhysicsSpace().remove(this.ghostBody.getControl(GhostControl.class));
@@ -699,6 +709,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (block != null) {
             if (block == alien.rootBlock) {
                 resetAlien();
+                nifty.getScreen("editor").findNiftyControl("limb_body_tabs", TabGroup.class).setSelectedTab(
+                        nifty.getScreen("editor").findNiftyControl("add_body_tab", Tab.class));
             } else {
                 alien.rootBlock.removeDescendantBlock(block);
                 restartAlien();
@@ -823,9 +835,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     public boolean loadAlien(String name) {
         SavedAlien a = AlienHelper.readAlien(name);
         if (a != null && a.body != null) {
+            resetAlien();
             alien = a.body;
             this.savedAlien = a;
-            resetAlien();
             instantiateAlien(alien, startLocation);
             setChaseCam(this.currentAlienNode);
             setupKeys(this.currentAlienNode);
@@ -1006,7 +1018,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         showOffRequest = -1;
         this.stopSimulation();
 
-        resetAlien();
+        reset();
 
         instantiateAlien(alien, startLocation);
         setChaseCam(this.currentAlienNode);

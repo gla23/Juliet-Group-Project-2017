@@ -243,7 +243,7 @@ public class AlienHelper {
      * @return true iff the save was sucessful
      */
     public static boolean writeAlien(SavedAlien alien) {
-        if (alien == null) {
+        if (alien == null || alien.body == null) {
             return false;
         }
 
