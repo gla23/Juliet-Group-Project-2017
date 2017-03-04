@@ -39,7 +39,7 @@ public class BasicAlienBrain extends AlienBrain {
      */
     @Override
     protected void updateInput() {
-        for (int i = 0; i < nnInput.length - 1; i++) { //TODO class to describe input categories
+        for (int i = 0; i < this.alien.joints.size(); i++) { //TODO class to describe input categories
 
             // normalise input to range from 0 to 1
             // Angles are in radians. 0 indicates no
@@ -84,7 +84,7 @@ public class BasicAlienBrain extends AlienBrain {
 
     @Override
     public int getInputCount(AlienNode a) {
-        return a.joints.size() * 2 + 1;
+        return a.joints.size() + 1;
     }
 
     @Override
