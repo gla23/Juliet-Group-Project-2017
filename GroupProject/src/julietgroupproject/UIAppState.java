@@ -1234,7 +1234,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         setNiftyField("limbStrength", 1.0f);
         setNiftyField("limbSeparation", 0.5f);
         setNiftyField("symmetric", false);
-        setNiftyField("jointRestrictionCheckBox", false);
+        setNiftyField("jointRestrictionCheckBox", true);
         setNiftyField("minHingeJoint", 0.785398f);
         setNiftyField("maxHingeJoint", 0.785398f);
         setNiftyField("limbYaw", 0.0f);
