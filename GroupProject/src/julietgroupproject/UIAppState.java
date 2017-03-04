@@ -828,8 +828,15 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public boolean resetTraining() {
-        savedAlien.alienChanged();
-        return true;
+        if (this.trainer == null || !this.trainer.getIsRunning())
+        {
+            savedAlien.alienChanged();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public boolean loadAlien(String name) {
@@ -962,8 +969,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public boolean beginTraining() {
-        if (alien == null || alien.rootBlock.getConnectedLimbs().size() == 0) {
-            return false;
+        if (alien == null || alien.rootBlock.getConnectedLimbs().size() == 0 || (this.trainer != null && this.trainer.getIsRunning())) {
+            return false; //TODO edit error message for case where training still going on in background.
         }
         nifty.getScreen("simulation").findNiftyControl("simulation_logger", ListBox.class).clear();
 
@@ -1278,7 +1285,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                         setAlienMessage("Running best generation so far"); //shouldn't be run
                     } else {
                         if (trainer != null) {
-                            s = new SimulationData(trainer.getBestSoFar(), AlienEvaluator.simTime);
+                            s = new SimulationData(AlienTrainer.getBestSoFar(this.savedAlien.train), AlienEvaluator.simTime);
                             setAlienMessage("Running initial generation");
                         }
                     }

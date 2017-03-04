@@ -306,7 +306,7 @@
                      <panel height = "100%" width = "100%" childLayout = "vertical" >
                        <panel id = "training_reset_fail_panel_info" height = "75%" childLayout = "vertical" >
                            <control name="label" valign = "center" id = "load_info_label" width = "100%" text="Unable to reset the alien's training."  />
-                           <control name="label" valign = "center" id = "load_info_label_2" width = "100%" text="Has it been trained before?"  />
+                           <control name="label" valign = "center" id = "load_info_label_2" width = "100%" text="Background training still in progress."  />
                         </panel>
                         <panel id = "return_training_reset_fail_panel" childLayout = "center"  valign = "center" height = "25%" width = "100%">
                             <control name ="button" label="OK"  width = "33%" id = "returnToEditor" visibleToMouse="true">
@@ -318,8 +318,8 @@
             </panel>
         </layer>
     </screen>
-   
-    <screen id="training_reset_success" controller="julietgroupproject.GUI.MessageController">
+	
+	<screen id="training_reset_success" controller="julietgroupproject.GUI.MessageController">
      <layer id="foreground" backgroundColor = "#33333333" childLayout="center">
             <panel id="training_reset_success_panel" childLayout="horizontal">
                 <effect>
