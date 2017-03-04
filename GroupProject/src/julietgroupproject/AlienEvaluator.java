@@ -13,7 +13,7 @@ import org.encog.ml.MLRegression;
  */
 public class AlienEvaluator implements CalculateScore, Serializable {
 
-    private Queue<SimulationData> simTasks;    //queue shared with simulators to make requests for neural networks to be evaluated.
+    private transient Queue<SimulationData> simTasks;    //queue shared with simulators to make requests for neural networks to be evaluated.
     public final static double simTime = 20.0; //time for which all simulations are to be run, in in-engine seconds.
 
     private static final long serialVersionUID = 1L;
