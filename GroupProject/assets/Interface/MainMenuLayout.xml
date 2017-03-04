@@ -442,7 +442,7 @@
                                                 <control id="limb_shape_selector" name="dropDown" />
                                                 <panel id = "rect_options"  childLayout = "vertical" >
                                                     <!-- vertical -->
-                                                    <panel id = "space_taker" height = "1.5%"/>
+                                                    <panel id = "space_taker_1" height = "1.5%"/>
 
                                                     <control name="label" id = "first_label" height = "2.5%" text="Select  Length:" />
                                                     <control id="limbWidthSlider" name="horizontalSlider" initial = "1.8" width="100%" min = "0.3" max = "5.0" stepSize = "0.1" buttonStepSize = "0.5"/>
@@ -486,7 +486,7 @@
                                                         </panel>
                                                     </panel>
 
-                                                    <panel id = "space_taker" height = "5%"/>
+                                                    <panel id = "space_taker_2" height = "5%"/>
                                                     <control name="label" id = "advanced_label" height = "4.5%" text="      Advanced Options      " >
                                                         <effect>
                                                             <onActive name="changeFont" font = "Interface/Fonts/ArialBold.fnt"/>
@@ -498,7 +498,7 @@
                                                         <control id="jointRestrictionCheckBox" align="center" valign = "center" name="checkbox" checked="true" />
                                                     </panel>
 
-                                                    <control name="label" id="space_taker" height = "4.5%" text=""/>
+                                                    <control name="label" id="space_taker_3" height = "4.5%" text=""/>
 
                                                     <control name="label" id = "minHinge_label" height = "2%" text="Negative limit:" />
                                                     <control id="minHingeSlider" name="horizontalSlider" initial = "0.785398" width="100%" min = "0.0" max = "1.570796" stepSize = "0.261799" buttonStepSize = "0.261799"/>
@@ -509,7 +509,7 @@
                                                     <control id="maxHingeSlider" name="horizontalSlider" initial = "0.785398" width="100%" min = "0.0" max = "1.570796" stepSize = "0.261799" buttonStepSize = "0.261799"/>
                                                     <control name="label" id = "max_limit_label" height = "2%" text="   0                            pi/2   " />
 
-                                                    <panel id = "space_taker" height = "1.5%"/>
+                                                    <panel id = "space_taker_4" height = "1.5%"/>
 
                                                     <control name="label" id = "eigth_label" height = "2.2%" text="Yaw:" />
                                                     <control id="yawSlider" name="horizontalSlider" initial = "0.0" width="100%" min = "-1.571" max = "1.571" stepSize = "0.2" buttonStepSize = "0.5"/>
@@ -538,7 +538,7 @@
                                     </control>
                                     back 2 or 3 rows-->
                                 </panel>
-                                <panel id = "space_taker" height = "5%"/>
+                                <panel id = "space_taker_5" height = "5%"/>
                                 <!--<control name ="button" label="Attach Limb" height = "5%" align = "center" width = "80%" id = "attach_limb_button" visibleToMouse="true">
                                     <interact onRelease="attachLimb()"/>
                                 </control>-->
