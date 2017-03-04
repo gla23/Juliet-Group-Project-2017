@@ -219,6 +219,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         ((DesktopAssetManager) assetManager).addToCache(graph, graphTex);
         NiftyImage newGraph = nifty.getRenderEngine().createImage(nifty.getScreen("simulation"), newTempTextureName, false);
         element.getRenderer(ImageRenderer.class).setImage(newGraph);
+        newGraph.dispose();
         //updateGraph();
         numLogEntries = log.size();
     }
