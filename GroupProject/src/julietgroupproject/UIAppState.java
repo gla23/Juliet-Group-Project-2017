@@ -340,7 +340,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         // currentHingeAxis Will be either "X", "Y", "Z" or "A" for auto
 
 
-        Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeparation));
+        //Vector3f newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeparation));
+        Vector3f newPos = contactPt.add(normal.mult(limbWidth+ limbSeparation));
 
         //Build the new limb
         Matrix3f rotation = new Matrix3f();
@@ -715,11 +716,15 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         //TODO fix this so that is gets the actual distance, and also make that distance correct when it is rotated
         Vector3f newHingePos;
         Vector3f newPos;
-        if (currentShape.equals("Cylinder")) {
+        newPos = contactPt.add(normal.mult(limbWidth + limbSeparation));
+        /*
+        if (currentShape.equals("Cylinder")||currentShape.equals("Box")) {
             newPos = contactPt.add(normal.mult(limbWidth + limbSeparation));
         } else {
             newPos = contactPt.add(normal.mult(Math.max(Math.max(limbLength, limbHeight), limbWidth) + limbSeparation));
         }
+        * */
+        
         //Vector3f 
         newHingePos = contactPt.add(normal.mult(4 * jointPositionFraction));
         // Work out which hinge axis would make sense for auto hinge axis
