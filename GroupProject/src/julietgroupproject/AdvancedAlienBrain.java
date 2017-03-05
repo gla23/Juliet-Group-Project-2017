@@ -64,7 +64,7 @@ public class AdvancedAlienBrain extends AlienBrain {
                 in = 1.0;
             }
             nnInput[2 * i] = in;
-            nnInput[2 * i + 1] = (double)j.getBodyA().getAngularVelocity().lengthSquared();
+            nnInput[2 * i + 1] = (double)j.getBodyB().getAngularVelocity().lengthSquared();
         }
         
         // orientation input
