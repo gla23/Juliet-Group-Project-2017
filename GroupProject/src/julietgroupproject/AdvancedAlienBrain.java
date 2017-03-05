@@ -11,6 +11,7 @@ import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.joints.HingeJoint;
 import com.jme3.bullet.joints.PhysicsJoint;
 import com.jme3.math.FastMath;
+import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 import java.util.ArrayList;
@@ -114,9 +115,9 @@ public class AdvancedAlienBrain extends AlienBrain implements PhysicsCollisionLi
             // to doubles in 0.0~1.0
             if (j.getUpperLimit() < j.getLowerLimit()) {
                 //no limit at all
-                in = ((double) j.getHingeAngle()) / (2.0 * Math.PI) + 0.5;
+                in = AlienHelper.normalise(j.getHingeAngle(),-Math.PI,Math.PI);
             } else {
-                in = ((double) (j.getHingeAngle() - j.getLowerLimit())) / ((double) (j.getUpperLimit() - j.getLowerLimit()));
+                in = AlienHelper.normalise(j.getHingeAngle(),j.getLowerLimit(),j.getUpperLimit());
             }
             if (in < 0.0) {
                 in = 0.0;
@@ -124,10 +125,9 @@ public class AdvancedAlienBrain extends AlienBrain implements PhysicsCollisionLi
             if (in > 1.0) {
                 in = 1.0;
             }
-            nnInput[2 * i] = in;
-            nnInput[2 * i + 1] = (double) j.getBodyB().getAngularVelocity().lengthSquared();
+            nnInput[i] = in;
         }
-        final int inputPivot = this.alien.joints.size() * 2;
+        final int inputPivot = this.alien.joints.size();
         for (int i = 0; i < this.leafLimbs.size(); ++i) {
             //if(this.isColliding[i]) System.out.println("Collision on " + i);
             nnInput[inputPivot + i] = (this.isColliding[i]) ? 1.0 : 0.0;
@@ -162,7 +162,7 @@ public class AdvancedAlienBrain extends AlienBrain implements PhysicsCollisionLi
 
     @Override
     public int getInputCount(AlienNode a) {
-        return a.joints.size() * 2 + 4 + countLeafLimbs(a);
+        return a.joints.size() + 3 + 1 + countLeafLimbs(a);
     }
 
     @Override
