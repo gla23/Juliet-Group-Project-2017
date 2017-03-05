@@ -72,10 +72,10 @@ public class TrainingAppState extends SimulatorAppState {
         AlienBrain brain;
         MLRegression nn = (MLRegression) ObjectCloner.deepCopy(data.getToEvaluate());
         if (isFixedTimeStep) {
-            brain = new BasicAlienBrain(this.physics.getPhysicsSpace().getAccuracy(), this.physics.getSpeed(), this.fixedTimeStep);
+            brain = new AdvancedAlienBrain(this.physics.getPhysicsSpace().getAccuracy(), this.physics.getSpeed(), this.fixedTimeStep);
             brain.setNN(nn);
         } else {
-            brain = new BasicAlienBrain(this.physics.getPhysicsSpace().getAccuracy(), this.physics.getSpeed());
+            brain = new AdvancedAlienBrain(this.physics.getPhysicsSpace().getAccuracy(), this.physics.getSpeed());
             brain.setNN(nn);
         }
         this.currentAlienNode.addControl(brain);

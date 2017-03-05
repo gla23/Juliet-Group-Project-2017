@@ -943,7 +943,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             instantiateAlien(alien, Vector3f.ZERO);
         }
 
-        AlienBrain tmpBrain = new BasicAlienBrain();
+        AlienBrain tmpBrain = new AdvancedAlienBrain();
         this.savedAlien.inputCount = tmpBrain.getInputCount(currentAlienNode);
         this.savedAlien.outputCount = tmpBrain.getOutputCount(currentAlienNode);
 
@@ -1144,10 +1144,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         MLRegression nn = (MLRegression) ObjectCloner.deepCopy(data.getToEvaluate());
         AlienBrain b;
         if (this.isFixedTimeStep) {
-            b = new BasicAlienBrain(physics.getPhysicsSpace().getAccuracy(), physics.getSpeed(), this.fixedTimeStep);
+            b = new AdvancedAlienBrain(physics.getPhysicsSpace().getAccuracy(), physics.getSpeed(), this.fixedTimeStep);
             b.setNN(nn);
         } else {
-            b = new BasicAlienBrain(physics.getPhysicsSpace().getAccuracy(), physics.getSpeed());
+            b = new AdvancedAlienBrain(physics.getPhysicsSpace().getAccuracy(), physics.getSpeed());
             b.setNN(nn);
         }
         this.currentAlienNode.addControl(b);
