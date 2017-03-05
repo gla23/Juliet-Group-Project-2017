@@ -129,6 +129,7 @@ public class AdvancedAlienBrain extends AlienBrain implements PhysicsCollisionLi
         }
         final int inputPivot = this.alien.joints.size() * 2;
         for (int i = 0; i < this.leafLimbs.size(); ++i) {
+            //if(this.isColliding[i]) System.out.println("Collision on " + i);
             nnInput[inputPivot + i] = (this.isColliding[i]) ? 1.0 : 0.0;
         }
 
@@ -168,6 +169,14 @@ public class AdvancedAlienBrain extends AlienBrain implements PhysicsCollisionLi
     public int getOutputCount(AlienNode a) {
         return a.joints.size();
     }
+    
+    @Override
+    protected void controlUpdate(float tpf) {
+        super.controlUpdate(tpf);
+        for (int i=0;i<this.isColliding.length;++i) {
+            isColliding[i] = false;
+        }
+    }
 
     @Override
     public void collision(PhysicsCollisionEvent pce) {
@@ -176,10 +185,7 @@ public class AdvancedAlienBrain extends AlienBrain implements PhysicsCollisionLi
             if (pce.getNodeA() == limb || pce.getNodeB() == limb) {
                 //System.out.println("Collision!");
                 this.isColliding[i] = true;
-            } else {
-                this.isColliding[i] = false;
             }
-
         }
     }
 }
