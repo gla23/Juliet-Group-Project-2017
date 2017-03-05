@@ -63,12 +63,6 @@ public class AdvancedAlienBrain extends AlienBrain{
             } else {
                 in = AlienHelper.normalise(j.getHingeAngle(),j.getLowerLimit(),j.getUpperLimit());
             }
-            if (in < 0.0) {
-                in = 0.0;
-            }
-            if (in > 1.0) {
-                in = 1.0;
-            }
             nnInput[i] = in;
         }
 
