@@ -48,14 +48,12 @@ public abstract class AlienBrain extends AbstractControl implements Serializable
     public double getUpdateInterval() {
         return this.updateInterval;
     }
-    
+
     /**
-     * Default contructor, used for computing NN parameters, e,g,
-     * input count.
+     * Default contructor, used for computing NN parameters, e,g, input count.
      */
-    
     public AlienBrain() {
-        this(1f/60f, 1.0f, 1.0);
+        this(1f / 60f, 1.0f, 1.0);
     }
 
     /**
@@ -134,16 +132,18 @@ public abstract class AlienBrain extends AbstractControl implements Serializable
         super.setSpatial(spatial);
 
         // initialise nn input arrays and MLData references
-        if (spatial != null && spatial instanceof AlienNode) {
-            this.alien = (AlienNode) spatial;
-            nnInput = new double[getInputCount()];
-            in = new BasicMLData(getInputCount());
-            out = new BasicMLData(getOutputCount());
-        } else {
-            throw new UnsupportedOperationException("Can only add an instantiated "
-                    + "AlienBrain to an AlienNode.");
+        if (spatial != null) {
+            if (spatial instanceof AlienNode) {
+                this.alien = (AlienNode) spatial;
+                nnInput = new double[getInputCount()];
+                in = new BasicMLData(getInputCount());
+                out = new BasicMLData(getOutputCount());
+            } else {
+                throw new UnsupportedOperationException("Can only add an instantiated "
+                        + "AlienBrain to an AlienNode.");
+            }
+            this.tick = 0;
         }
-        this.tick = 0;
     }
 
     /**

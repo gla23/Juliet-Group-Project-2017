@@ -292,4 +292,26 @@ public class AlienHelper {
         //indicate failure
         return false;
     }
+    
+    /**
+     * Normalise input to range 0.0-1.0.
+     * @param in input value
+     * @param min minimum value
+     * @param max maximum value
+     * @return normalised input
+     */
+    public static double normalise(double in, double min, double max) {
+        return (in - min) / (max - min);
+    }
+    
+    /**
+     * Denormalise output from domain 0.0-1.0 to a given range.
+     * @param out normalised output value
+     * @param min minimum value
+     * @param max maximum value
+     * @return denormalised output
+     */
+    public static double denormalise(double out, double min, double max) {
+        return out * (max - min) + min;
+    }
 }
