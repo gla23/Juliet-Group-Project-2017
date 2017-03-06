@@ -108,7 +108,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private volatile int textureNo = 1;
     private Block blockGhostingOn = null;
     private CollisionListener collisionListener = null;
-
     // nifty fields:
     private Map<String, String> niftyStringFields = new HashMap<>();
     private Map<String, Float> niftyFloatFields = new HashMap<>();
@@ -359,7 +358,6 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
     }
 
-
     private void resetCollisionChecking() {
         if (collisionListener == null) {
             collisionListener = new CollisionListener(floorGeometry.getControl(RigidBodyControl.class).getPhysicsSpace());
@@ -395,10 +393,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     public Geometry addAdditionGhostLimb(Block block, Vector3f contactPt, Vector3f normal, boolean symmetricLimb) {
 
-		resetCollisionChecking();
-    
+        resetCollisionChecking();
+
         Block limb = createLimb(block, contactPt, normal, symmetricLimb);
-        
+
         Geometry gl = AlienHelper.assembleBlock(limb, limb.getPosition().add(AlienHelper.getGeometryLocation(block.getGeometry())));
         Matrix3f rotation = new Matrix3f();
         rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
@@ -431,7 +429,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             }
         }
         blockGhostingOn = null;
-        
+
         resetCollisionChecking();
     }
 
@@ -567,27 +565,29 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                             Vector3f pt = colpt.add(geo.getWorldTranslation().negate());
                             Vector3f norm = collision.getContactNormal();
 
-                            if (block != blockGhostingOn)
-                            {
+                            if (block != blockGhostingOn) {
                                 removeAdditionGhostLimbs(additionGhostRoot);
                                 ghostLimb = null;
                                 ghostLimbSymmetric = null;
                                 blockGhostingOn = block;
                             }
-                            
+
                             ghostLimb = placeGhostLimb(ghostLimb, block, pt, norm, false);
 
                             if (getNiftyBoolean("symmetric")) {
-                                    block.rotation.invert().multLocal(norm);
-                            block.rotation.invert().multLocal(pt);
-                            //norm.negateLocal(); //Centrosymmetric
-                            norm.subtractLocal(norm.project(Vector3f.UNIT_Z).mult(2.0f));
-                            block.rotation.multLocal(norm);
-                            //pt.negateLocal(); //Centrosymmetric
-                            pt.subtractLocal(pt.project(Vector3f.UNIT_Z).mult(2.0f));
-                            block.rotation.multLocal(pt);
+                                block.rotation.invert().multLocal(norm);
+                                block.rotation.invert().multLocal(pt);
+                                //norm.negateLocal(); //Centrosymmetric
+                                norm.subtractLocal(norm.project(Vector3f.UNIT_Z).mult(2.0f));
+                                block.rotation.multLocal(norm);
+                                //pt.negateLocal(); //Centrosymmetric
+                                pt.subtractLocal(pt.project(Vector3f.UNIT_Z).mult(2.0f));
+                                block.rotation.multLocal(pt);
+
+                                if (AlienHelper.approxEqual(block.rotationForYRP, Matrix3f.IDENTITY)) {
                                     ghostLimbSymmetric = placeGhostLimb(ghostLimbSymmetric, block, pt, norm, true);
-                                
+                                }
+
                             }
                         }
                     }
@@ -602,7 +602,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             }
             this.isCollisionOccuring = ghostCollisionCheck(ghostLimb)
                     | ghostCollisionCheck(ghostLimbSymmetric);
-            
+
             resetCollisionChecking();
 
         } else {
@@ -1125,13 +1125,13 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                             norm.subtractLocal(norm.project(Vector3f.UNIT_Z).mult(2.0f));
                             //pt.negateLocal(); //Centrosymmetric
                             pt.subtractLocal(pt.project(Vector3f.UNIT_Z).mult(2.0f));
-                            
+
                             block.rotation.multLocal(norm);
                             block.rotation.multLocal(pt);
-                            
-                            //if (AlienHelper.approxEqual(block.rotationForYRP, Matrix3f.IDENTITY)) {
+
+                            if (AlienHelper.approxEqual(block.rotationForYRP, Matrix3f.IDENTITY)) {
                                 addLimb(block, pt, norm, true);
-                            //}
+                            }
                         }
                     } else { // delete limb
 
