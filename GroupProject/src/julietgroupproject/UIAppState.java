@@ -106,6 +106,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private volatile boolean forceReset = false;
     private float bestSoFar = Float.NEGATIVE_INFINITY;
     private volatile int textureNo = 1;
+    private Block blockGhostingOn = null;
     // nifty fields:
     private Map<String, String> niftyStringFields = new HashMap<>();
     private Map<String, Float> niftyFloatFields = new HashMap<>();
@@ -417,6 +418,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 ghost.removeFromParent();
             }
         }
+        blockGhostingOn = null;
     }
 
     public void removeRemovalGhostLimbs(Node ghostRoot) {
@@ -551,10 +553,20 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                             Vector3f pt = colpt.add(geo.getWorldTranslation().negate());
                             Vector3f norm = collision.getContactNormal();
 
+                            if (block != blockGhostingOn)
+                            {
+                                removeAdditionGhostLimbs(additionGhostRoot);
+                                ghostLimb = null;
+                                ghostLimbSymmetric = null;
+                                blockGhostingOn = block;
+                            }
+                            
                             ghostLimb = placeGhostLimb(ghostLimb, block, pt, norm, false);
 
                             if (getNiftyBoolean("symmetric")) {
-                                ghostLimbSymmetric = placeGhostLimb(ghostLimbSymmetric, block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)), norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)), true);
+                                if (AlienHelper.approxEqual(block.rotationForYRP, Matrix3f.IDENTITY)) {
+                                    ghostLimbSymmetric = placeGhostLimb(ghostLimbSymmetric, block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)), norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)), true);
+                                }
                             }
                         }
                     }
@@ -565,6 +577,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 removeAdditionGhostLimbs(additionGhostRoot);
                 ghostLimb = null;
                 ghostLimbSymmetric = null;
+                blockGhostingOn = null;
             }
             this.isCollisionOccuring = ghostCollisionCheck(ghostLimb)
                     | ghostCollisionCheck(ghostLimbSymmetric);
@@ -574,6 +587,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             removeAdditionGhostLimbs(additionGhostRoot);
             ghostLimb = null;
             ghostLimbSymmetric = null;
+            blockGhostingOn = null;
         }
     }
 
@@ -740,8 +754,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         // Apply yaw pitch roll rotation
         float[] angles = new float[3];
-        angles[0] = symmetricLimb? - yaw : yaw;
-        angles[1] = symmetricLimb? - roll : roll;
+        angles[0] = symmetricLimb ? -yaw : yaw;
+        angles[1] = symmetricLimb ? -roll : roll;
         angles[2] = pitch;
         Matrix3f rotationForYRP = new Quaternion(angles).toRotationMatrix();
 
@@ -1081,7 +1095,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                         addLimb(block, pt, norm, false);
 
                         if (getNiftyBoolean("symmetric")) {
-                            addLimb(block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)), norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)), true);
+                            if (AlienHelper.approxEqual(block.rotationForYRP, Matrix3f.IDENTITY)) {
+                                addLimb(block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)), norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)), true);
+                            }
                         }
                     } else { // delete limb
 
