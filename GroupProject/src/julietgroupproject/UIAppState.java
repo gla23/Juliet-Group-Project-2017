@@ -578,9 +578,16 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                             ghostLimb = placeGhostLimb(ghostLimb, block, pt, norm, false);
 
                             if (getNiftyBoolean("symmetric")) {
-                                if (AlienHelper.approxEqual(block.rotationForYRP, Matrix3f.IDENTITY)) {
-                                    ghostLimbSymmetric = placeGhostLimb(ghostLimbSymmetric, block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)), norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)), true);
-                                }
+                                    block.rotation.invert().multLocal(norm);
+                            block.rotation.invert().multLocal(pt);
+                            //norm.negateLocal(); //Centrosymmetric
+                            norm.subtractLocal(norm.project(Vector3f.UNIT_Z).mult(2.0f));
+                            block.rotation.multLocal(norm);
+                            //pt.negateLocal(); //Centrosymmetric
+                            pt.subtractLocal(pt.project(Vector3f.UNIT_Z).mult(2.0f));
+                            block.rotation.multLocal(pt);
+                                    ghostLimbSymmetric = placeGhostLimb(ghostLimbSymmetric, block, pt, norm, true);
+                                
                             }
                         }
                     }
@@ -770,11 +777,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
         // Apply yaw pitch roll rotation
         float[] angles = new float[3];
+        //angles[0] = yaw;
+        //angles[1] = roll;
         angles[0] = symmetricLimb ? -yaw : yaw;
         angles[1] = symmetricLimb ? -roll : roll;
         angles[2] = pitch;
         Matrix3f rotationForYRP = new Quaternion(angles).toRotationMatrix();
-
         limb.rotation = rotationForNormal;
         limb.rotationForYRP = rotationForYRP;
         // Stores the normal the limb was created at in the limb for future use
@@ -1111,9 +1119,19 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                         addLimb(block, pt, norm, false);
 
                         if (getNiftyBoolean("symmetric")) {
-                            if (AlienHelper.approxEqual(block.rotationForYRP, Matrix3f.IDENTITY)) {
-                                addLimb(block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)), norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)), true);
-                            }
+                            block.rotation.invert().multLocal(norm);
+                            block.rotation.invert().multLocal(pt);
+                            //norm.negateLocal(); //Centrosymmetric
+                            norm.subtractLocal(norm.project(Vector3f.UNIT_Z).mult(2.0f));
+                            //pt.negateLocal(); //Centrosymmetric
+                            pt.subtractLocal(pt.project(Vector3f.UNIT_Z).mult(2.0f));
+                            
+                            block.rotation.multLocal(norm);
+                            block.rotation.multLocal(pt);
+                            
+                            //if (AlienHelper.approxEqual(block.rotationForYRP, Matrix3f.IDENTITY)) {
+                                addLimb(block, pt, norm, true);
+                            //}
                         }
                     } else { // delete limb
 
