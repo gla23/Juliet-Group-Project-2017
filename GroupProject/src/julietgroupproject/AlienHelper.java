@@ -175,6 +175,24 @@ public class AlienHelper {
         recursivelyAddBlocks(rootBlock, rootBlock, rootBlockGeometry, alienNode);
         return alienNode;
     }
+    
+    public static boolean approxEqual(Matrix3f a, Matrix3f b)
+    {
+        float[] aAsArr = new float[9];
+        float[] bAsArr = new float[9];
+        
+        a.get(aAsArr, true);
+        b.get(bAsArr, true);
+        
+        for (int i = 0; i < 9; ++i)
+        {
+            if ( Math.abs(aAsArr[i] - bAsArr[i]) > .0000001 ) //epsilon recommended by Java documentation.
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public static Mesh transformMesh(Matrix3f rotation, Matrix3f rotationForYPR, Vector3f moveOrigin, Mesh mesh) {
         // Get the buffer from the mesh and put in array of vectors

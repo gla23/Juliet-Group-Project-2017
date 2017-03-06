@@ -371,13 +371,13 @@
                                         <panel id = "panel_new_body_entry_fields" backgroundColour="#33333333" width = "*" height = "90%" childLayout = "vertical" valign ="center">
                                             <control name="label" text="Shape Selector:" height = "12%"/>
                                             <control id="body_shape_selector" name="dropDown"/>
-                                            <control name="label" id = "first_body_label" height = "9%" width = "100%" text="Width:" />
+                                            <control name="label" id = "first_body_label" height = "9%" width = "100%" text="Length:" />
 
                                             <control id="bodyWidthSlider" name="horizontalSlider" initial = "2" width="100%" min = "0.5" max = "5.0" stepSize = "0.1" buttonStepSize = "0.3"/>
 
 
 
-                                            <control name="label" id = "third_body_label"text="Length:" height = "9%" width = "100%" />
+                                            <control name="label" id = "third_body_label"text="Width:" height = "9%" width = "100%" />
                                             <control id="bodyLengthSlider" name="horizontalSlider" initial = "3"  width="100%" min = "0.5" max = "5.0" stepSize = "0.1" buttonStepSize = "0.3"/>
                                             <control name="label" id = "second_body_label" width = "100%"  height = "9%" text="Height:" />
                                             <control id="bodyHeightSlider" name="horizontalSlider" initial = "1"width="100%" min = "0.5" max = "5.0" stepSize = "0.1" buttonStepSize = "0.3"/>

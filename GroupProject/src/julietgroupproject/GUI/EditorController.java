@@ -390,7 +390,7 @@ public class EditorController implements ScreenController {
 
     @NiftyEventSubscriber(id = "yawSlider")
     public void onLimbYawSliderChanged(final String id, final SliderChangedEvent event) {
-        app.setFieldSafe("limbYaw", event.getValue());
+        app.setFieldSafe("limbRoll", event.getValue()); //internal yaw differs from what makes sense to user
     }
 
     @NiftyEventSubscriber(id = "pitchSlider")
@@ -400,7 +400,7 @@ public class EditorController implements ScreenController {
 
     @NiftyEventSubscriber(id = "rollSlider")
     public void onLimbRollSliderChanged(final String id, final SliderChangedEvent event) {
-        app.setFieldSafe("limbRoll", event.getValue());
+        app.setFieldSafe("limbYaw", event.getValue()); //internal roll differs from what makes sense to user
     }
 
     @NiftyEventSubscriber(id = "jointPosSlider")
