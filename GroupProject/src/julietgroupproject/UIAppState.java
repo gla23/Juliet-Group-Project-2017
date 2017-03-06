@@ -106,6 +106,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private volatile boolean forceReset = false;
     private float bestSoFar = Float.NEGATIVE_INFINITY;
     private volatile int textureNo = 1;
+    private CollisionListener collisionListener = null;
     // nifty fields:
     private Map<String, String> niftyStringFields = new HashMap<>();
     private Map<String, Float> niftyFloatFields = new HashMap<>();
@@ -356,6 +357,14 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
     }
 
+    private void resetCollisionChecking() {
+        if (collisionListener == null) {
+            collisionListener = new CollisionListener(floorGeometry.getControl(RigidBodyControl.class).getPhysicsSpace());
+        } else {
+            collisionListener.resetIsColliding();
+        }
+    }
+
     public Geometry placeGhostLimb(Geometry gl, Block block, Vector3f contactPt, Vector3f normal) {
 
         if (gl == null) {
@@ -383,7 +392,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     }
 
     public Geometry addAdditionGhostLimb(Block block, Vector3f contactPt, Vector3f normal) {
-
+       
+        resetCollisionChecking();
+        
         Block limb = createLimb(block, contactPt, normal);
 
         Geometry gl = AlienHelper.assembleBlock(limb, limb.getPosition().add(AlienHelper.getGeometryLocation(block.getGeometry())));
@@ -417,6 +428,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 ghost.removeFromParent();
             }
         }
+        
+        resetCollisionChecking();
     }
 
     public void removeRemovalGhostLimbs(Node ghostRoot) {
@@ -427,7 +440,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (gl != null) {
             GhostControl gc = gl.getControl(GhostControl.class);
             if (gc != null) {
-                if (gc.getOverlappingCount() > 0) {
+                if (collisionListener.getIsColliding()) {
                     gl.setMaterial(redGhostMaterial);
                     return true;
                 } else {
@@ -476,7 +489,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 this.rootNode.attachChild(gb);
                 setChaseCam(this.ghostBody);
             }
-            if (ghostBody.getControl(GhostControl.class).getOverlappingCount() < 1) {
+            if (!collisionListener.getIsColliding()) {
                 ghostBody.setMaterial(m);
             } else {
                 ghostBody.setMaterial(redGhostMaterial);
@@ -575,6 +588,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             }
             this.isCollisionOccuring = ghostCollisionCheck(ghostLimb)
                     | ghostCollisionCheck(ghostLimbSymmetric);
+            
+            resetCollisionChecking();
 
         } else {
             // make sure there is no ghost in simulation
