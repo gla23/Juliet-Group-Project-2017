@@ -319,7 +319,13 @@ public class AlienHelper {
      * @return normalised input
      */
     public static double normalise(double in, double min, double max) {
-        return (in - min) / (max - min);
+        if (in < min) {
+            return 0.0;
+        } else if (in > max) {
+            return 1.0;
+        } else {
+            return (min == max) ? 0.0 : (in - min) / (max - min);
+        }
     }
     
     /**
@@ -330,6 +336,12 @@ public class AlienHelper {
      * @return denormalised output
      */
     public static double denormalise(double out, double min, double max) {
-        return out * (max - min) + min;
+        if (out < 0.0) {
+            return min;
+        } else if (out > 1.0) {
+            return max;
+        } else {
+            return (min == max) ? min : out * (max - min) + min;
+        }
     }
 }

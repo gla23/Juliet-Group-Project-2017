@@ -107,6 +107,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
     private float bestSoFar = Float.NEGATIVE_INFINITY;
     private volatile int textureNo = 1;
     private Block blockGhostingOn = null;
+    private CollisionListener collisionListener = null;
+
     // nifty fields:
     private Map<String, String> niftyStringFields = new HashMap<>();
     private Map<String, Float> niftyFloatFields = new HashMap<>();
@@ -357,8 +359,16 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
     }
 
-    public Geometry placeGhostLimb(Geometry gl, Block block, Vector3f contactPt, Vector3f normal, boolean symmetricLimb) {
 
+    private void resetCollisionChecking() {
+        if (collisionListener == null) {
+            collisionListener = new CollisionListener(floorGeometry.getControl(RigidBodyControl.class).getPhysicsSpace());
+        } else {
+            collisionListener.resetIsColliding();
+        }
+    }
+
+    public Geometry placeGhostLimb(Geometry gl, Block block, Vector3f contactPt, Vector3f normal, boolean symmetricLimb) {
         if (gl == null) {
             gl = addAdditionGhostLimb(block, contactPt, normal, symmetricLimb);
         }
@@ -385,8 +395,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
 
     public Geometry addAdditionGhostLimb(Block block, Vector3f contactPt, Vector3f normal, boolean symmetricLimb) {
 
+		resetCollisionChecking();
+    
         Block limb = createLimb(block, contactPt, normal, symmetricLimb);
-
+        
         Geometry gl = AlienHelper.assembleBlock(limb, limb.getPosition().add(AlienHelper.getGeometryLocation(block.getGeometry())));
         Matrix3f rotation = new Matrix3f();
         rotation.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
@@ -419,6 +431,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             }
         }
         blockGhostingOn = null;
+        
+        resetCollisionChecking();
     }
 
     public void removeRemovalGhostLimbs(Node ghostRoot) {
@@ -429,7 +443,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (gl != null) {
             GhostControl gc = gl.getControl(GhostControl.class);
             if (gc != null) {
-                if (gc.getOverlappingCount() > 0) {
+                if (collisionListener.getIsColliding()) {
                     gl.setMaterial(redGhostMaterial);
                     return true;
                 } else {
@@ -478,7 +492,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                 this.rootNode.attachChild(gb);
                 setChaseCam(this.ghostBody);
             }
-            if (ghostBody.getControl(GhostControl.class).getOverlappingCount() < 1) {
+            if (!collisionListener.getIsColliding()) {
                 ghostBody.setMaterial(m);
             } else {
                 ghostBody.setMaterial(redGhostMaterial);
@@ -581,6 +595,8 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             }
             this.isCollisionOccuring = ghostCollisionCheck(ghostLimb)
                     | ghostCollisionCheck(ghostLimbSymmetric);
+            
+            resetCollisionChecking();
 
         } else {
             // make sure there is no ghost in simulation
@@ -950,7 +966,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             instantiateAlien(alien, Vector3f.ZERO);
         }
 
-        AlienBrain tmpBrain = new BasicAlienBrain();
+        AlienBrain tmpBrain = new AdvancedAlienBrain();
         this.savedAlien.inputCount = tmpBrain.getInputCount(currentAlienNode);
         this.savedAlien.outputCount = tmpBrain.getOutputCount(currentAlienNode);
 
@@ -1145,10 +1161,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         MLRegression nn = (MLRegression) ObjectCloner.deepCopy(data.getToEvaluate());
         AlienBrain b;
         if (this.isFixedTimeStep) {
-            b = new BasicAlienBrain(physics.getPhysicsSpace().getAccuracy(), physics.getSpeed(), this.fixedTimeStep);
+            b = new AdvancedAlienBrain(physics.getPhysicsSpace().getAccuracy(), physics.getSpeed(), this.fixedTimeStep);
             b.setNN(nn);
         } else {
-            b = new BasicAlienBrain(physics.getPhysicsSpace().getAccuracy(), physics.getSpeed());
+            b = new AdvancedAlienBrain(physics.getPhysicsSpace().getAccuracy(), physics.getSpeed());
             b.setNN(nn);
         }
         this.currentAlienNode.addControl(b);
