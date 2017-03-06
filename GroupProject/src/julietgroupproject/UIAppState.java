@@ -356,16 +356,10 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         }
     }
 
-    public Geometry placeGhostLimb(Geometry gl, Block block, Vector3f contactPt, Vector3f normal, boolean symmetric) {
+    public Geometry placeGhostLimb(Geometry gl, Block block, Vector3f contactPt, Vector3f normal, boolean symmetricLimb) {
 
-        if (symmetric)
-        {
-            contactPt = contactPt.subtract(contactPt.project(Vector3f.UNIT_Z).mult(2.0f));
-            normal = normal.subtract(normal.project(Vector3f.UNIT_Z).mult(2.0f));
-        }
-        
         if (gl == null) {
-            gl = addAdditionGhostLimb(block, contactPt, normal, symmetric);
+            gl = addAdditionGhostLimb(block, contactPt, normal, symmetricLimb);
         }
 
         float limbWidth = getNiftyFloat("limbWidth");
@@ -388,17 +382,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         return gl;
     }
 
-    public Geometry addAdditionGhostLimb(Block block, Vector3f contactPt, Vector3f normal, boolean symmetric) {
-        
-        
-        if (symmetric)
-        {
-            contactPt = contactPt.subtract(contactPt.project(Vector3f.UNIT_Z).mult(2.0f));
-            normal = normal.subtract(normal.project(Vector3f.UNIT_Z).mult(2.0f));
-        }
-        
-        Block limb = createLimb(block, contactPt, normal, symmetric);
-        
+    public Geometry addAdditionGhostLimb(Block block, Vector3f contactPt, Vector3f normal, boolean symmetricLimb) {
+
+        Block limb = createLimb(block, contactPt, normal, symmetricLimb);
 
         Geometry gl = AlienHelper.assembleBlock(limb, limb.getPosition().add(AlienHelper.getGeometryLocation(block.getGeometry())));
         Matrix3f rotation = new Matrix3f();
@@ -568,7 +554,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                             ghostLimb = placeGhostLimb(ghostLimb, block, pt, norm, false);
 
                             if (getNiftyBoolean("symmetric")) {
-                                        ghostLimbSymmetric = placeGhostLimb(ghostLimbSymmetric, block, pt, norm, true);
+                                ghostLimbSymmetric = placeGhostLimb(ghostLimbSymmetric, block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)), norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)), true);
                             }
                         }
                     }
@@ -718,27 +704,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         String currentShape = getNiftyString("currentLimbShape");
         String currentHingeAxis = getNiftyString("currentHingeAxis");
 
-        
-        // Calculate yaw pitch roll rotation
-        float[] angles = new float[3];
-        angles[0] = yaw;
-        angles[1] = roll;
-        angles[2] = pitch;
-        Matrix3f rotationForYRP = new Quaternion(angles).toRotationMatrix();
-        
-        if(symmetricLimb)
-        {
-            rotationForYRP = (new Matrix3f(1f,0f,0f,0f,1f,0f,0f,0f,-1f).mult(rotationForYRP)); //if we are symmetric, reflect about z-axis
-        }
-        
-        
-
         //Find hinge and postion vectors given shape and click position
         Vector3f newHingePos;
         Vector3f newPos;
         newPos = contactPt.add(normal.mult(limbWidth + limbSeparation));
         newHingePos = contactPt.add(normal.mult(4 * jointPositionFraction));
-        
+
         // Work out which hinge axis would make sense for auto hinge axis
         String axisToUse = "ZAxis";
         if (currentHingeAxis.equals("A")) {
@@ -767,6 +738,12 @@ public class UIAppState extends DrawingAppState implements ActionListener {
             rotationForNormal.fromStartEndVectors(new Vector3f(1, 0, 0), normal);
         }
 
+        // Apply yaw pitch roll rotation
+        float[] angles = new float[3];
+        angles[0] = symmetricLimb? - yaw : yaw;
+        angles[1] = symmetricLimb? - roll : roll;
+        angles[2] = pitch;
+        Matrix3f rotationForYRP = new Quaternion(angles).toRotationMatrix();
 
         limb.rotation = rotationForNormal;
         limb.rotationForYRP = rotationForYRP;
@@ -789,15 +766,9 @@ public class UIAppState extends DrawingAppState implements ActionListener {
         if (this.currentAlienNode != null) {
             removeAlien(this.currentAlienNode);
         }
-        
-        if (symmetricLimb)
-        {
-            contactPt = contactPt.subtract(contactPt.project(Vector3f.UNIT_Z).mult(2.0f));
-            normal = normal.subtract(normal.project(Vector3f.UNIT_Z).mult(2.0f));
-        }
 
         Block limb = createLimb(block, contactPt, normal, symmetricLimb);
-            
+
         //Add new limb to alien and instantiate
         block.addLimb(limb);
 
@@ -1110,7 +1081,7 @@ public class UIAppState extends DrawingAppState implements ActionListener {
                         addLimb(block, pt, norm, false);
 
                         if (getNiftyBoolean("symmetric")) {
-                            addLimb(block, pt, norm, true);
+                            addLimb(block, pt.subtract(pt.project(Vector3f.UNIT_Z).mult(2.0f)), norm.subtract(norm.project(Vector3f.UNIT_Z).mult(2.0f)), true);
                         }
                     } else { // delete limb
 
