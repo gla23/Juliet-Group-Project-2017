@@ -114,6 +114,8 @@ public class LearnToBeAnAlienCommandLine {
                 AlienEvaluator score = new AlienEvaluator(simulationQueue);
                 //creates the trainer to train this population
                 trainer = NEATUtil.constructNEATTrainer(pop, score);
+                // preserve the trainer in savedAlien
+                savedAlien.train = trainer;
             }
             
             // training
