@@ -90,18 +90,18 @@ public class AlienHelper {
     }
 
     public static Geometry createLimb(String meshShape, float width, float height, float length, Vector3f location, float mass, Matrix3f rotation, Matrix3f rotationForYPR) {
-
+        int shapeAccuracy = 20;
         Mesh mesh;
         Vector3f moveOriginOfRotation = Vector3f.ZERO;
         switch (meshShape) {
             case "Cylinder":
-                mesh = new Cylinder(40, 40, length, 2 * width, true);
+                mesh = new Cylinder(shapeAccuracy, shapeAccuracy, length, 2 * width, true);
                 break;
             case "Torus":
-                mesh = new Torus(40, 40, length, width - length);
+                mesh = new Torus(shapeAccuracy, shapeAccuracy, length, width - length);
                 break;
             case "Sphere":
-                mesh = new Sphere(40, 40, 1f);
+                mesh = new Sphere(shapeAccuracy, shapeAccuracy, 1f);
                 Matrix3f rotationForShapeTransform = new Matrix3f(width, 0f, 0f, 0f, height, 0f, 0f, 0f, length);
                 transformMesh(rotationForShapeTransform, Matrix3f.IDENTITY, moveOriginOfRotation, mesh);
                 break;
