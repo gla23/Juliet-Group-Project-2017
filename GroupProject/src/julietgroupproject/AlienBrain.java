@@ -86,6 +86,7 @@ public abstract class AlienBrain extends AbstractControl implements Serializable
         this.speed = _speed;
         this.timeStep = _timeStep;
         this.updateInterval = _updateInterval;
+        this.tickCycle = (int) (this.updateInterval / (double) this.accuracy);
     }
 
     public AlienBrain(float _accuracy, float _speed, float _timeStep) {
@@ -164,8 +165,7 @@ public abstract class AlienBrain extends AbstractControl implements Serializable
             tpf = this.timeStep;
         }
         tick += (tpf * this.speed / this.accuracy);
-        if (tick >= this.tickCycle) {
-            tick -= this.tickCycle;
+        if (tick % this.tickCycle == 0) {
 
             updateInput();
             this.in.setData(nnInput);
