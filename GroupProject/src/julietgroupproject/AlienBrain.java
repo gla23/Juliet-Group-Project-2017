@@ -33,6 +33,7 @@ public abstract class AlienBrain extends AbstractControl implements Serializable
     private transient final float accuracy;
     private transient float speed;
     private transient int tickCycle;
+    private transient int updateTick = 0;
     protected transient int tick = 0;
     /*
      * The updateInterval is the time (in seconds) between each recalculation of
@@ -86,6 +87,7 @@ public abstract class AlienBrain extends AbstractControl implements Serializable
         this.speed = _speed;
         this.timeStep = _timeStep;
         this.updateInterval = _updateInterval;
+        this.tickCycle = (int) (this.updateInterval / (double) this.accuracy);
     }
 
     public AlienBrain(float _accuracy, float _speed, float _timeStep) {
@@ -143,6 +145,7 @@ public abstract class AlienBrain extends AbstractControl implements Serializable
                         + "AlienBrain to an AlienNode.");
             }
             this.tick = 0;
+            this.updateTick = 0;
         }
     }
 
@@ -163,10 +166,11 @@ public abstract class AlienBrain extends AbstractControl implements Serializable
         if (this.isFixedTimestep) {
             tpf = this.timeStep;
         }
-        tick += (tpf * this.speed / this.accuracy);
-        if (tick >= this.tickCycle) {
-            tick -= this.tickCycle;
-
+        int delta = Math.round(tpf * this.speed / this.accuracy);
+        tick += delta;
+        updateTick += delta;
+        if (updateTick >= this.tickCycle) {
+            updateTick -= this.tickCycle;
             updateInput();
             this.in.setData(nnInput);
             this.out = this.nn.compute(in);
